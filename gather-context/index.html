@@ -1,0 +1,87 @@
+<script type="text/javascript">
+    RED.nodes.registerType("Gather Context", {
+        category: 'AI Intent',
+        color: '#81ecec',
+        icon:"font-awesome/fa-floppy-o",
+        defaults: {
+            name: { value: "" },
+            prompt: { value: "" },
+            context: { value: "" },
+            dataSourceKey: { value: "" },
+        },
+        inputs: 1,
+        outputs: 2,
+        outputLabels:["found context", "failed context"],
+        label: function () {
+            return this.name || "Gather Context";
+        },
+        oneditprepare:function() {
+            $("#node-input-context").typedInput({
+                types: [
+                    {
+                        value: "date",
+                        options: [
+                            { value: "", label: "Select a context" },
+                            { value: "date", label: "Date" },
+                            { value: "duration", label: "Duration" },
+                            { value: "amount", label: "Amount" },
+                        ]
+                    }
+                ]
+            })
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="Gather Context">
+
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-prompt"><i class="fa fa-tag"></i> Prompt</label>
+        <input type="text" id="node-input-prompt" placeholder="prompt">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-dataSourceKey"><i class="fa fa-tag"></i> Datasource Key</label>
+        <input type="text" id="node-input-dataSourceKey">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-context"><i class="fa fa-tag"></i> Context</label>
+        <input type="hidden" id="node-input-context">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="Gather Context">
+    <p>NLP enabled node that will move forward if the given context is found</p>
+    
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt>Prompt
+            <span class="property-type">string</span>
+        </dt>
+        <dd>Text to return if the NLP was unsuccessful finding the specified <code>Context</code></dd>
+
+        <dt>Context
+            <span class="property-type">Date | Duration | Amount</span>
+        </dt>
+        <dd>Uses NLP to find values for dates, durations, and amounts</dd>
+    
+        <dt>DataSourceKey
+            <span class="property-type">string</span>
+        </dt>
+        <dd>The dot notation path in the <code>msg</code> object to the string the NLP should analyze for the given context</dd>
+    
+        <dt class="optional">Path <span class="property-type">string </span></dt>
+        <dd>Only applicable for <code>Save</code>. <b>Path</b> represents the dot notation path in msg object where the data
+            is stored</dd>
+    </dl>
+    
+    <h3>Details</h3>
+    <p>This node will search for all supported context regardless of what is chosen in the <code>Context</code> dropdown.
+    However, based on what is chosen in the dropdown the node will return the prompt string if that selected context is not found.</p>
+</script>

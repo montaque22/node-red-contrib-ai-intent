@@ -1,0 +1,116 @@
+<script type="text/javascript">
+    RED.nodes.registerType("Register Intent", {
+        category: 'AI Intent',
+        color: '#9b59b6',
+        icon:"font-awesome/fa-registered",
+        defaults: {
+            name: { value: "" },
+            intentId: { value: "" },
+            aiDescription: { value: "" },
+            confirmationMessage: { value: "" },
+            requireConfirmation: { value: true },
+            enableConversation: { value: false },
+        },
+        inputs: 0,
+        outputs: 1,
+        label: function () {
+            return this.name || "Register Intent";
+        },
+        oneditprepare:function() {
+                 updateConfirmationMessageVisibility()      
+            $("#node-input-requireConfirmation").on("change",() =>{
+                
+              updateConfirmationMessageVisibility()
+            })
+        }
+    });
+
+    function updateConfirmationMessageVisibility(){
+        if ($("#node-input-requireConfirmation").is(":checked")) {
+            $("#confirmationMessage").slideDown()
+        } else {
+            $("#confirmationMessage").slideUp()
+        }
+    }
+</script>
+
+<script type="text/html" data-template-name="Register Intent">
+
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-intentId"><i class="fa fa-tag"></i> Intent ID</label>
+        <input type="text" id="node-input-intentId" placeholder="Intent ID">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-aiDescription"><i class="fa fa-tag"></i> AI Description</label>
+        <input type="text" id="node-input-aiDescription" placeholder="AI Description">
+    </div>
+
+    <div style="display: flex; justify-content: space-around;">
+        <label for="node-input-requireConfirmation" style="display: flex;">
+            <i class="fa fa-tag"></i>
+            <span style="margin-left: 5px;">Require Confirmation</span>
+            <input style="display: inline-block;margin-left: 1rem;" type="checkbox" id="node-input-requireConfirmation"
+                name="require confirmation"></label>
+
+        <label for="node-input-enableConversation" style="display: flex;">
+            <i class="fa fa-tag"></i>
+            <span style="margin-left: 5px;">Enable Conversation</span>
+            <input style="display: inline-block;margin-left: 1rem;" type="checkbox" id="node-input-enableConversation"
+                name="enable conversation"></label>
+    </div>
+
+    <div class="form-row" id="confirmationMessage">
+        <label for="node-input-confirmationMessage"><i class="fa fa-tag"></i> Confirmation Message</label>
+        <input type="text" id="node-input-confirmationMessage" placeholder="Confirmation Message">
+    </div>
+  
+</script>
+
+<script type="text/html" data-help-name="Register Intent">
+    <p>Temporarily stores data to the global context store</p>
+    
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt>intentId
+            <span class="property-type">string</span>
+        </dt>
+        <dd>This must be a unique id to identify an automation. </dd>
+
+        <dt>aiDescription
+            <span class="property-type">string</span>
+        </dt>
+        <dd>Describe when the and what the automation should be used.</dd>
+    
+        <dt>confirmationMessage
+            <span class="property-type">string</span>
+        </dt>
+        <dd>Message used to verify the intent/automation should run</dd>
+
+        <dt class="optional">requireConfirmation
+            <span class="property-type">boolean</span>
+        </dt>
+        <dd>True indicates the confirmation should be used otherwise it could be ignored </dd>
+    
+        <dt class="optional">enableConversation <span class="property-type">boolean </span></dt>
+        <dd>When the node fires, it will temporarily save the intent to allow back and forth conversation</dd>
+    </dl>
+    
+    <h3>Details</h3>
+    <p>Place this node at the begining of an automation to register it to be called by the <code>Call-Intent</code> node.
+    Registering an intent is useful for integrating with AI's as the AI can use the <b>aiDescription</b> to 
+determine the circumstances the intent should be called. As a result, make the <b>aiDescription</b> as clear and succinct
+as possible.</p>
+<p><b>requireConfirmation</b> and <b>confirmationMessage</b> doesn't actually do anything. It is useful for you, the user,
+to run custom logic based on these values. For example. By setting both <b>requireConfirmation</b> and <b>confirmationMessage</b>
+you can setup your automation to prevent the automation from being called without sending the confirmation and recieving
+a positive response.</p>
+
+<p>By setting <b>enableConversation</b> to <code>true</code> ensures the intent id is stored in memory when <code>Call-intent</code> node 
+    is fired</p>
+</script>

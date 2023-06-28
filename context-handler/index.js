@@ -1,0 +1,63 @@
+const Sugar = require("sugar");
+const { ACTIVE_CONVERSATION } = require("../constants");
+module.exports = function (RED) {
+  function ContextHandlerNode(config) {
+    RED.nodes.createNode(this, config);
+
+    const node = this;
+    let timeoutId;
+
+    function initTimeout(msg, key, ms) {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+
+      timeoutId = setTimeout(() => {
+        const globalContext = node.context().global;
+
+        globalContext.set(key, undefined);
+        return node.send([null, msg]);
+      }, ms);
+    }
+
+    node.on("input", function (msg) {
+      const { wait, id, path, action } = config;
+      const key = id || msg.payload.id;
+
+      if (!path && ["find", "save"].includes(action)) {
+        return node.error("Missing path");
+      } else if (!id && !["clear intent"].includes(action)) {
+        return node.error("Missing id");
+      }
+
+      const value = Sugar.Object.get(msg, path);
+      const globalContext = node.context().global;
+
+      if (action === "find") {
+        value = globalContext.get(key);
+        config.path = "";
+      } else if (action === "save") {
+        globalContext.set(key, value);
+      } else if (action === "clear context") {
+        config.path = "";
+        return initTimeout(msg, key, 0);
+      } else if (action === "clear intent") {
+        config.path = "";
+        return initTimeout(msg, ACTIVE_CONVERSATION, 0);
+      }
+
+      msg.payload = value;
+
+      if (wait === undefined) {
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
+      } else {
+        initTimeout(msg, key, wait * 1000 * 60);
+      }
+
+      node.send([msg]);
+    });
+  }
+  RED.nodes.registerType("Context Handler", ContextHandlerNode);
+};

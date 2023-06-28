@@ -1,0 +1,26 @@
+{
+  "name": "@technithusiast/red-contrib-ai-intent",
+  "version": "1.0.0",
+  "description": "A collection of nodes to elevate a user's automation interactions",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+   "keywords": [ "node-red" ],
+  "node-red": {
+    "version": ">=2.0.0",
+    "nodes": {
+      "context-handler": "context-handler/index.js",
+      "register-intent": "register-intent/index.js",
+      "call-intent": "call-intent/index.js",
+      "gather-context": "gather-context/index.js"
+    }
+  },
+  "author": "Michael Montaque",
+  "license": "ISC",
+  "dependencies": {
+    "compromise": "^14.9.0",
+    "compromise-dates": "^3.4.1",
+    "pubsub-js": "^1.9.4",
+    "sugar": "^2.0.6"
+  }
+}
