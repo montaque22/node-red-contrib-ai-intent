@@ -5,7 +5,6 @@ const { getErrorMessagesForConfig } = require("./utils");
 module.exports = function (RED) {
   function RegisterIntentHandlerNode(config) {
     RED.nodes.createNode(this, config);
-
     const globalContext = this.context().global;
     const context = globalContext.get(INTENT_STORE) || {};
     const {
@@ -19,7 +18,7 @@ module.exports = function (RED) {
 
     if (errorMessage) {
       return this.error(errorMessage);
-    } else if (!context[intentId]) {
+    } else {
       context[intentId] = {
         id: intentId,
         aiDescription,
@@ -35,11 +34,8 @@ module.exports = function (RED) {
 
     globalContext.set(INTENT_STORE, context);
 
-    // this.send([{ payload: context[config.intentId] }]);
-
     const node = this;
     var token = PubSub.subscribe(intentId, function (msg, data) {
-      node.log("Got Data: ", data);
       node.send(data);
     });
   }

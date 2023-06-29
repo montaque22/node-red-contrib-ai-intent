@@ -1,5 +1,6 @@
 const Sugar = require("sugar");
-const { ACTIVE_CONVERSATION } = require("../constants");
+const { ACTIVE_CONVERSATION, INTENT_STORE } = require("../constants");
+
 module.exports = function (RED) {
   function ContextHandlerNode(config) {
     RED.nodes.createNode(this, config);
@@ -44,6 +45,14 @@ module.exports = function (RED) {
       } else if (action === "clear intent") {
         config.path = "";
         return initTimeout(msg, ACTIVE_CONVERSATION, 0);
+      } else if (action === "get conversation intent") {
+        msg.payload = globalContext.get(ACTIVE_CONVERSATION) || "";
+
+        return node.send([msg]);
+      } else if (action === "get registered intents") {
+        msg.payload = globalContext.get(INTENT_STORE) || {};
+
+        return node.send([msg]);
       }
 
       msg.payload = value;

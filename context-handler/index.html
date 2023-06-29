@@ -22,10 +22,16 @@
             $("#node-input-action").on("change",() =>{
                 
                 const type = $("#node-input-action").val()
-                if(["find", "clear intent", "clear context"].includes(type)){
+                if(["find", "clear intent", "clear context", "get conversation intent", "get registered intents"].includes(type)){
                         $("#prop-value").slideUp()
                 }else{
                      $("#prop-value").slideDown()
+                }
+
+                if(["get conversation intent", "get registered intents"].includes(type)){
+                     $("#id-row, #wait-row").slideUp()
+                }else{
+                    $("#id-row, #wait-row").slideDown()
                 }
             })
 
@@ -62,12 +68,12 @@
     <input type="text" id="node-input-name" placeholder="Name">
 </div>
 
-<div class="form-row">
+<div class="form-row" id="id-row">
     <label for="node-input-id"><i class="fa fa-tag"></i> ID</label>
     <input type="text" id="node-input-id" placeholder="id">
 </div>
 
-<div class="form-row">
+<div class="form-row" id="wait-row">
     <label for="node-input-wait"><i class="fa fa-tag"></i> Wait (minutes)</label>
     <input type="text" id="node-input-wait">
     <input type="hidden" id="node-input-wait-type">
@@ -77,6 +83,8 @@
     <label for="node-input-action"><i class="fa fa-tag"></i> Action</label>
     <select name="Actions" id="node-input-action">
         <option value="find">Find</option>
+        <option value="get conversation intent">Get current conversation intent</option>
+        <option value="get registered intents">Get all registered intents</option>
         <option value="save">Save</option>
         <option value="clear context">Clear Context</option>
         <option value="clear intent">Clear Intent</option>
@@ -86,7 +94,7 @@
 
 <div class="form-row" style="display: flex;" id="prop-value">
     <label for="node-input-path"><i class="fa fa-tag"></i> Path</label>
-    <input type="text" id="node-input-path" placeholder="payload.path.path">
+    <input type="text" id="node-input-path" placeholder="payload.property.path">
 </div>
 </script>
 
