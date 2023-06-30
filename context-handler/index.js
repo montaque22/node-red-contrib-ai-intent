@@ -31,7 +31,7 @@ module.exports = function (RED) {
         return node.error("Missing id");
       }
 
-      const value = Sugar.Object.get(msg, path);
+      let value = Sugar.Object.get(msg, path);
       const globalContext = node.context().global;
 
       if (action === "find") {

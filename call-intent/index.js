@@ -11,16 +11,15 @@ module.exports = function (RED) {
       const context = globalContext.get(INTENT_STORE) || {};
       const intentId = config.intentId || msg.payload?.intentId || "";
       const message = config.message || msg.payload?.message || "";
-      console.log("config: ", config);
+
       if (!intentId) {
         return node.error("Missing intent id");
       } else if (!context[intentId]) {
         node.warn("There is no registered intent with id: ", intentId);
         return node.send(msg);
       }
-      const payload = context[intentId];
 
-      console.log(payload);
+      const payload = context[intentId];
 
       if (payload.enableConversation) {
         globalContext.set(ACTIVE_CONVERSATION, intentId);
