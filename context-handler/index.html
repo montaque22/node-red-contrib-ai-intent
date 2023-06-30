@@ -6,7 +6,7 @@
         defaults: {
             name: { value: "" },
             action: { value: "find" },
-            id: { value: "" },
+            contextId: { value: "" },
             path: { value: "payload" },
             wait: {value: 2}
         },
@@ -69,8 +69,8 @@
 </div>
 
 <div class="form-row" id="id-row">
-    <label for="node-input-id"><i class="fa fa-tag"></i> ID</label>
-    <input type="text" id="node-input-id" placeholder="id">
+    <label for="node-input-contextId"><i class="fa fa-tag"></i> Context Id</label>
+    <input type="text" id="node-input-contextId" placeholder="ContextID">
 </div>
 
 <div class="form-row" id="wait-row">
@@ -110,7 +110,7 @@
         <dd><b>Save</b> stores the <code>input</code> at the given <code>id</code></dd>
         <dd><b>Clear Context</b> deletes the data at the given <code>id</code></dd>
         <dd><b>Clear Register Intent</b> Removes intent saved in the context by register intent node</dd>
-        <dt>id
+        <dt>Context Id
             <span class="property-type">string</span>
         </dt>
         <dd> A unique id at which to store the given input</dd>
@@ -130,4 +130,10 @@
     <p>Context handler is an opinionated node implementation of the global context. It allows you to store data for a
         period of time to be reused by many flows and automations. An example of this is saving the time in one automation
     and then referencing that data-time value in a completely separate automation</p>
+    <p>When you use the <b>Find</b> or <b>Save</b> action, it will start a timer to clear the information at the specified
+    key. The timer will be the duration specified by the <code>wait</code> property. The timer will reset if the node 
+is called before the timer is up.</p>
+    <p>It is strongly encourage to add a value to the <code>wait</code> property as this allows the context to empty itself
+    and reduce the rate you consue OpenAI tokens.</p>
+
 </script>

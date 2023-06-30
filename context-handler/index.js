@@ -22,8 +22,8 @@ module.exports = function (RED) {
     }
 
     node.on("input", function (msg) {
-      const { wait, id, path, action } = config;
-      const key = id || msg.payload.id;
+      const { wait, contextId, path, action } = config;
+      const key = contextId || msg.payload.contextId;
 
       if (!path && ["find", "save"].includes(action)) {
         return node.error("Missing path");
