@@ -27,7 +27,7 @@ module.exports = function (RED) {
 
       if (!path && ["find", "save"].includes(action)) {
         return node.error("Missing path");
-      } else if (!id && !["clear intent"].includes(action)) {
+      } else if (!key && !["clear intent"].includes(action)) {
         return node.error("Missing id");
       }
 
