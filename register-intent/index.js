@@ -5,6 +5,7 @@ const { getErrorMessagesForConfig } = require("./utils");
 module.exports = function (RED) {
   function RegisterIntentHandlerNode(config) {
     RED.nodes.createNode(this, config);
+    let didRunOnce = false;
     const globalContext = this.context().global;
     const context = globalContext.get(INTENT_STORE) || {};
     const {
@@ -36,7 +37,16 @@ module.exports = function (RED) {
 
     const node = this;
     var token = PubSub.subscribe(intentId, function (msg, data) {
-      node.send(data);
+      if (context[intentId].confirmationMessage) {
+        if (!didRunOnce) {
+          didRunOnce = true;
+          node.send([null, { payload: context[intentId] }]);
+        } else {
+          node.send([data]);
+        }
+      } else {
+        node.send([data]);
+      }
     });
   }
 
