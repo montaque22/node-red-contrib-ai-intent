@@ -1,6 +1,6 @@
 const PubSub = require("pubsub-js");
 const { INTENT_STORE } = require("../constants");
-const { set, get } = require("../didRunOnceStore");
+const { DidRunOnce } = require("../didRunOnceStore");
 const { getErrorMessagesForConfig } = require("./utils");
 
 module.exports = function (RED) {
@@ -37,11 +37,12 @@ module.exports = function (RED) {
 
     const node = this;
     var token = PubSub.subscribe(intentId, function (msg, data) {
-      const didRunOnce = get(intentId);
+      const didRunOnce = new DidRunOnce(globalContext);
+      const didRun = didRunOnce.getForKey(intentId);
 
       if (context[intentId].confirmationMessage) {
-        if (!didRunOnce) {
-          set(intentId, true);
+        if (!didRun) {
+          didRunOnce.setForKey(intentId, true);
           node.send([null, { payload: context[intentId] }]);
         } else {
           node.send([data]);

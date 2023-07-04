@@ -1,5 +1,5 @@
 const Sugar = require("sugar");
-const { reset } = require("../didRunOnceStore");
+const { DidRunOnce } = require("../didRunOnceStore");
 const { ACTIVE_CONVERSATION, INTENT_STORE } = require("../constants");
 
 module.exports = function (RED) {
@@ -25,7 +25,8 @@ module.exports = function (RED) {
     node.on("input", function (msg) {
       const { wait, contextId, path, action } = config;
       const key = contextId || msg.payload?.contextId;
-
+      const globalContext = node.context().global;
+      const didRunOnce = new DidRunOnce(globalContext);
       if (!path && ["find", "save"].includes(action)) {
         return node.error("Missing path");
       } else if (
@@ -40,7 +41,6 @@ module.exports = function (RED) {
       }
 
       let value = Sugar.Object.get(msg, path);
-      const globalContext = node.context().global;
 
       if (action === "find") {
         value = globalContext.get(key);
@@ -52,7 +52,7 @@ module.exports = function (RED) {
         return initTimeout(msg, key, 0);
       } else if (action === "clear intent") {
         config.path = "";
-        reset();
+        didRunOnce.reset();
         return initTimeout(msg, ACTIVE_CONVERSATION, wait * 1000 * 60);
       } else if (action === "get conversation intent") {
         msg.payload = globalContext.get(ACTIVE_CONVERSATION) || "";
@@ -77,5 +77,12 @@ module.exports = function (RED) {
       node.send([msg]);
     });
   }
-  RED.nodes.registerType("Context Handler", ContextHandlerNode);
+  RED.nodes.registerType("Context Handler", ContextHandlerNode, {
+    settings: {
+      contextHandlerGlobals: {
+        value: { foo: "bar", hello: "world" },
+        exportable: true,
+      },
+    },
+  });
 };
