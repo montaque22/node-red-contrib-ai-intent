@@ -23,15 +23,17 @@
                 
                 const type = $("#node-input-action").val()
                 if(["find", "clear intent", "clear context", "get conversation intent", "get registered intents"].includes(type)){
-                        $("#prop-value").slideUp()
+                        $("#prop-value").hide()
                 }else{
-                     $("#prop-value").slideDown()
+                     $("#prop-value").show()
                 }
 
                 if(["get conversation intent", "get registered intents"].includes(type)){
-                     $("#id-row, #wait-row").slideUp()
-                }else{
-                    $("#id-row, #wait-row").slideDown()
+                     $("#id-row, #wait-row").hide()
+                }else  if (["clear intent"].includes(type)) {
+                      $("#id-row").hide()   
+                } else {
+                    $("#id-row, #wait-row").show()
                 }
             })
 
@@ -68,6 +70,18 @@
     <input type="text" id="node-input-name" placeholder="Name">
 </div>
 
+<div class="form-row">
+    <label for="node-input-action"><i class="fa fa-tag"></i> Action</label>
+    <select name="Actions" id="node-input-action">
+        <option value="find">Find</option>
+        <option value="get conversation intent">Get current conversation intent</option>
+        <option value="get registered intents">Get all registered intents</option>
+        <option value="save">Save</option>
+        <option value="clear context">Clear Context</option>
+        <option value="clear intent">Clear conversation intent</option>
+    </select>
+
+</div>
 <div class="form-row" id="id-row">
     <label for="node-input-contextId"><i class="fa fa-tag"></i> Context Id</label>
     <input type="text" id="node-input-contextId" placeholder="ContextID">
@@ -79,18 +93,7 @@
     <input type="hidden" id="node-input-wait-type">
 </div>
 
-<div class="form-row">
-    <label for="node-input-action"><i class="fa fa-tag"></i> Action</label>
-    <select name="Actions" id="node-input-action">
-        <option value="find">Find</option>
-        <option value="get conversation intent">Get current conversation intent</option>
-        <option value="get registered intents">Get all registered intents</option>
-        <option value="save">Save</option>
-        <option value="clear context">Clear Context</option>
-        <option value="clear intent">Clear Intent</option>
-    </select>
 
-</div>
 
 <div class="form-row" style="display: flex;" id="prop-value">
     <label for="node-input-path"><i class="fa fa-tag"></i> Path</label>

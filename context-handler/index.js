@@ -1,4 +1,5 @@
 const Sugar = require("sugar");
+const { reset } = require("../didRunOnceStore");
 const { ACTIVE_CONVERSATION, INTENT_STORE } = require("../constants");
 
 module.exports = function (RED) {
@@ -51,7 +52,8 @@ module.exports = function (RED) {
         return initTimeout(msg, key, 0);
       } else if (action === "clear intent") {
         config.path = "";
-        return initTimeout(msg, ACTIVE_CONVERSATION, 0);
+        reset();
+        return initTimeout(msg, ACTIVE_CONVERSATION, wait * 1000 * 60);
       } else if (action === "get conversation intent") {
         msg.payload = globalContext.get(ACTIVE_CONVERSATION) || "";
 
