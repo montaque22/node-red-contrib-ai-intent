@@ -6,17 +6,23 @@ module.exports = function (RED) {
     RED.nodes.createNode(this, config);
     const node = this;
 
-    node.on("input", function (msg) {
+    node.on("input", function (msg, send, done = () => {}) {
       const globalContext = node.context().global;
       const context = globalContext.get(INTENT_STORE) || {};
       const intentId = config.intentId || msg.payload?.intentId || "";
       const message = config.message || msg.payload?.message || "";
+      send =
+        send ||
+        function () {
+          node.send.apply(node, arguments);
+        };
 
       if (!intentId) {
         return node.error("Missing intent id");
       } else if (!context[intentId]) {
         node.warn("There is no registered intent with id: ", intentId);
-        return node.send(msg);
+        send(msg);
+        return done();
       }
 
       const payload = context[intentId];
@@ -27,7 +33,8 @@ module.exports = function (RED) {
 
       msg.payload = { ...payload, message };
       PubSub.publishSync(intentId, msg);
-      node.send(msg);
+      send(msg);
+      done();
     });
   }
 

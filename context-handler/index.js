@@ -22,11 +22,17 @@ module.exports = function (RED) {
       }, ms);
     }
 
-    node.on("input", function (msg) {
+    node.on("input", function (msg, send, done = () => {}) {
       const { wait, contextId, path, action } = config;
       const key = contextId || msg.payload?.contextId;
       const globalContext = node.context().global;
       const didRunOnce = new DidRunOnce(globalContext);
+      send =
+        send ||
+        function () {
+          node.send.apply(node, arguments);
+        };
+
       if (!path && ["find", "save"].includes(action)) {
         return node.error("Missing path");
       } else if (
@@ -56,12 +62,12 @@ module.exports = function (RED) {
         return initTimeout(msg, ACTIVE_CONVERSATION, wait * 1000 * 60);
       } else if (action === "get conversation intent") {
         msg.payload = globalContext.get(ACTIVE_CONVERSATION) || "";
-
-        return node.send([msg]);
+        send([msg]);
+        return done();
       } else if (action === "get registered intents") {
         msg.payload = globalContext.get(INTENT_STORE) || {};
-
-        return node.send([msg]);
+        send([msg]);
+        return done();
       }
 
       msg.payload = value;
@@ -74,7 +80,8 @@ module.exports = function (RED) {
         initTimeout(msg, key, wait * 1000 * 60);
       }
 
-      node.send([msg]);
+      send([msg]);
+      done();
     });
   }
   RED.nodes.registerType("Context Handler", ContextHandlerNode, {

@@ -36,7 +36,7 @@ module.exports = function (RED) {
     globalContext.set(INTENT_STORE, context);
 
     const node = this;
-    var token = PubSub.subscribe(intentId, function (msg, data) {
+    const token = PubSub.subscribe(intentId, function (msg, data) {
       const didRunOnce = new DidRunOnce(globalContext);
       const didRun = didRunOnce.getForKey(intentId);
 
@@ -50,6 +50,10 @@ module.exports = function (RED) {
       } else {
         node.send([data]);
       }
+    });
+
+    this.on("close", function () {
+      PubSub.unsubscribe(token);
     });
   }
 
