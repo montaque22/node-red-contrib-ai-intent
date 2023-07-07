@@ -1,11 +1,16 @@
 const PubSub = require("pubsub-js");
 const { INTENT_STORE, ACTIVE_CONVERSATION } = require("../constants");
+const { getIntentsCollection } = require("../db");
+const intentsCollection = getIntentsCollection();
 
 module.exports = function (RED) {
   function CallIntentHandlerNode(config) {
     RED.nodes.createNode(this, config);
     const node = this;
-
+    const intents = intentsCollection.where(function (obj) {
+      return !!obj.id;
+    });
+    console.log("Intents: ", intents);
     node.on("input", function (msg, send, done = () => {}) {
       const globalContext = node.context().global;
       const context = globalContext.get(INTENT_STORE) || {};
