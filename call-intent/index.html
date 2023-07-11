@@ -1,4 +1,6 @@
 <script type="text/javascript">
+    const DYNAMIC_OPTION = {value:"", label:"Use payload.intentId"}
+
     RED.nodes.registerType("Call Intent", {
         category: 'AI Intent',
         color: '#1abc9c',
@@ -41,9 +43,13 @@
     });
 
 function getIntentOptions(intents = []) {
-    return intents.map(intent => {
+    const options = intents.map(intent => {
         return { value: intent.id, label: intent.name }
     })
+
+    options.push(DYNAMIC_OPTION)
+
+    return options
 }
 </script>
 
