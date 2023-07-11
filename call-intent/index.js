@@ -1,17 +1,14 @@
 const PubSub = require("pubsub-js");
 const { INTENT_STORE, ACTIVE_CONVERSATION } = require("../constants");
-const { getIntentsCollection } = require("../db");
-const intentsCollection = getIntentsCollection();
+const { getDatabase } = require("../db");
+let intents;
 
 module.exports = function (RED) {
   function CallIntentHandlerNode(config) {
     RED.nodes.createNode(this, config);
     const node = this;
-    const intents = intentsCollection.where(function (obj) {
-      return !!obj.id;
-    });
-    console.log("Intents: ", intents);
-    node.on("input", function (msg, send, done = () => {}) {
+
+    this.on("input", function (msg, send, done = () => {}) {
       const globalContext = node.context().global;
       const context = globalContext.get(INTENT_STORE) || {};
       const intentId = config.intentId || msg.payload?.intentId || "";
@@ -43,5 +40,23 @@ module.exports = function (RED) {
     });
   }
 
-  RED.nodes.registerType("Call Intent", CallIntentHandlerNode);
+  getDatabase(async (storage) => {
+    intents = await storage.values();
+
+    RED.nodes.registerType("Call Intent", CallIntentHandlerNode, {
+      settings: {
+        callIntentRegistry: {
+          value: intents,
+          exportable: true,
+        },
+      },
+    });
+  });
+
+  RED.httpAdmin.get("/registered-intents", function (req, res) {
+    getDatabase(async (storage) => {
+      intents = await storage.values();
+      res.json(intents);
+    });
+  });
 };

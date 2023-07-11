@@ -2,8 +2,7 @@ const PubSub = require("pubsub-js");
 const { INTENT_STORE } = require("../constants");
 const { DidRunOnce } = require("../didRunOnceStore");
 const { getErrorMessagesForConfig } = require("./utils");
-const { getIntentsCollection, database } = require("../db");
-const intentsCollection = getIntentsCollection();
+const { getDatabase } = require("../db");
 
 module.exports = function (RED) {
   function RegisterIntentHandlerNode(config) {
@@ -18,9 +17,11 @@ module.exports = function (RED) {
       requireConfirmation,
       enableConversation,
     } = config;
+
     const errorMessage = getErrorMessagesForConfig(config);
 
     if (errorMessage) {
+      // There was an error. Stop.
       return this.error(errorMessage);
     } else {
       context[intentId] = {
@@ -38,28 +39,34 @@ module.exports = function (RED) {
       delete context[intentId].confirmationMessage;
     }
 
-    var intent = intentsCollection.findOne({ id: intentId });
+    getDatabase(async (storage) => {
+      var intent = await storage.get(intentId);
 
-    console.log("EXIST: ", intent);
-    if (!intent) {
-      console.log("CREATE: ", context[intentId]);
-      intentsCollection.insertOne(context[intentId]);
-    } else if (intent.nodeId !== this.id) {
-      // a node is duplicating an id! Fail it.
-      this.warn(`A node with intent id ${intentId} already exists!`);
-    }
-    var test = intentsCollection.where(function (obj) {
-      return !!obj.id;
+      if (!intent) {
+        // Intent is new. Store the intent since it doesn't exist
+        await storage.setItem(intentId, context[intentId]);
+      } else if (intent.nodeId !== this.id) {
+        // a node is duplicating an intent! Send a warning but allow it.
+        // This allows a user o use Register Intent node in multiple places for the same ID.
+        // (not sure if this should be allowed)
+        this.warn(`A node with intent id ${intentId} already exists!`);
+      }
     });
-    console.log("TEST: ", test);
+
+    // Massive storage that holds data to all the Register Intent nodes
+    // This allows us to look up this info later in the Call Intent node
     globalContext.set(INTENT_STORE, context);
 
     const node = this;
+    // Call intent node will publish events.
+    // This node will only listen for its own intent
     const token = PubSub.subscribe(intentId, function (msg, data) {
       const didRunOnce = new DidRunOnce(globalContext);
       const didRun = didRunOnce.getForKey(intentId);
 
-      if (context[intentId].confirmationMessage) {
+      if (context[intentId].requireConfirmation) {
+        // Although the information passed to the node is the same in both conditions
+        // The node will send the data down a different path to help users develop better automations without needing switch nodes
         if (!didRun) {
           didRunOnce.setForKey(intentId, true);
           node.send([null, { ...data, payload: context[intentId] }]);
@@ -71,9 +78,19 @@ module.exports = function (RED) {
       }
     });
 
-    this.on("close", function () {
-      PubSub.unsubscribe(token);
-      database.close();
+    // We need to clean up on close otherwise more than one message is sent when a call is published
+    this.on("close", function (removed, done) {
+      if (removed) {
+        getDatabase(async (storage) => {
+          console.log("Remove: ", intentId);
+          await storage.removeItem(intentId);
+          PubSub.unsubscribe(token);
+          done();
+        });
+      } else {
+        PubSub.unsubscribe(token);
+        done();
+      }
     });
   }
 

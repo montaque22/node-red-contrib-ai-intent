@@ -1,24 +1,12 @@
-const Loki = require("lokijs");
-var adapter = new Loki.LokiFsAdapter();
-var db = new Loki("registeredIntents.db", {
-  adapter: adapter,
-  autoload: true,
-  autoloadCallback: databaseInitialize,
-  autosave: true,
-  autosaveInterval: 4000,
-});
+const storage = require("node-persist");
 
-function databaseInitialize() {
-  getIntentsCollection();
-}
-
-function getIntentsCollection() {
-  const intentCollection = db.getCollection("intents");
-
-  if (intentCollection === null) {
-    db.addCollection("intents");
+let didInit = false;
+//you must first call storage.init
+async function getDatabase(cb) {
+  if (!didInit) {
+    await storage.init();
   }
-  return db.getCollection("intents");
+  cb(storage);
 }
 
-module.exports = { getIntentsCollection, database: db };
+module.exports = { getDatabase };

@@ -12,17 +12,43 @@ const getAmount = (message) => {
 
 const getDuration = (message) => {
   const nlp = compromise(message);
-  const dates = nlp.dates().get();
+  let dates = nlp.dates().get();
 
-  return dates.map((date) => {
-    return Sugar.Date.millisecondsFromNow(new Date(date.start));
-  });
+  if (dates.length) {
+    return dates.map((date) => {
+      const milliSecs = Sugar.Date.millisecondsFromNow(new Date(date.start));
+
+      return milliSecs ? milliSecs + 1 : milliSecs;
+    });
+  }
+
+  return nlp
+    .durations()
+    .get()
+    .map((date) => {
+      const milliSecs = Sugar.Date.millisecondsFromNow(
+        Sugar.Date.advance(new Date(), date)
+      );
+      return milliSecs ? milliSecs + 1 : milliSecs;
+    });
 };
 
 const getDate = (message) => {
   const nlp = compromise(message);
+  let dates = nlp.dates().get();
 
-  return nlp.dates().get();
+  if (dates.length) {
+    return dates.map((date) => {
+      return new Date(date.start);
+    });
+  }
+
+  return nlp
+    .durations()
+    .get()
+    .map((date) => {
+      return Sugar.Date.advance(new Date(), date);
+    });
 };
 
 module.exports = { getAmount, getDate, getDuration };

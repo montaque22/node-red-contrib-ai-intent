@@ -6,7 +6,8 @@
         defaults: {
             name: { value: "" },
             intentId: { value: "" },
-            message: {value: ""}
+            message: {value: ""},
+            intents:{value: getIntentOptions(RED.settings.callIntentRegistry) }
         },
         inputs: 1,
         outputs: 0,
@@ -15,15 +16,35 @@
             return this.name || "Call Intent";
         },
 
-        oneditprepare: function(){
+        oneditprepare: function(x){
             $("#node-input-message").typedInput({
                 type: "str",
                 types: ["str", "num", "bool", "json"],
                 typeField: "#node-input-message-type"
             })
+
+            $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
+                const intentOptions = getIntentOptions(data)
+                
+               $("#node-input-intentId").typedInput({
+                    types: [
+                        {
+                            value: "",
+                            options: intentOptions
+                        }
+                    ]
+                })
+            });
+            
         }
       
     });
+
+function getIntentOptions(intents = []) {
+    return intents.map(intent => {
+        return { value: intent.id, label: intent.name }
+    })
+}
 </script>
 
 <script type="text/html" data-template-name="Call Intent">
