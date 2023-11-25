@@ -4,35 +4,19 @@
         color: '#a29bfe',
         icon:"font-awesome/fa-registered",
         defaults: {
-            name: { value: "" },
-            intentId: { value: "" },
-            aiDescription: { value: "" },
-            confirmationMessage: { value: "" },
-            requireConfirmation: { value: true },
-            enableConversation: { value: false },
+            name: { value: "", required: true },
+            description: { value: "", required: true},
+            excludeFromOpenAi: { value: false }, 
         },
         inputs: 0,
-        outputs: 2,
-        outputLabels:["unrestricted", "require confirmation"],
+        outputs: 1,
         label: function () {
             return this.name || "Register Intent";
         },
-        oneditprepare:function() {
-                 updateConfirmationMessageVisibility()      
-            $("#node-input-requireConfirmation").on("change",() =>{
-                
-              updateConfirmationMessageVisibility()
-            })
-        }
+
     });
 
-    function updateConfirmationMessageVisibility(){
-        if ($("#node-input-requireConfirmation").is(":checked")) {
-            $("#confirmationMessage").slideDown()
-        } else {
-            $("#confirmationMessage").slideUp()
-        }
-    }
+
 </script>
 
 <script type="text/html" data-template-name="Register Intent">
@@ -43,75 +27,51 @@
     </div>
 
     <div class="form-row">
-        <label for="node-input-intentId"><i class="fa fa-tag"></i> Intent ID</label>
-        <input type="text" id="node-input-intentId" placeholder="Intent ID">
-    </div>
-
-    <div class="form-row">
-        <label for="node-input-aiDescription"><i class="fa fa-tag"></i> AI Description</label>
-        <input type="text" id="node-input-aiDescription" placeholder="AI Description">
+        <label for="node-input-description"><i class="fa fa-tag"></i>Intent Description</label>
+        <input type="text" id="node-input-description" placeholder="Description">
     </div>
 
     <div style="display: flex; justify-content: space-around;">
-        <label for="node-input-requireConfirmation" style="display: flex;">
-            <i class="fa fa-tag"></i>
-            <span style="margin-left: 5px;">Require Confirmation</span>
-            <input style="display: inline-block;margin-left: 1rem;" type="checkbox" id="node-input-requireConfirmation"
-                name="require confirmation"></label>
 
-        <label for="node-input-enableConversation" style="display: flex;">
+        <label for="node-input-excludeFromOpenAi" style="display: flex;">
             <i class="fa fa-tag"></i>
-            <span style="margin-left: 5px;">Enable Conversation</span>
-            <input style="display: inline-block;margin-left: 1rem;" type="checkbox" id="node-input-enableConversation"
+            <span style="margin-left: 5px;">Exclude from OpenAI</span>
+            <input style="display: inline-block;margin-left: 1rem;" type="checkbox" id="node-input-excludeFromOpenAi"
                 name="enable conversation"></label>
-    </div>
-
-    <div class="form-row" id="confirmationMessage">
-        <label for="node-input-confirmationMessage"><i class="fa fa-tag"></i> Confirmation Message</label>
-        <input type="text" id="node-input-confirmationMessage" placeholder="Confirmation Message">
     </div>
   
 </script>
 
 <script type="text/html" data-help-name="Register Intent">
-    <p>Temporarily stores data to the global context store</p>
+    <p>Creates a listener for specific event and fires when event is triggered</p>
     
     <h3>Inputs</h3>
     <dl class="message-properties">
-        <dt>intentId
+        <dt>Name
             <span class="property-type">string</span>
         </dt>
-        <dd>This must be a unique id to identify an automation. </dd>
+        <dd>This must be a unique to identify an automation. This must also use camel-case </dd>
 
-        <dt>aiDescription
+        <dt>description
             <span class="property-type">string</span>
         </dt>
-        <dd>Describe when the and what the automation should be used.</dd>
+        <dd>Describes what the registered intent should be used for. OpenAI will use this as a description when 
+            sending this intent as a function payload.</dd>
     
-        <dt>confirmationMessage
-            <span class="property-type">string</span>
-        </dt>
-        <dd>Message used to verify the intent/automation should run</dd>
-
-        <dt class="optional">requireConfirmation
+        <dt class="optional">excludeFromOpenAi
             <span class="property-type">boolean</span>
         </dt>
-        <dd>True indicates the confirmation should be used otherwise it could be ignored </dd>
+        <dd>If true, this intent will not be sent to OpenAI as a function it can call</dd>
     
-        <dt class="optional">enableConversation <span class="property-type">boolean </span></dt>
-        <dd>When the node fires, it will temporarily save the intent to allow back and forth conversation</dd>
     </dl>
     
     <h3>Details</h3>
     <p>Place this node at the begining of an automation to register it to be called by the <code>Call-Intent</code> node.
-    Registering an intent is useful for integrating with AI's as the AI can use the <b>aiDescription</b> to 
-determine the circumstances the intent should be called. As a result, make the <b>aiDescription</b> as clear and succinct
+    Registering an intent is useful for integrating with AI's as the AI can use the <b>description</b> to 
+determine the circumstances the intent should be called. As a result, make the <b>description</b> as clear and succinct
 as possible.</p>
-<p><b>requireConfirmation</b> and <b>confirmationMessage</b> doesn't actually do anything. It is useful for you, the user,
-to run custom logic based on these values. For example. By setting both <b>requireConfirmation</b> and <b>confirmationMessage</b>
-you can setup your automation to prevent the automation from being called without sending the confirmation and recieving
-a positive response.</p>
-
-<p>By setting <b>enableConversation</b> to <code>true</code> ensures the intent id is stored in memory when <code>Call-intent</code> node 
-    is fired</p>
+<p>Because this node is a custom trigger, OpenAI by default will add it to its list of functions it can call in order
+    handle user requests. If you this is negatively affecting OpenAI's results or you don't want this function
+    to be considered by OpenAI, set <b>excludeFromOpenAi</b> to <code>true</code> 
+</p>
 </script>

@@ -1,0 +1,57 @@
+<script type="text/javascript">
+    RED.nodes.registerType("OpenAI Tool", {
+        category: 'AI Intent',
+        color: '#f1c40f',
+        icon:"font-awesome/fa-code",
+        defaults: {
+            name: { value: "" },
+            tool: { value: "" }
+        },
+        inputs: 1,
+        outputs: 1,
+
+        label: function () {
+            return this.name || "OpenAI Tool";
+        },
+         oneditprepare: function () {
+
+            $("#node-input-tool").typedInput({
+                type: "json"
+            })
+        }    
+    });
+</script>
+
+<script type="text/html" data-template-name="OpenAI Tool">
+
+    <div class="form-row">
+        <label for="node-input-name"> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-tool">Tool Definition</label>
+        
+        <input id="node-input-tool" name="openai Tool"/>
+    </div>
+
+   
+</script>
+
+<script type="text/html" data-help-name="OpenAI Tool">
+    <p>Function that OpenAI can reference to respond more effectively to peculiar requests</p>
+    
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt>Tool Definition
+            <span class="property-type">json</span>
+        </dt>
+        <dd> JSON Schema that defines the function GPT can call to do work. Check out the <a href="https://platform.openai.com/docs/api-reference/chat/create">documentation</a> 
+            to see how to write the JSON schema </dd>
+    </dl>
+
+    <h3>Details</h3>
+    <p>This node should come before the <code>OpenAI Chat</code> node as this OpenAI Tool node adds the functions to 
+    the msg object for the <code>OpenAI Chat</code> to use. OpenAI is experimental so you may have to make a lot of adjustments
+to get the desired results</p>
+</script>

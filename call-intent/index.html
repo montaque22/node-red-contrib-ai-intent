@@ -1,15 +1,14 @@
 <script type="text/javascript">
-    const DYNAMIC_OPTION = {value:"", label:"Use payload.intentId"}
+    const DYNAMIC_OPTION = {value:"", label:"Use payload.intentName"}
 
     RED.nodes.registerType("Call Intent", {
         category: 'AI Intent',
-        color: '#1abc9c',
+        color: '#74b9ff',
         icon:"font-awesome/fa-reply-all",
         defaults: {
             name: { value: "" },
-            intentId: { value: "" },
-            message: {value: ""},
-            intents:{value: getIntentOptions(RED.settings.callIntentRegistry) }
+            intentName: { value: "" },
+            intent:{value: getIntentOptions(RED.settings.callIntentRegistry) }
         },
         inputs: 1,
         outputs: 0,
@@ -28,7 +27,7 @@
             $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
                 const intentOptions = getIntentOptions(data)
                 
-               $("#node-input-intentId").typedInput({
+               $("#node-input-intentName").typedInput({
                     types: [
                         {
                             value: "",
@@ -61,14 +60,8 @@ function getIntentOptions(intents = []) {
     </div>
 
     <div class="form-row">
-        <label for="node-input-intentId"><i class="fa fa-tag"></i> Intent ID</label>
-        <input type="text" id="node-input-intentId" placeholder="Intent ID">
-    </div>
-
-    <div class="form-row">
-        <label for="node-input-message"><i class="fa fa-tag"></i> Message</label>
-        <input type="text" id="node-input-message">
-        <input type="hidden" id="node-input-message-type">
+        <label for="node-input-intentName"><i class="fa fa-tag"></i> Intent Name</label>
+        <input type="text" id="node-input-intentName" placeholder="Intent ID">
     </div>
 
 </script>
@@ -78,17 +71,16 @@ function getIntentOptions(intents = []) {
     
     <h3>Inputs</h3>
     <dl class="message-properties">
-        <dt>intentId
+        <dt>Intent Name
             <span class="property-type">string</span>
         </dt>
-        <dd> A unique id for the node. Having duplicates nodes with this value will lead to bugs. </dd>
-        <dt class="optional">Message <span class="property-type">string | number | object | boolean</span></dt>
-        <dd> Any value to pass to the Register node</dd>
+        <dd>Name of the intent you want to trigger. This is a dropdown however, you can choose payload.intentName to allow
+            dynamic triggering. <code>msg.intentName</code>
+        </dd>
     </dl>
 
     <h3>Details</h3>
-    <p><code>intentId</code> is used to distinguish the the registered nodes apart.
-    Using the Call Intent node activates the Registered Intent node that has the corresponding ID</p>
-    <p>If you need a more dynamic approach you can pass the <code>intentId</code> and <code>message</code>
-    as properties in <code>msg.payload</code> and leave the inputs in the GUI blank.</p>
+    <p>This node can be used as a standalone way to trigger custom intents (this will act very similar to the link in/out nodes)
+        or this node can be used immediately after the <code>OpenAI Response</code> node. If used after the aforementioned node
+        OpenAI can dynamically trigger any registered intents.</p>
 </script>

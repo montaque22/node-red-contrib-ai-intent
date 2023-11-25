@@ -1,0 +1,100 @@
+<script type="text/javascript">
+    RED.nodes.registerType("OpenAI Chat", {
+        category: 'AI Intent',
+        color: '#e67e22',
+        icon:"font-awesome/fa-comment",
+        defaults: {
+            name: { value: "" },
+            model: { value: "", required: true },
+            temperature: { value: .7, required: true },
+            max_tokens: { value: 1200, required: true },
+            top_p: { value: 1, required: true },
+            frequency_penalty: { value: 0, required: true },
+            presence_penalty: { value: 0, required: true },
+        },
+        inputs: 1,
+        outputs: 1,
+
+        label: function () {
+            return this.name || "OpenAI Chat";
+        },
+
+        oneditprepare: function(x){
+            $("#node-input-temperature").typedInput({
+                type: "num",
+            })
+            $("#node-input-max_tokens").typedInput({
+                type: "num",
+            })
+            $("#node-input-top_p").typedInput({
+                type: "num",
+            })
+            $("#node-input-frequency_penalty").typedInput({
+                type: "num",
+            })
+            $("#node-input-presence_penalty").typedInput({
+                type: "num",
+            })
+        }
+    });
+
+</script>
+
+<script type="text/html" data-template-name="OpenAI Chat">
+    <div class="form-row">
+        <label for="node-input-name"> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-model"> Model</label>
+        <input type="text" id="node-input-model" placeholder="gpt-3.5-turbo">
+    </div>
+    <div class="form-row">
+        <label for="node-input-temperature"> Temperature</label>
+        <input type="text" id="node-input-temperature" placeholder="0.7">
+    </div>
+    <div class="form-row">
+        <label for="node-input-max_tokens"> Max Tokens</label>
+        <input type="text" id="node-input-max_tokens" placeholder="1200">
+    </div>
+    <div class="form-row">
+        <label for="node-input-top_p"> Top P</label>
+        <input type="text" id="node-input-top_p" placeholder="0">
+    </div>
+    <div class="form-row">
+        <label for="node-input-frequency_penalty"> Frequency Penalty</label>
+        <input type="text" id="node-input-frequency_penalty" placeholder="0">
+    </div>
+    <div class="form-row">
+        <label for="node-input-presence_penalty"> Presence Penalty</label>
+        <input type="text" id="node-input-presence_penalty" placeholder="0">
+    </div>
+   
+</script>
+
+<script type="text/html" data-help-name="OpenAI Chat">
+    <p>Calls OpenAI and returns the response</p>
+    
+    <h3>Important</h3>
+    <p>To use this node you need an API Key from OpenAI. Add the API Key to the settings.js file in the node-red folder under
+    the functonGlobalContext section using the key "openaiAPIKey"</p>
+    <pre>
+    functionGlobalContext: {
+        openaiAPIKey: "Your Key Goes Here",
+    }
+    </pre>
+
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt class="required">model
+            <span class="property-type">string</span>
+        </dt>
+        <dd> Required field that dictates the model to use when calling OpenAI </dd>
+    </dl>
+    <p>To learn more about the other properties, look at <a href="https://platform.openai.com/docs/api-reference/chat/create">OpenAI's documentation</a></p>
+    
+    <h3>Details</h3>
+    <p>At minimum the OpenAI User node should be used before this node. The OpenAI User node adds necessary 
+        information to the msg object to allow the chat to work.</p>
+
+</script>

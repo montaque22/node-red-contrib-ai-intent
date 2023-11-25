@@ -1,6 +1,7 @@
 const PubSub = require("pubsub-js");
-const { INTENT_STORE, ACTIVE_CONVERSATION } = require("../constants");
+const { INTENT_STORE } = require("../constants");
 const { getDatabase } = require("../db");
+const { end } = require("../globalUtils");
 let intents;
 
 module.exports = function (RED) {
@@ -11,32 +12,37 @@ module.exports = function (RED) {
     this.on("input", function (msg, send, done = () => {}) {
       const globalContext = node.context().global;
       const context = globalContext.get(INTENT_STORE) || {};
-      const intentId = config.intentId || msg.payload?.intentId || "";
-      const message = config.message || msg.payload?.message || "";
+      let intentName = config.intentName || "";
+
       send =
         send ||
         function () {
           node.send.apply(node, arguments);
         };
 
-      if (!intentId) {
-        return node.error("Missing intent id");
-      } else if (!context[intentId]) {
-        node.warn("There is no registered intent with id: ", intentId);
+      if (Array.isArray(msg.payload)) {
+        msg.payload.forEach((payload) => {
+          const { functionName } = payload;
+          if (!functionName) {
+            node.warn("payload is missing functionName property");
+          } else if (!context[functionName]) {
+            node.warn(
+              "There is no registered intent with name: ",
+              functionName
+            );
+          } else {
+            msg.payload = context[functionName];
+            PubSub.publishSync(functionName, msg);
+            send(msg);
+          }
+        });
+      } else {
+        msg.payload = context[functionName];
+        PubSub.publishSync(intentName, msg);
         send(msg);
-        return done();
       }
 
-      const payload = context[intentId];
-
-      if (payload.enableConversation) {
-        globalContext.set(ACTIVE_CONVERSATION, intentId);
-      }
-
-      msg.payload = { ...payload, message };
-      PubSub.publishSync(intentId, msg);
-      send(msg);
-      done();
+      end(done);
     });
   }
 

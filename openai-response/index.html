@@ -1,0 +1,36 @@
+<script type="text/javascript">
+    RED.nodes.registerType("OpenAI Response", {
+        category: 'AI Intent',
+        color: '#ffeaa7',
+        icon:"font-awesome/fa-commenting-o",
+        defaults: {
+            name: { value: "" },
+        },
+        inputs: 1,
+        outputs: 1,
+
+        label: function () {
+            return this.name || "OpenAI Response";
+        },
+
+        oneditprepare: function(x){
+           
+        }
+    });
+
+</script>
+
+<script type="text/html" data-template-name="OpenAI Response">
+
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="OpenAI Response">
+    <p>Sanitize the response from OpenAI and returns a consistent data interface </p>
+
+    <h3>Details</h3>
+    <p>This node must be used directly after the <code>OpenAI Chat</code> node.</p>
+</script>
