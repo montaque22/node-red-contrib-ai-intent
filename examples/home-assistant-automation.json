@@ -1,0 +1,213 @@
+[
+    {
+        "id": "8f1e7d4a810ed167",
+        "type": "Call Intent",
+        "z": "0aa7f2a9c8a696e1",
+        "name": "Dynamic Payload",
+        "intentName": "",
+        "x": 490,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "46917ec1adb0e757",
+        "type": "debug",
+        "z": "0aa7f2a9c8a696e1",
+        "name": "debug 4",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 340,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "2d713b90c7f65576",
+        "type": "Register Intent",
+        "z": "0aa7f2a9c8a696e1",
+        "name": "disarmHome",
+        "description": "deactivates the alarm for the house",
+        "excludeFromOpenAi": false,
+        "x": 110,
+        "y": 180,
+        "wires": [
+            [
+                "46917ec1adb0e757"
+            ]
+        ]
+    },
+    {
+        "id": "d2843e5ee19d6524",
+        "type": "inject",
+        "z": "0aa7f2a9c8a696e1",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "test",
+                "v": "foobar",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 320,
+        "wires": [
+            [
+                "ae2e303a450840f7"
+            ]
+        ]
+    },
+    {
+        "id": "403fe0e709ff7fd4",
+        "type": "catch",
+        "z": "0aa7f2a9c8a696e1",
+        "name": "",
+        "scope": null,
+        "uncaught": false,
+        "x": 460,
+        "y": 560,
+        "wires": [
+            [
+                "6bf60a1bede18e1d"
+            ]
+        ]
+    },
+    {
+        "id": "6bf60a1bede18e1d",
+        "type": "debug",
+        "z": "0aa7f2a9c8a696e1",
+        "name": "debug 44",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 460,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "ae2e303a450840f7",
+        "type": "OpenAI User",
+        "z": "0aa7f2a9c8a696e1",
+        "name": "",
+        "instruction": "turn on the light",
+        "x": 190,
+        "y": 360,
+        "wires": [
+            [
+                "cfbf104ff6775661"
+            ]
+        ]
+    },
+    {
+        "id": "cfbf104ff6775661",
+        "type": "OpenAI System",
+        "z": "0aa7f2a9c8a696e1",
+        "name": "",
+        "instruction": "You are an virtual Assistant named Ke. You can assist requests about my smart home. The following is a JSON list of devices and their states in my home:\n\n[\n{{entityId: light.master, state: on, friendlyName: Master bedroom light}},\n{{entityId: alarm.front, state: disarmed, friendlyName: Front Door Alarm}}\n]",
+        "x": 180,
+        "y": 400,
+        "wires": [
+            [
+                "46e1b048915b2c90"
+            ]
+        ]
+    },
+    {
+        "id": "4dc4762b4cf757a8",
+        "type": "OpenAI Chat",
+        "z": "0aa7f2a9c8a696e1",
+        "name": "",
+        "model": "gpt-4-1106-preview",
+        "temperature": 0.7,
+        "max_tokens": 1200,
+        "top_p": 1,
+        "frequency_penalty": 0,
+        "presence_penalty": 0,
+        "x": 190,
+        "y": 480,
+        "wires": [
+            [
+                "c1a47d4aec0ec3f0"
+            ]
+        ]
+    },
+    {
+        "id": "c1a47d4aec0ec3f0",
+        "type": "OpenAI Response",
+        "z": "0aa7f2a9c8a696e1",
+        "name": "",
+        "x": 170,
+        "y": 520,
+        "wires": [
+            [
+                "6bf60a1bede18e1d",
+                "8f1e7d4a810ed167"
+            ]
+        ]
+    },
+    {
+        "id": "157c85e2d841d199",
+        "type": "debug",
+        "z": "0aa7f2a9c8a696e1",
+        "name": "debug 45",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 340,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "b84e436d512c72e2",
+        "type": "Register Intent",
+        "z": "0aa7f2a9c8a696e1",
+        "name": "armHome",
+        "description": "Turn on the alarm for the house",
+        "excludeFromOpenAi": false,
+        "x": 120,
+        "y": 220,
+        "wires": [
+            [
+                "157c85e2d841d199"
+            ]
+        ]
+    },
+    {
+        "id": "46e1b048915b2c90",
+        "type": "OpenAI Tool",
+        "z": "0aa7f2a9c8a696e1",
+        "name": "",
+        "tool": "{\"type\":\"function\",\"function\":{\"name\":\"light\",\"description\":\"turn on or off the lights\",\"parameters\":{\"type\":\"object\",\"properties\":{\"isQuestion\":{\"enum\":[false]},\"action\":{\"type\":\"string\",\"description\":\"action to run which will turn on or off the light\",\"enum\":[\"turn_on\",\"turn_off\"]},\"entities\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"response\":{\"type\":\"string\",\"description\":\"A friendly response to the given command\"}},\"required\":[\"isQuestion\",\"action\",\"entities\",\"response\"]}}}",
+        "x": 190,
+        "y": 440,
+        "wires": [
+            [
+                "4dc4762b4cf757a8"
+            ]
+        ]
+    }
+]
