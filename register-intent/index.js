@@ -13,7 +13,7 @@ module.exports = function (RED) {
 
     if (errorMessage) {
       // There was an error. Stop.
-      return end(this.error, errorMessage);
+      return this.error(errorMessage);
     } else {
       context[config.name] = {
         nodeId: this.id,

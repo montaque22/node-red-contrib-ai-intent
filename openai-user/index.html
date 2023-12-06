@@ -5,7 +5,7 @@
         icon:"font-awesome/fa-user",
         defaults: {
             name: { value: "" },
-            instruction: { value: "" }
+            content: { value: "" }
         },
         inputs: 1,
         outputs: 1,
@@ -33,9 +33,9 @@
     </div>
 
     <div class="form-row">
-        <label for="node-input-instruction"><i class="fa fa-tag"></i>Message</label>
+        <label for="node-input-content"><i class="fa fa-tag"></i>Content</label>
         
-        <textarea id="node-input-instruction" name="openai user" rows="15" cols="150">
+        <textarea id="node-input-content" name="openai user" rows="15" cols="150">
             This represents the chat message to send to OpenAI
         </textarea>
     </div>
@@ -48,12 +48,16 @@
     
     <h3>Inputs</h3>
     <dl class="message-properties">
-        <dt>Message
+        <dt>Content
             <span class="property-type">string</span>
         </dt>
         <dd> Message to send to OpenAI. This can be a command, question or any string. </dd>
     </dl>
 
     <h3>Details</h3>
-    <p>This node must be used before <code>OpenAI Chat</code></p>
+    <p>This node must be used before <code>OpenAI Chat</code>. This node can also substitute strings within
+    the given payload using <code>{}</code>. For example, given the message "Hello {foo}".
+    if the msg object contains foo as a property that's equal to "world", then the payload sent to OpenAI
+    would be "Hello world". If you need to send curly braces in your payload use doubld curly braces
+    <code>{{}}</code> to escape.</p>
 </script>

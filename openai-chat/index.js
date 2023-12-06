@@ -93,6 +93,9 @@ module.exports = function (RED) {
         })
         .then((answer) => {
           msg.payload = answer;
+          delete msg.user;
+          delete msg.system;
+          delete msg.tools;
           send(msg);
           end(done);
         })

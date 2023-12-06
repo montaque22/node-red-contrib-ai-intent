@@ -1,10 +1,13 @@
+const Sugar = require("sugar");
+
 module.exports = function (RED) {
   function OpenAIUserHandlerNode(config) {
     RED.nodes.createNode(this, config);
     const node = this;
 
     this.on("input", function (msg, send, done = () => {}) {
-      const content = msg.payload?.instruction || config.instruction;
+      let content = msg.payload?.content || config.content;
+      content = Sugar.String.format(content, msg);
 
       send =
         send ||

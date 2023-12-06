@@ -20,7 +20,7 @@ to use.
 
 ## OpenAI User
 
-Provides the message with role = user to use in OpenAI's chat completition Payload
+Provides the message with role = user to use in OpenAI's chat completition Payload. This node is also capable of utilizing string substitution and can replace tokenized content in the string payload with data from the msg object. Any text wrapped in single curly brace `{}` will be treated as a key in the msg object.
 
 ## OpenAI System
 
