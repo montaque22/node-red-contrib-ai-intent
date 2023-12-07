@@ -4,6 +4,17 @@ const { getDatabase } = require("../db");
 const { end } = require("../globalUtils");
 let intents;
 
+/**
+ * Searches context for an object whose `name` property matches the given name parameter
+ * and returns the matching object.
+ * @param {string} name
+ * @param {Record<string, object>} context
+ * @returns
+ */
+const getIntentWithName = (name, context) => {
+  return Object.values(context).find((intent) => intent.name === name);
+};
+
 module.exports = function (RED) {
   function CallIntentHandlerNode(config) {
     RED.nodes.createNode(this, config);
@@ -25,19 +36,19 @@ module.exports = function (RED) {
           const { functionName } = payload;
           if (!functionName) {
             node.warn("payload is missing functionName property");
-          } else if (!context[functionName]) {
+          } else if (!getIntentWithName(functionName, context)) {
             node.warn(
               "There is no registered intent with name: ",
               functionName
             );
           } else {
-            msg.payload = context[functionName];
+            msg.payload = getIntentWithName(functionName, context);
             PubSub.publishSync(functionName, msg);
             send(msg);
           }
         });
       } else {
-        msg.payload = context[functionName];
+        msg.payload = getIntentWithName(functionName, context);
         PubSub.publishSync(intentName, msg);
         send(msg);
       }

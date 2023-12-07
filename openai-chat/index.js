@@ -8,10 +8,8 @@ const { end } = require("../globalUtils");
  */
 const createFunctionsFromContext = (context = {}) => {
   return (
-    Object.keys(context)
-      .map((key) => {
-        const payload = context[key];
-
+    Object.values(context)
+      .map((payload) => {
         if (payload.excludeFromOpenAi) {
           return undefined;
         }
@@ -19,7 +17,7 @@ const createFunctionsFromContext = (context = {}) => {
         return {
           type: "function",
           function: {
-            name: key,
+            name: payload.name,
             description: payload.description,
             parameters: {
               type: "object",
@@ -39,6 +37,38 @@ const createFunctionsFromContext = (context = {}) => {
   );
 };
 
+/**
+ * combines various properties from `msg` and `config` to return all the properties needed for OpenAI API request
+ * @param {Record<string,any>} msg
+ * @param {Record<string, any>} config
+ * @returns
+ */
+const getChatCompletionProps = (msg, config) => {
+  const model = msg.payload?.model || config.model;
+  const temperature = msg.payload?.temperature || config.temperature;
+  const max_tokens = msg.payload?.max_tokens || config.max_tokens;
+  const top_p = msg.payload?.top_p || config.top_p;
+  const frequency_penalty =
+    msg.payload?.frequency_penalty || config.frequency_penalty;
+  const presence_penalty =
+    msg.payload?.presence_penalty || config.presence_penalty;
+  const { user, system } = msg;
+  const messages = [system, user];
+  const tools = msg?.tools || [];
+  const tool_choice = tools.length ? "auto" : "none";
+
+  return {
+    model,
+    temperature,
+    max_tokens,
+    top_p,
+    frequency_penalty,
+    presence_penalty,
+    messages,
+    tool_choice,
+  };
+};
+
 module.exports = function (RED) {
   function OpenAIChatHandlerNode(config) {
     RED.nodes.createNode(this, config);
@@ -48,21 +78,12 @@ module.exports = function (RED) {
       const globalContext = node.context().global;
       const context = globalContext.get(INTENT_STORE) || {};
       const apiKey = globalContext.get(OPEN_AI_KEY);
-      const model = msg.payload?.model || config.model;
-
-      const temperature = msg.payload?.temperature || config.temperature;
-      const max_tokens = msg.payload?.max_tokens || config.max_tokens;
-      const top_p = msg.payload?.top_p || config.top_p;
-      const frequency_penalty =
-        msg.payload?.frequency_penalty || config.frequency_penalty;
-      const presence_penalty =
-        msg.payload?.presence_penalty || config.presence_penalty;
-      const { user, system } = msg;
-      const messages = [system, user];
+      const apiProps = getChatCompletionProps(msg, config);
       const registeredIntentFunctions = createFunctionsFromContext(context);
-      const _tools = msg?.tools || [];
-      const tools = [..._tools, ...registeredIntentFunctions].filter(Boolean);
-      const tool_choice = tools.length ? "auto" : "none";
+      const messages = apiProps.messages.filter(Boolean);
+      const tools = [...apiProps.tools, ...registeredIntentFunctions].filter(
+        Boolean
+      );
 
       send =
         send ||
@@ -81,18 +102,23 @@ module.exports = function (RED) {
 
       openai.chat.completions
         .create({
-          model,
-          messages: messages.filter(Boolean),
+          model: apiProps.model,
+          messages,
           tools,
-          tool_choice,
-          temperature,
-          max_tokens,
-          top_p,
-          frequency_penalty,
-          presence_penalty,
+          tool_choice: apiProps.tool_choice,
+          temperature: apiProps.temperature,
+          max_tokens: apiProps.max_tokens,
+          top_p: apiProps.top_p,
+          frequency_penalty: apiProps.frequency_penalty,
+          presence_penalty: apiProps.presence_penalty,
         })
         .then((answer) => {
           msg.payload = answer;
+          msg._debug = {
+            system,
+            tools,
+            user,
+          };
           delete msg.user;
           delete msg.system;
           delete msg.tools;

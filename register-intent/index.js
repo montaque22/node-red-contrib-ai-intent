@@ -10,28 +10,31 @@ module.exports = function (RED) {
     const globalContext = this.context().global;
     const context = globalContext.get(INTENT_STORE) || {};
     const errorMessage = getErrorMessagesForConfig(config);
-
+    const nodeId = this.id;
     if (errorMessage) {
       // There was an error. Stop.
       return this.error(errorMessage);
     } else {
-      context[config.name] = {
-        nodeId: this.id,
+      // create a new entry for the given node id
+      context[nodeId] = {
+        nodeId: nodeId,
         ...config,
       };
     }
 
+    // Trigger database save
     getDatabase(async (storage) => {
-      var intent = await storage.get(config.name);
+      // get intent data for given node id
+      var intent = await storage.get(nodeId);
 
       if (!intent) {
         // Intent is new. Store the intent since it doesn't exist
-        await storage.setItem(config.name, context[config.name]);
-      } else if (intent.nodeId !== this.id) {
-        // a node is duplicating an intent! Send a warning but allow it.
-        // This allows a user o use Register Intent node in multiple places for the same ID.
-        // (not sure if this should be allowed)
-        this.warn(`A node with intent name ${config.name} already exists!`);
+        await storage.setItem(nodeId, context[nodeId]);
+      } else if (intent.nodeId !== nodeId) {
+        // a node is either duplicating an intent or the same node is updating! Send a warning but allow it.
+        this.warn(
+          `Overwriting intent named "${config.name}" for node id ${nodeId} already exists!`
+        );
       }
     });
 
@@ -44,7 +47,7 @@ module.exports = function (RED) {
     // Call intent node will publish events.
     // This node will only listen for its own intent
     const token = PubSub.subscribe(config.name, function (msg, data) {
-      node.send([{ ...data, payload: context[config.name] }]);
+      node.send([{ ...data, payload: context[nodeId] }]);
     });
 
     // We need to clean up on close otherwise more than one message is sent when a call is published
@@ -52,7 +55,7 @@ module.exports = function (RED) {
       if (removed) {
         getDatabase(async (storage) => {
           console.log("Remove: ", config.name);
-          await storage.removeItem(config.name);
+          await storage.removeItem(nodeId);
           PubSub.unsubscribe(token);
           end(done);
         });
