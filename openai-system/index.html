@@ -12,7 +12,23 @@
 
         label: function () {
             return this.name || "OpenAI System";
-        }      
+        },
+        oneditprepare: function () {
+            this.editor = RED.editor.createEditor({
+                id: 'node-input-instruction',
+                mode: 'ace/mode/text',
+                value: this.instruction
+            });
+        },
+        oneditsave: function () {
+            this.instruction = this.editor.getValue();
+            this.editor.destroy();
+            delete this.editor;
+        },
+        oneditcancel: function () {
+            this.editor.destroy();
+            delete this.editor;
+        },  
     });
 </script>
 
@@ -25,10 +41,7 @@
 
     <div class="form-row">
         <label for="node-input-instruction"><i class="fa fa-tag"></i>System Message</label>
-        
-        <textarea id="node-input-instruction" name="openai user" rows="15" cols="150">
-            This represents the system message to send to OpenAI
-        </textarea>
+        <div style="height: 250px; min-height:150px;" class="node-text-editor" id="node-input-instruction"></div>
     </div>
 
    

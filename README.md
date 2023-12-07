@@ -1,6 +1,6 @@
 # AI Intent
 
-> This is experimental and subjected to change!
+> This is experimental and subjected to change! This is unstable and may introduce breaking changes.
 
 This is a collection of nodes to help enhance existing automations to be utilized by chatbots and take advantage of LLM's like GPT. There are 4 Nodes in this collection:
 
@@ -33,3 +33,7 @@ Provide functions the Open AI can use to handle unique requests. These nodes can
 ## OpenAI Response
 
 Sanitizes the response from OpenAI. This provides a consistent easy to read output but it will also pass the original OpenAI output in a separate property called `originalResponse`.
+
+## How to use
+
+**Coming Soon**

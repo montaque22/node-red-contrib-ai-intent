@@ -12,7 +12,23 @@
 
         label: function () {
             return this.name || "OpenAI User";
-        }
+        },
+        oneditprepare: function(){
+            this.editor = RED.editor.createEditor({
+                id: 'node-input-content',
+                mode: 'ace/mode/text',
+                value: this.content
+            });
+        },
+        oneditsave: function () {
+            this.content = this.editor.getValue();
+            this.editor.destroy();
+            delete this.editor;
+        },
+        oneditcancel: function () {
+            this.editor.destroy();
+            delete this.editor;
+        },
     });
 
 //     const options = intents.map(intent => {
@@ -34,10 +50,7 @@
 
     <div class="form-row">
         <label for="node-input-content"><i class="fa fa-tag"></i>Content</label>
-        
-        <textarea id="node-input-content" name="openai user" rows="15" cols="150">
-            This represents the chat message to send to OpenAI
-        </textarea>
+        <div style="height: 250px; min-height:150px;" class="node-text-editor" id="node-input-content"></div>
     </div>
 
    
