@@ -66,6 +66,7 @@ const getChatCompletionProps = (msg, config) => {
     presence_penalty,
     messages,
     tool_choice,
+    tools,
   };
 };
 
