@@ -82,6 +82,7 @@ module.exports = function (RED) {
       const apiProps = getChatCompletionProps(msg, config);
       const registeredIntentFunctions = createFunctionsFromContext(context);
       const messages = apiProps.messages.filter(Boolean);
+      const { user, system } = msg;
       const tools = [...apiProps.tools, ...registeredIntentFunctions].filter(
         Boolean
       );
