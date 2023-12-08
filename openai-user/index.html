@@ -15,7 +15,7 @@
         },
         oneditprepare: function(){
             this.editor = RED.editor.createEditor({
-                id: 'node-input-content',
+                id: 'node-input-user-editor',
                 mode: 'ace/mode/text',
                 value: this.content
             });
@@ -50,7 +50,7 @@
 
     <div class="form-row">
         <label for="node-input-content"><i class="fa fa-tag"></i>Content</label>
-        <div style="height: 250px; min-height:150px;" class="node-text-editor" id="node-input-content"></div>
+        <div style="height: 250px; min-height:150px;" class="node-text-editor" id="node-input-user-editor"></div>
     </div>
 
    

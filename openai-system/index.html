@@ -15,12 +15,13 @@
         },
         oneditprepare: function () {
             this.editor = RED.editor.createEditor({
-                id: 'node-input-instruction',
+                id: 'node-input-system-editor',
                 mode: 'ace/mode/text',
                 value: this.instruction
             });
         },
         oneditsave: function () {
+            debugger
             this.instruction = this.editor.getValue();
             this.editor.destroy();
             delete this.editor;
@@ -41,7 +42,7 @@
 
     <div class="form-row">
         <label for="node-input-instruction"><i class="fa fa-tag"></i>System Message</label>
-        <div style="height: 250px; min-height:150px;" class="node-text-editor" id="node-input-instruction"></div>
+        <div style="height: 250px; min-height:150px;" class="node-text-editor" id="node-input-system-editor"></div>
     </div>
 
    
