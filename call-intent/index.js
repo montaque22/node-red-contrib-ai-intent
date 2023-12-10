@@ -38,8 +38,7 @@ module.exports = function (RED) {
             node.warn("payload is missing functionName property");
           } else if (!getIntentWithName(functionName, context)) {
             node.warn(
-              "There is no registered intent with name: ",
-              functionName
+              `There is no registered intent with name: ${functionName}`
             );
           } else {
             msg.payload = getIntentWithName(functionName, context);
@@ -47,10 +46,16 @@ module.exports = function (RED) {
             send(msg);
           }
         });
-      } else {
+      } else if (msg.payload?.functionName || intentName) {
+        const functionName = msg.payload?.functionName || intentName;
+
         msg.payload = getIntentWithName(functionName, context);
-        PubSub.publishSync(intentName, msg);
+        PubSub.publishSync(functionName, msg);
         send(msg);
+      } else {
+        node.warn(
+          "The config is missing Intent Name or missing payload.functionName "
+        );
       }
 
       end(done);
