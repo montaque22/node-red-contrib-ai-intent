@@ -11,6 +11,7 @@ module.exports = function (RED) {
     const context = globalContext.get(INTENT_STORE) || {};
     const errorMessage = getErrorMessagesForConfig(config);
     const nodeId = this.id;
+
     if (errorMessage) {
       // There was an error. Stop.
       return this.error(errorMessage);
@@ -46,8 +47,11 @@ module.exports = function (RED) {
 
     // Call intent node will publish events.
     // This node will only listen for its own intent
-    const token = PubSub.subscribe(config.name, function (msg, data) {
-      node.send([{ ...data, payload: context[nodeId] }]);
+    const token = PubSub.subscribe(config.id, function (msg, data) {
+      const { name, description, excludeFromOpenAi } = context[nodeId];
+      node.send([
+        { ...data, _config: { name, description, excludeFromOpenAi } },
+      ]);
     });
 
     // We need to clean up on close otherwise more than one message is sent when a call is published

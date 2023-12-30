@@ -29,7 +29,7 @@ module.exports = function (RED) {
               payload.args = {
                 ...JSON.parse(tool.function.arguments),
               };
-              payload.functionName = tool.function.name;
+              payload.nodeName = tool.function.name;
               output.push(payload);
             }
           });
