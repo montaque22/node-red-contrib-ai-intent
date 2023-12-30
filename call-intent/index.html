@@ -1,14 +1,19 @@
 <script type="text/javascript">
-    const DYNAMIC_OPTION = {value:"", label:"Use payload.intentName"}
-
+    const DYNAMIC_OPTION = {value:"", label:"Use payload.nodeName"}
+    
     RED.nodes.registerType("Call Intent", {
         category: 'AI Intent',
         color: '#74b9ff',
         icon:"font-awesome/fa-reply-all",
         defaults: {
             name: { value: "" },
-            intentName: { value: "" },
-            intent:{value: getIntentOptions(RED.settings.callIntentRegistry) }
+            registeredNodeId: { 
+                value: getIntentOptions(RED.settings.callIntentRegistry),
+            validate: (value) => {
+                return window._intentOptions?.some(option => {
+                    return option.value === value
+                })
+            } },
         },
         inputs: 1,
         outputs: 0,
@@ -26,8 +31,8 @@
 
             $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
                 const intentOptions = getIntentOptions(data)
-                
-               $("#node-input-intentName").typedInput({
+                window._intentOptions = intentOptions;
+               $("#node-input-registeredNodeId").typedInput({
                     types: [
                         {
                             value: "",
@@ -60,8 +65,8 @@ function getIntentOptions(intents = []) {
     </div>
 
     <div class="form-row">
-        <label for="node-input-intentName"><i class="fa fa-tag"></i> Intent Name</label>
-        <input type="text" id="node-input-intentName" placeholder="Intent ID">
+        <label for="node-input-registeredNodeId"><i class="fa fa-tag"></i> Registered Node Name</label>
+        <input type="text" id="node-input-registeredNodeId" placeholder="Name of registered node">
     </div>
 
 </script>
@@ -71,11 +76,13 @@ function getIntentOptions(intents = []) {
     
     <h3>Inputs</h3>
     <dl class="message-properties">
-        <dt>Intent Name
+        <dt>Registered Node Name
             <span class="property-type">string</span>
         </dt>
-        <dd>Name of the intent you want to trigger. This is a dropdown however, you can choose payload.intentName to allow
-            dynamic triggering. <code>msg.intentName</code>
+        <dd>Name of the registed intent node you want to trigger. For convenience you can choose the name from the 
+            the dropdown however, you can choose payload.nodeName to allow the node to read the
+            intent name from the msg object - <code>msg.payload.nodeName</code>. This function can also fire multiple times 
+            if the payload is an array of the objects with nodeName <code>msg.payload = [{nodeName: "fake_name"}]</code>.
         </dd>
     </dl>
 

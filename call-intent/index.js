@@ -5,14 +5,34 @@ const { end } = require("../globalUtils");
 let intents;
 
 /**
- * Searches context for an object whose `name` property matches the given name parameter
+ * Searches context for an object whose `name` or `id` property matches the given name parameter
  * and returns the matching object.
  * @param {string} name
  * @param {Record<string, object>} context
  * @returns
  */
-const getIntentWithName = (name, context) => {
-  return Object.values(context).find((intent) => intent.name === name);
+const getMatchingIntentFromContext = (nameOrID = "", context) => {
+  return Object.values(context).find((intent) => {
+    return intent.name === nameOrID || intent.id === nameOrID;
+  });
+};
+
+/**
+ * Fires the callback with either an error string or with the node matching the `nameOrId` value
+ * from the context.
+ * @param {string} nameOrId
+ * @param {object} context
+ * @param {function} callback
+ */
+const getNode = (nameOrId, context, callback) => {
+  const node = getMatchingIntentFromContext(nameOrId, context);
+  if (!nameOrId) {
+    callback("payload is missing nodeName property");
+  } else if (!node) {
+    callback(`There is no registered intent with name or id of "${nameOrId}"`);
+  } else {
+    callback(null, node);
+  }
 };
 
 module.exports = function (RED) {
@@ -23,7 +43,7 @@ module.exports = function (RED) {
     this.on("input", function (msg, send, done = () => {}) {
       const globalContext = node.context().global;
       const context = globalContext.get(INTENT_STORE) || {};
-      let intentName = config.intentName || "";
+      const { registeredNodeId = "" } = config;
 
       send =
         send ||
@@ -33,31 +53,29 @@ module.exports = function (RED) {
 
       if (Array.isArray(msg.payload)) {
         msg.payload.forEach((payload) => {
-          const { functionName } = payload;
-          if (!functionName) {
-            node.warn("payload is missing functionName property");
-          } else if (!getIntentWithName(functionName, context)) {
-            node.warn(
-              `There is no registered intent with name: ${functionName}`
-            );
+          const { nodeName } = payload;
+
+          getNode(nodeName, context, (err, registeredNode) => {
+            if (err) {
+              node.warn(err);
+            } else {
+              PubSub.publishSync(registeredNode.id, msg);
+              send(msg);
+            }
+          });
+        });
+      } else {
+        const nameOrId = msg.payload?.nodeName || registeredNodeId;
+
+        getNode(nameOrId, context, (err, registeredNode) => {
+          if (err) {
+            node.warn(err);
           } else {
-            msg.payload = getIntentWithName(functionName, context);
-            PubSub.publishSync(functionName, msg);
+            PubSub.publishSync(registeredNode.id, msg);
             send(msg);
           }
         });
-      } else if (msg.payload?.functionName || intentName) {
-        const functionName = msg.payload?.functionName || intentName;
-
-        msg.payload = getIntentWithName(functionName, context);
-        PubSub.publishSync(functionName, msg);
-        send(msg);
-      } else {
-        node.warn(
-          "The config is missing Intent Name or missing payload.functionName "
-        );
       }
-
       end(done);
     });
   }
