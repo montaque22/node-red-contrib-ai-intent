@@ -1,6 +1,6 @@
 {
   "name": "@technithusiast/node-red-contrib-ai-intent",
-  "version": "1.1.30",
+  "version": "1.1.32",
   "description": "A collection of nodes to elevate a user's automation interactions",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -21,7 +21,8 @@
       "openai-system": "openai-system/index.js",
       "openai-chat": "openai-chat/index.js",
       "openai-response": "openai-response/index.js",
-      "openai-tool": "openai-tool/index.js"
+      "openai-tool": "openai-tool/index.js",
+      "openai-config": "openai-chat/openai-config/index.js"
     }
   },
   "author": "Michael Montaque",

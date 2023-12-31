@@ -73,12 +73,14 @@ const getChatCompletionProps = (msg, config) => {
 module.exports = function (RED) {
   function OpenAIChatHandlerNode(config) {
     RED.nodes.createNode(this, config);
+    // Retrieve the config node with API token data.
+    this.token = RED.nodes.getNode(config.token);
     const node = this;
 
     this.on("input", function (msg, send, done = () => {}) {
       const globalContext = node.context().global;
       const context = globalContext.get(INTENT_STORE) || {};
-      const apiKey = globalContext.get(OPEN_AI_KEY);
+      const apiKey = node.token?.api || globalContext.get(OPEN_AI_KEY);
       const apiProps = getChatCompletionProps(msg, config);
       const registeredIntentFunctions = createFunctionsFromContext(context);
       const messages = apiProps.messages.filter(Boolean);

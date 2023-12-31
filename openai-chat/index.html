@@ -5,6 +5,7 @@
         icon:"font-awesome/fa-comment",
         defaults: {
             name: { value: "" },
+            token: {value: "", type: "openai-config", required: false},
             model: { value: "gpt-4-1106-preview", required: true },
             temperature: { value: .7, required: true },
             max_tokens: { value: 1200, required: true },
@@ -44,6 +45,10 @@
     <div class="form-row">
         <label for="node-input-name"> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-token"> Token</label>
+        <input type="text" id="node-input-token" placeholder="0a1b2c3b4d5e6f">
     </div>
     <div class="form-row">
         <label for="node-input-model"> Model</label>
