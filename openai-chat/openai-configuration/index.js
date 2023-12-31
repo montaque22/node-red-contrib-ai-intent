@@ -3,5 +3,5 @@ module.exports = function (RED) {
     RED.nodes.createNode(this, prop);
     this.api = prop.api;
   }
-  RED.nodes.registerType("openai-config", OpenAIConfigNode);
+  RED.nodes.registerType("openai-configuration", OpenAIConfigNode);
 };

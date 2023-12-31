@@ -1,5 +1,5 @@
 <script type="text/javascript">
-    RED.nodes.registerType('openai-config', {
+    RED.nodes.registerType('openai-configuration', {
         category: 'config',
         defaults: {
             api: { value: "", required: true }
@@ -10,7 +10,7 @@
     });
 </script>
 
-<script type="text/html" data-template-name="openai-config">
+<script type="text/html" data-template-name="openai-configuration">
     <div class="form-row">
         <label for="node-config-input-api"><i class="fa fa-bookmark"></i> API Token</label>
         <input type="text" id="node-config-input-api">
