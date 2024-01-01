@@ -1,7 +1,5 @@
 # AI Intent
 
-> This is experimental and subjected to change! This is unstable and may introduce breaking changes.
-
 This is a collection of nodes to help enhance existing automations to be utilized by chatbots and take advantage of LLM's like GPT. There are 4 Nodes in this collection:
 
 ## Register Intent
@@ -36,4 +34,24 @@ Sanitizes the response from OpenAI. This provides a consistent easy to read outp
 
 ## How to use
 
-**Coming Soon**
+> NOTE: You need to have a valid token from OpenAI for this to work. Visit [OpenAI](https://platform.openai.com/).
+
+Once you have a valid token there are two ways to install it.
+
+### Configuration Node
+
+![](./images/set-config-node.gif)
+When you use the **OpenAI Chat** node there is a Token dropdown. Click the pencil icon and paste the token key into the text box and click add. This method is the easiest however it you should be careful when exporting your flows as the token will be added to the exported JSON.
+
+### Settings.js File
+
+Alternatively, you can add your token to the settings.js file. The file can be found under `.node-red/settings.js` path (or some equivalent). Based on reports from various users the location seems to be slightly different based on how you installed it. You may want to do a global search for it if you're having trouble. Once you find the file search for the `functionGlobalContext` property and add the following:
+
+```
+  functionGlobalContext: {
+    openaiAPIKey: "YOUR-TOKEN-API-GOES-HERE",
+  },
+
+```
+
+Make sure you restart node-red once you save this file. This method is more complicated than the Configuration node however you can freely share and export your flows and automations as the token will be hidden from the flow.
