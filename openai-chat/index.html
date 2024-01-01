@@ -56,23 +56,23 @@
     </div>
     <div class="form-row">
         <label for="node-input-temperature"> Temperature</label>
-        <input type="text" id="node-input-temperature" placeholder="0.7">
+        <input type="number" id="node-input-temperature" placeholder="0.7">
     </div>
     <div class="form-row">
         <label for="node-input-max_tokens"> Max Tokens</label>
-        <input type="text" id="node-input-max_tokens" placeholder="1200">
+        <input type="number" id="node-input-max_tokens" placeholder="1200">
     </div>
     <div class="form-row">
         <label for="node-input-top_p"> Top P</label>
-        <input type="text" id="node-input-top_p" placeholder="0">
+        <input type="number" id="node-input-top_p" placeholder="0">
     </div>
     <div class="form-row">
         <label for="node-input-frequency_penalty"> Frequency Penalty</label>
-        <input type="text" id="node-input-frequency_penalty" placeholder="0">
+        <input type="number" id="node-input-frequency_penalty" placeholder="0">
     </div>
     <div class="form-row">
         <label for="node-input-presence_penalty"> Presence Penalty</label>
-        <input type="text" id="node-input-presence_penalty" placeholder="0">
+        <input type="number" id="node-input-presence_penalty" placeholder="0">
     </div>
    
 </script>
@@ -88,6 +88,9 @@
         openaiAPIKey: "Your Key Goes Here",
     }
     </pre>
+
+    Alternatively, you can add the token via the token configuration dropdown. 
+    See the [Read Me](https://github.com/montaque22/node-red-contrib-ai-intent) for more information 
 
     <h3>Inputs</h3>
     <dl class="message-properties">

@@ -45,15 +45,17 @@ const createFunctionsFromContext = (context = {}) => {
  */
 const getChatCompletionProps = (msg, config) => {
   const model = msg.payload?.model || config.model;
-  const temperature = msg.payload?.temperature || config.temperature;
-  const max_tokens = msg.payload?.max_tokens || config.max_tokens;
-  const top_p = msg.payload?.top_p || config.top_p;
-  const frequency_penalty =
-    msg.payload?.frequency_penalty || config.frequency_penalty;
-  const presence_penalty =
-    msg.payload?.presence_penalty || config.presence_penalty;
+  const temperature = Number(msg.payload?.temperature || config.temperature);
+  const max_tokens = Number(msg.payload?.max_tokens || config.max_tokens);
+  const top_p = Number(msg.payload?.top_p || config.top_p);
+  const frequency_penalty = Number(
+    msg.payload?.frequency_penalty || config.frequency_penalty
+  );
+  const presence_penalty = Number(
+    msg.payload?.presence_penalty || config.presence_penalty
+  );
   const { user, system } = msg;
-  const messages = [system, user];
+  const messages = [system, user].filter(Boolean);
   const tools = msg?.tools || [];
   const tool_choice = tools.length ? "auto" : "none";
 
@@ -83,7 +85,6 @@ module.exports = function (RED) {
       const apiKey = node.token?.api || globalContext.get(OPEN_AI_KEY);
       const apiProps = getChatCompletionProps(msg, config);
       const registeredIntentFunctions = createFunctionsFromContext(context);
-      const messages = apiProps.messages.filter(Boolean);
       const { user, system } = msg;
       const tools = [...apiProps.tools, ...registeredIntentFunctions].filter(
         Boolean
@@ -103,26 +104,24 @@ module.exports = function (RED) {
       }
 
       const openai = new OpenAI({ apiKey });
-
+      const finalProps = {
+        model: apiProps.model,
+        messages: apiProps.messages,
+        tools,
+        tool_choice: apiProps.tool_choice,
+        temperature: apiProps.temperature,
+        max_tokens: apiProps.max_tokens,
+        top_p: apiProps.top_p,
+        frequency_penalty: apiProps.frequency_penalty,
+        presence_penalty: apiProps.presence_penalty,
+      };
+      console.log("PAYLOAD: ", finalProps);
       openai.chat.completions
-        .create({
-          model: apiProps.model,
-          messages,
-          tools,
-          tool_choice: apiProps.tool_choice,
-          temperature: apiProps.temperature,
-          max_tokens: apiProps.max_tokens,
-          top_p: apiProps.top_p,
-          frequency_penalty: apiProps.frequency_penalty,
-          presence_penalty: apiProps.presence_penalty,
-        })
+
+        .create(finalProps)
         .then((answer) => {
           msg.payload = answer;
-          msg._debug = {
-            system,
-            tools,
-            user,
-          };
+          msg._debug = finalProps;
           delete msg.user;
           delete msg.system;
           delete msg.tools;

@@ -1,0 +1,178 @@
+[
+    {
+        "id": "8fc448b752df95d3",
+        "type": "inject",
+        "z": "d312f6d5f62126f3",
+        "name": "Ask about boiler status",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "test",
+                "v": "foobar",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 220,
+        "y": 1160,
+        "wires": [
+            [
+                "e9989674f89d04ad"
+            ]
+        ]
+    },
+    {
+        "id": "e9989674f89d04ad",
+        "type": "OpenAI User",
+        "z": "d312f6d5f62126f3",
+        "name": "",
+        "content": "Are there any boilers i should be concerned about?",
+        "x": 250,
+        "y": 1200,
+        "wires": [
+            [
+                "00a05563456186da"
+            ]
+        ]
+    },
+    {
+        "id": "00a05563456186da",
+        "type": "OpenAI System",
+        "z": "d312f6d5f62126f3",
+        "name": "",
+        "instruction": "You are an engineer observing the boiler status. \nNormal ranges for boilers are 180 - 250 degrees.\n\nTheses are the boilers and their status:\n\n[\n    {{\n        \"name\": \"btar1,\n        \"temp\": 130.2\n    }},\n    {{\n        \"name\": \"trag32\",\n        \"temp\": 212\n    }},\n    {{\n        \"name\": \"simt11\",\n        \"temp\": 300.91\n    }},\n   {{\n        \"name\": \"n00p\",\n        \"temp\": 250.1\n    }},\n    {{\n        \"name\": \"foobar\",\n        \"temp\": 180.8\n    }}\n]",
+        "x": 520,
+        "y": 1200,
+        "wires": [
+            [
+                "f35e1d642fd02513"
+            ]
+        ]
+    },
+    {
+        "id": "f35e1d642fd02513",
+        "type": "OpenAI Tool",
+        "z": "d312f6d5f62126f3",
+        "name": "",
+        "tool": "{\"type\":\"function\",\"function\":{\"name\":\"adjust_boilers\",\"description\":\"Run this function when boilers are too hot or too cool\",\"parameters\":{\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\",\"description\":\"name of boiler\"},\"action\":{\"type\":\"string\",\"description\":\"Choose the action appropriate for the boilers\",\"enum\":[\"warm_up\",\"cool_down\"]},\"response\":{\"type\":\"string\",\"description\":\"Explaination of what is happening\"}},\"required\":[\"name\",\"action\",\"response\"]}}}",
+        "x": 530,
+        "y": 1240,
+        "wires": [
+            [
+                "8e61aa15dbdfa57f"
+            ]
+        ]
+    },
+    {
+        "id": "2e71ce6e4a9bcc3e",
+        "type": "debug",
+        "z": "d312f6d5f62126f3",
+        "name": "debug 48",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 740,
+        "y": 1320,
+        "wires": []
+    },
+    {
+        "id": "aa7f596eea390db8",
+        "type": "OpenAI Response",
+        "z": "d312f6d5f62126f3",
+        "name": "",
+        "x": 510,
+        "y": 1320,
+        "wires": [
+            [
+                "2e71ce6e4a9bcc3e"
+            ]
+        ]
+    },
+    {
+        "id": "5260df988ebc6089",
+        "type": "inject",
+        "z": "d312f6d5f62126f3",
+        "name": "Issue Command to fix boilers",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "test",
+                "v": "foobar",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 1260,
+        "wires": [
+            [
+                "5de6b8ce49a24023"
+            ]
+        ]
+    },
+    {
+        "id": "5de6b8ce49a24023",
+        "type": "OpenAI User",
+        "z": "d312f6d5f62126f3",
+        "name": "",
+        "content": "Please readjust the boilers \nthat are out of range",
+        "x": 250,
+        "y": 1300,
+        "wires": [
+            [
+                "00a05563456186da"
+            ]
+        ]
+    },
+    {
+        "id": "c4c0509f726b5c27",
+        "type": "comment",
+        "z": "d312f6d5f62126f3",
+        "name": "Example: OpenAI Tools node can be used to get specific values for actions",
+        "info": "",
+        "x": 360,
+        "y": 1120,
+        "wires": []
+    },
+    {
+        "id": "8e61aa15dbdfa57f",
+        "type": "OpenAI Chat",
+        "z": "d312f6d5f62126f3",
+        "name": "",
+        "token": "",
+        "model": "gpt-3.5-turbo",
+        "temperature": 0.7,
+        "max_tokens": 1200,
+        "top_p": 1,
+        "frequency_penalty": 0,
+        "presence_penalty": 0,
+        "x": 530,
+        "y": 1280,
+        "wires": [
+            [
+                "aa7f596eea390db8"
+            ]
+        ]
+    }
+]

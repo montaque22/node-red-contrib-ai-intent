@@ -1,19 +1,89 @@
 [
     {
-        "id": "8f1e7d4a810ed167",
-        "type": "Call Intent",
-        "z": "0aa7f2a9c8a696e1",
-        "name": "Dynamic Payload",
-        "intentName": "",
-        "x": 490,
-        "y": 480,
-        "wires": []
+        "id": "17bc360ebf2f52da",
+        "type": "api-render-template",
+        "z": "b9203c19c137b9ca",
+        "name": "",
+        "server": "228d3d53.df8e02",
+        "version": 0,
+        "template": "Available Devices:\n```json\n{\n  \"current time\": {{now()}},\n{% set lights =  expand(states.light) %}\n{%- for area in areas() %}\n  {%- set area_info = namespace(printed=false) %}\n  {%- for device in area_devices(area) -%}\n    {%- if not device_attr(device, \"disabled_by\") and not device_attr(device, \"entry_type\") and device_attr(device, \"name\") %}\n      {%- if not area_info.printed %}\n\n        \"{{ area_name(area) }}\": {\n          {%- set area_info.printed = true -%}\n          \"lights\": [\n            {%- for light in lights -%}\n              {%- if area_name(light.entity_id) == area_name(area) %}\n                {\n                  \"entity name\": \"{{light.name}}\",\n                  \"id\": \"{{light.entity_id}}\",\n                  \"state\": \"{{light.state}}\",\n                  \"timestamp\": \"{{ as_timestamp(light.last_changed) | timestamp_custom('%m-%d-%y %I:%M %p') }}\"\n                },\n              {%- endif %}\n            {%- endfor %}\n          ],\n         \n          \"doors and windows\": [\n            {%- for sensor in expand(states.binary_sensor.ring_contact_sensors) -%}\n              {%- if area_name(sensor.entity_id) == area_name(area) %}\n                {\n                  \"entity name\": \"{{sensor.name}}\",\n                  \"id\": \"{{sensor.entity_id}}\",\n                  \"state\": \"{% if states(sensor.entity_id) == 'on'%}open {%else%}closed {%endif%}\",\n                  \"timestamp\": \"{{ as_timestamp(sensor.last_changed) | timestamp_custom('%m-%d-%y %I:%M %p') }}\"\n                },\n              {%- endif %}\n            {%- endfor %}\n          ]\n        }\n        \n      {%- endif -%}\n    {%- endif %}\n  {%- endfor %}\n{%- endfor %}\n}\n```",
+        "resultsLocation": "summary",
+        "resultsLocationType": "msg",
+        "templateLocation": "template",
+        "templateLocationType": "msg",
+        "x": 360,
+        "y": 700,
+        "wires": [
+            [
+                "1b2cb2b75a5a2fe2"
+            ]
+        ]
     },
     {
-        "id": "46917ec1adb0e757",
+        "id": "1b2cb2b75a5a2fe2",
+        "type": "OpenAI User",
+        "z": "b9203c19c137b9ca",
+        "name": "",
+        "content": "{prompt}",
+        "x": 350,
+        "y": 740,
+        "wires": [
+            [
+                "82fe0e2b3fbd6cd2"
+            ]
+        ]
+    },
+    {
+        "id": "82fe0e2b3fbd6cd2",
+        "type": "OpenAI System",
+        "z": "b9203c19c137b9ca",
+        "name": "",
+        "instruction": "You possess the knowledge of all the universe, answer any question given to you truthfully and to your fullest ability.  \nYou are also a smart home manager, named Ke, who has been given permission to control my smart home which is powered by Home Assistant.\nI will provide you information about my smart home along, you can truthfully make corrections or respond in polite and concise language.\n\n{summary}\nUser is located in the {location}\n\nThe current state of devices is provided in Available Devices.\nOnly use the execute_services function when smart home actions are requested.\nDo not tell me what you're thinking about doing either, just do it.\nIf I ask you about the current state of the home, or many devices I have, or how many devices are in a specific state, just respond with the accurate information but do not call the execute_services function.\nIf I ask you what time or date it is be sure to respond in a human readable format.\nIf you don't have enough information to execute a smart home command then specify what other information you need.",
+        "x": 340,
+        "y": 780,
+        "wires": [
+            [
+                "fb67875ebc73a3ff"
+            ]
+        ]
+    },
+    {
+        "id": "f2aa9233e44a12b4",
+        "type": "OpenAI Chat",
+        "z": "b9203c19c137b9ca",
+        "name": "",
+        "model": "gpt-4-1106-preview",
+        "temperature": 0.7,
+        "max_tokens": 1200,
+        "top_p": 1,
+        "frequency_penalty": 0,
+        "presence_penalty": 0,
+        "x": 350,
+        "y": 860,
+        "wires": [
+            [
+                "ab9b59dc4a6aadf8"
+            ]
+        ]
+    },
+    {
+        "id": "ab9b59dc4a6aadf8",
+        "type": "OpenAI Response",
+        "z": "b9203c19c137b9ca",
+        "name": "",
+        "x": 330,
+        "y": 900,
+        "wires": [
+            [
+                "2c78c52f1c872c2f"
+            ]
+        ]
+    },
+    {
+        "id": "2c78c52f1c872c2f",
         "type": "debug",
-        "z": "0aa7f2a9c8a696e1",
-        "name": "debug 4",
+        "z": "b9203c19c137b9ca",
+        "name": "debug 142",
         "active": true,
         "tosidebar": true,
         "console": false,
@@ -22,37 +92,22 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 340,
-        "y": 180,
+        "x": 570,
+        "y": 900,
         "wires": []
     },
     {
-        "id": "2d713b90c7f65576",
-        "type": "Register Intent",
-        "z": "0aa7f2a9c8a696e1",
-        "name": "disarmHome",
-        "description": "deactivates the alarm for the house",
-        "excludeFromOpenAi": false,
-        "x": 110,
-        "y": 180,
-        "wires": [
-            [
-                "46917ec1adb0e757"
-            ]
-        ]
-    },
-    {
-        "id": "d2843e5ee19d6524",
+        "id": "fae6fc0d7ac5c16b",
         "type": "inject",
-        "z": "0aa7f2a9c8a696e1",
+        "z": "b9203c19c137b9ca",
         "name": "",
         "props": [
             {
                 "p": "payload"
             },
             {
-                "p": "test",
-                "v": "foobar",
+                "p": "prompt",
+                "v": "How many lights are on?",
                 "vt": "str"
             }
         ],
@@ -63,151 +118,50 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 200,
-        "y": 320,
+        "x": 160,
+        "y": 700,
         "wires": [
             [
-                "ae2e303a450840f7"
+                "17bc360ebf2f52da"
             ]
         ]
     },
     {
-        "id": "403fe0e709ff7fd4",
-        "type": "catch",
-        "z": "0aa7f2a9c8a696e1",
-        "name": "",
-        "scope": null,
-        "uncaught": false,
-        "x": 460,
-        "y": 560,
-        "wires": [
-            [
-                "6bf60a1bede18e1d"
-            ]
-        ]
-    },
-    {
-        "id": "6bf60a1bede18e1d",
-        "type": "debug",
-        "z": "0aa7f2a9c8a696e1",
-        "name": "debug 44",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 460,
-        "y": 520,
-        "wires": []
-    },
-    {
-        "id": "ae2e303a450840f7",
-        "type": "OpenAI User",
-        "z": "0aa7f2a9c8a696e1",
-        "name": "",
-        "instruction": "turn on the light",
-        "x": 190,
-        "y": 360,
-        "wires": [
-            [
-                "cfbf104ff6775661"
-            ]
-        ]
-    },
-    {
-        "id": "cfbf104ff6775661",
-        "type": "OpenAI System",
-        "z": "0aa7f2a9c8a696e1",
-        "name": "",
-        "instruction": "You are an virtual Assistant named Ke. You can assist requests about my smart home. The following is a JSON list of devices and their states in my home:\n\n[\n{{entityId: light.master, state: on, friendlyName: Master bedroom light}},\n{{entityId: alarm.front, state: disarmed, friendlyName: Front Door Alarm}}\n]",
-        "x": 180,
-        "y": 400,
-        "wires": [
-            [
-                "46e1b048915b2c90"
-            ]
-        ]
-    },
-    {
-        "id": "4dc4762b4cf757a8",
-        "type": "OpenAI Chat",
-        "z": "0aa7f2a9c8a696e1",
-        "name": "",
-        "model": "gpt-4-1106-preview",
-        "temperature": 0.7,
-        "max_tokens": 1200,
-        "top_p": 1,
-        "frequency_penalty": 0,
-        "presence_penalty": 0,
-        "x": 190,
-        "y": 480,
-        "wires": [
-            [
-                "c1a47d4aec0ec3f0"
-            ]
-        ]
-    },
-    {
-        "id": "c1a47d4aec0ec3f0",
-        "type": "OpenAI Response",
-        "z": "0aa7f2a9c8a696e1",
-        "name": "",
-        "x": 170,
-        "y": 520,
-        "wires": [
-            [
-                "6bf60a1bede18e1d",
-                "8f1e7d4a810ed167"
-            ]
-        ]
-    },
-    {
-        "id": "157c85e2d841d199",
-        "type": "debug",
-        "z": "0aa7f2a9c8a696e1",
-        "name": "debug 45",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 340,
-        "y": 220,
-        "wires": []
-    },
-    {
-        "id": "b84e436d512c72e2",
-        "type": "Register Intent",
-        "z": "0aa7f2a9c8a696e1",
-        "name": "armHome",
-        "description": "Turn on the alarm for the house",
-        "excludeFromOpenAi": false,
-        "x": 120,
-        "y": 220,
-        "wires": [
-            [
-                "157c85e2d841d199"
-            ]
-        ]
-    },
-    {
-        "id": "46e1b048915b2c90",
+        "id": "fb67875ebc73a3ff",
         "type": "OpenAI Tool",
-        "z": "0aa7f2a9c8a696e1",
-        "name": "",
-        "tool": "{\"type\":\"function\",\"function\":{\"name\":\"light\",\"description\":\"turn on or off the lights\",\"parameters\":{\"type\":\"object\",\"properties\":{\"isQuestion\":{\"enum\":[false]},\"action\":{\"type\":\"string\",\"description\":\"action to run which will turn on or off the light\",\"enum\":[\"turn_on\",\"turn_off\"]},\"entities\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}},\"response\":{\"type\":\"string\",\"description\":\"A friendly response to the given command\"}},\"required\":[\"isQuestion\",\"action\",\"entities\",\"response\"]}}}",
-        "x": 190,
-        "y": 440,
+        "z": "b9203c19c137b9ca",
+        "name": "execute_services",
+        "tool": "{\"type\":\"function\",\"function\":{\"name\":\"execute_services\",\"description\":\"Use this function to execute service of devices in Home Assistant.\",\"parameters\":{\"type\":\"object\",\"properties\":{\"list\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"domain\":{\"type\":\"string\",\"description\":\"The service to be called\"},\"service\":{\"type\":\"string\",\"description\":\"The service to be called\"},\"target\":{\"type\":\"object\",\"description\":\"The service data object to indicate what to control.\",\"properties\":{\"entity_id\":{\"type\":\"string\",\"description\":\"The entity_id retrieved from available devices. It must start with domain, followed by dot character.\"}},\"required\":[\"entity_id\"]}},\"required\":[\"domain\",\"service\",\"target\"]}},\"response\":{\"type\":\"string\",\"description\":\"A friendly response to the given command\"}}}}}",
+        "x": 330,
+        "y": 820,
         "wires": [
             [
-                "4dc4762b4cf757a8"
+                "f2aa9233e44a12b4"
             ]
         ]
+    },
+    {
+        "id": "865aa4b5f2775a4b",
+        "type": "comment",
+        "z": "b9203c19c137b9ca",
+        "name": "Example: Answers questions about the lights in your smart home",
+        "info": "This execute_services was adapted from [jekalmin](https://github.com/jekalmin/extended_openai_conversation)\nThe System context was adapted from [FutureProofHomes](https://www.youtube.com/watch?v=pAKqKTkx5X4&t=2s)",
+        "x": 330,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "228d3d53.df8e02",
+        "type": "server",
+        "name": "Home Assistant",
+        "addon": false,
+        "rejectUnauthorizedCerts": true,
+        "ha_boolean": "",
+        "connectionDelay": false,
+        "cacheJson": false,
+        "heartbeat": false,
+        "heartbeatInterval": "",
+        "statusSeparator": "",
+        "enableGlobalContextStore": false
     }
 ]

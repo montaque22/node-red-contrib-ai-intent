@@ -1,0 +1,120 @@
+[
+    {
+        "id": "e4635021cdeaacaa",
+        "type": "inject",
+        "z": "d312f6d5f62126f3",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "test",
+                "v": "foobar",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 220,
+        "y": 880,
+        "wires": [
+            [
+                "53e38c029c8507da"
+            ]
+        ]
+    },
+    {
+        "id": "23d78dc85792fc51",
+        "type": "debug",
+        "z": "d312f6d5f62126f3",
+        "name": "debug 47",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 460,
+        "y": 1040,
+        "wires": []
+    },
+    {
+        "id": "53e38c029c8507da",
+        "type": "OpenAI User",
+        "z": "d312f6d5f62126f3",
+        "name": "",
+        "content": "What is on the agenda today?",
+        "x": 210,
+        "y": 920,
+        "wires": [
+            [
+                "62f7c0e77f156c69"
+            ]
+        ]
+    },
+    {
+        "id": "1069caa745871f7f",
+        "type": "OpenAI Chat",
+        "z": "d312f6d5f62126f3",
+        "name": "",
+        "token": "",
+        "model": "gpt-3.5-turbo",
+        "temperature": 0.7,
+        "max_tokens": 1200,
+        "top_p": 1,
+        "frequency_penalty": 0,
+        "presence_penalty": 0,
+        "x": 210,
+        "y": 1000,
+        "wires": [
+            [
+                "eda369f64ccc7874"
+            ]
+        ]
+    },
+    {
+        "id": "eda369f64ccc7874",
+        "type": "OpenAI Response",
+        "z": "d312f6d5f62126f3",
+        "name": "",
+        "x": 190,
+        "y": 1040,
+        "wires": [
+            [
+                "23d78dc85792fc51"
+            ]
+        ]
+    },
+    {
+        "id": "62f7c0e77f156c69",
+        "type": "OpenAI System",
+        "z": "d312f6d5f62126f3",
+        "name": "",
+        "instruction": "You are are alfred, batman's butler. Treat me\nas you would bruce wayne.",
+        "x": 200,
+        "y": 960,
+        "wires": [
+            [
+                "1069caa745871f7f"
+            ]
+        ]
+    },
+    {
+        "id": "46538276df96ae02",
+        "type": "comment",
+        "z": "d312f6d5f62126f3",
+        "name": "Example: OpenAI System node gives GPT the context it is Alfred and you are Bruce wayne",
+        "info": "",
+        "x": 410,
+        "y": 840,
+        "wires": []
+    }
+]

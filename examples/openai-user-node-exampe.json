@@ -1,0 +1,106 @@
+[
+    {
+        "id": "4629835899ef6a94",
+        "type": "inject",
+        "z": "d312f6d5f62126f3",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "test",
+                "v": "foobar",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 220,
+        "y": 600,
+        "wires": [
+            [
+                "34bc5dbf3f85c1c6"
+            ]
+        ]
+    },
+    {
+        "id": "8c4e6be9d8f809b2",
+        "type": "debug",
+        "z": "d312f6d5f62126f3",
+        "name": "debug 44",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 460,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "34bc5dbf3f85c1c6",
+        "type": "OpenAI User",
+        "z": "d312f6d5f62126f3",
+        "name": "",
+        "content": "What color is the sky",
+        "x": 210,
+        "y": 640,
+        "wires": [
+            [
+                "265bcb5f2a387d15"
+            ]
+        ]
+    },
+    {
+        "id": "265bcb5f2a387d15",
+        "type": "OpenAI Chat",
+        "z": "d312f6d5f62126f3",
+        "name": "",
+        "token": "",
+        "model": "gpt-3.5-turbo",
+        "temperature": 0.7,
+        "max_tokens": 1200,
+        "top_p": 1,
+        "frequency_penalty": 0,
+        "presence_penalty": 0,
+        "x": 210,
+        "y": 680,
+        "wires": [
+            [
+                "743157a166429126"
+            ]
+        ]
+    },
+    {
+        "id": "743157a166429126",
+        "type": "OpenAI Response",
+        "z": "d312f6d5f62126f3",
+        "name": "",
+        "x": 190,
+        "y": 720,
+        "wires": [
+            [
+                "8c4e6be9d8f809b2"
+            ]
+        ]
+    },
+    {
+        "id": "4aec75bc6fa6f5a8",
+        "type": "comment",
+        "z": "d312f6d5f62126f3",
+        "name": "Example: Simple question to GPT with only the OpenAI User node",
+        "info": "",
+        "x": 320,
+        "y": 560,
+        "wires": []
+    }
+]
