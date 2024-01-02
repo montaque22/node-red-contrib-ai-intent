@@ -85,10 +85,17 @@ module.exports = function (RED) {
       const apiKey = node.token?.api || globalContext.get(OPEN_AI_KEY);
       const apiProps = getChatCompletionProps(msg, config);
       const registeredIntentFunctions = createFunctionsFromContext(context);
-      const { user, system } = msg;
       const tools = [...apiProps.tools, ...registeredIntentFunctions].filter(
         Boolean
       );
+      const toolProps = {};
+
+      // Tools cannot be an empty array so we add it
+      // only if there are tools
+      if (!!tools.length) {
+        toolProps.tools = tools;
+        toolProps.tool_choice = "auto";
+      }
 
       send =
         send ||
@@ -105,17 +112,16 @@ module.exports = function (RED) {
 
       const openai = new OpenAI({ apiKey });
       const finalProps = {
+        ...toolProps,
         model: apiProps.model,
         messages: apiProps.messages,
-        tools,
-        tool_choice: apiProps.tool_choice,
         temperature: apiProps.temperature,
         max_tokens: apiProps.max_tokens,
         top_p: apiProps.top_p,
         frequency_penalty: apiProps.frequency_penalty,
         presence_penalty: apiProps.presence_penalty,
       };
-      console.log("PAYLOAD: ", finalProps);
+
       openai.chat.completions
 
         .create(finalProps)
