@@ -8,7 +8,7 @@ This node creates a subscription that can be activated by the **Call Intent** no
 
 ## Call Intent
 
-Triggers the associated **Register Intent** node. When this node is attached directly after the **OpenAI Response** node, it can dynamically trigger Registered intents.
+Triggers the associated **Register Intent** node. When this node is attached directly after the **OpenAI Response** node, it can dynamically trigger Registered intents. To see this in action check the examples folder and look for the `openai-call-registered-intent-example.json`.
 
 ## OpenAI Chat
 
@@ -40,7 +40,7 @@ Once you have a valid token there are two ways to install it.
 
 ### Configuration Node
 
-![](./images/set-config-node.gif)
+![](https://raw.githubusercontent.com/montaque22/node-red-contrib-ai-intent/master/images/set-config-node.gif)
 When you use the **OpenAI Chat** node there is a Token dropdown. Click the pencil icon and paste the token key into the text box and click add. This method is the easiest however it you should be careful when exporting your flows as the token will be added to the exported JSON.
 
 ### Settings.js File

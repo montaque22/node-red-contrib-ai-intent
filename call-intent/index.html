@@ -1,37 +1,53 @@
 <script type="text/javascript">
-    const DYNAMIC_OPTION = {value:"", label:"Use payload.nodeName"}
+    const DYNAMIC_OPTION = {value:"", label:"Use payload.nodeName"}   
     
-    RED.nodes.registerType("Call Intent", {
-        category: 'AI Intent',
-        color: '#74b9ff',
-        icon:"font-awesome/fa-reply-all",
-        defaults: {
-            name: { value: "" },
-            registeredNodeId: { 
-                value: getIntentOptions(RED.settings.callIntentRegistry),
-            validate: (value) => {
-                return window._intentOptions?.some(option => {
-                    return option.value === value
+
+    const getIntentOptions = (intents = []) => {
+        const options = intents.map(intent => {
+            return { value: intent.id, label: intent.name }
+        })
+
+        options.push(DYNAMIC_OPTION)
+
+        return options
+    }
+    $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
+        const intentOptions = getIntentOptions(data)
+
+        initialize(intentOptions)
+    });
+
+
+    const initialize = (intentOptions = []) => {
+        RED.nodes.registerType("Call Intent", {
+            category: 'AI Intent',
+            color: '#74b9ff',
+            icon: "font-awesome/fa-reply-all",
+            defaults: {
+                name: { value: "" },
+                registeredNodeId: {
+                    value: getIntentOptions(RED.settings.callIntentRegistry),
+                    validate: (value) => {
+                        return intentOptions.some(option => {
+                            return option.value === value
+                        })
+                    }
+                },
+            },
+            inputs: 1,
+            outputs: 0,
+
+            label: function () {
+                return this.name || "Call Intent";
+            },
+
+            oneditprepare: function () {
+                $("#node-input-message").typedInput({
+                    type: "str",
+                    types: ["str", "num", "bool", "json"],
+                    typeField: "#node-input-message-type"
                 })
-            } },
-        },
-        inputs: 1,
-        outputs: 0,
 
-        label: function () {
-            return this.name || "Call Intent";
-        },
-
-        oneditprepare: function(x){
-            $("#node-input-message").typedInput({
-                type: "str",
-                types: ["str", "num", "bool", "json"],
-                typeField: "#node-input-message-type"
-            })
-
-            $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
-                const intentOptions = getIntentOptions(data)
-                window._intentOptions = intentOptions;
                $("#node-input-registeredNodeId").typedInput({
                     types: [
                         {
@@ -40,21 +56,13 @@
                         }
                     ]
                 })
-            });
-            
-        }
-      
-    });
+            }
 
-function getIntentOptions(intents = []) {
-    const options = intents.map(intent => {
-        return { value: intent.id, label: intent.name }
-    })
+        });
+    }
+    
 
-    options.push(DYNAMIC_OPTION)
 
-    return options
-}
 </script>
 
 <script type="text/html" data-template-name="Call Intent">

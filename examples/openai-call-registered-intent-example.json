@@ -1,0 +1,174 @@
+[
+    {
+        "id": "05bdf9f147f9ea58",
+        "type": "inject",
+        "z": "d312f6d5f62126f3",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "test",
+                "v": "foobar",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 240,
+        "y": 1160,
+        "wires": [
+            [
+                "937aada85a8bbdf9"
+            ]
+        ]
+    },
+    {
+        "id": "937aada85a8bbdf9",
+        "type": "OpenAI User",
+        "z": "d312f6d5f62126f3",
+        "name": "",
+        "content": "Lock up the house for me.",
+        "x": 230,
+        "y": 1200,
+        "wires": [
+            [
+                "881af854eea6f26b"
+            ]
+        ]
+    },
+    {
+        "id": "a55915b38c3e6a75",
+        "type": "OpenAI Chat",
+        "z": "d312f6d5f62126f3",
+        "name": "",
+        "token": "",
+        "model": "gpt-3.5-turbo",
+        "temperature": 0.7,
+        "max_tokens": 1200,
+        "top_p": 1,
+        "frequency_penalty": 0,
+        "presence_penalty": 0,
+        "x": 230,
+        "y": 1280,
+        "wires": [
+            [
+                "8097038c41fd6f2a"
+            ]
+        ]
+    },
+    {
+        "id": "8097038c41fd6f2a",
+        "type": "OpenAI Response",
+        "z": "d312f6d5f62126f3",
+        "name": "",
+        "x": 210,
+        "y": 1320,
+        "wires": [
+            [
+                "18324bcf3283205b"
+            ]
+        ]
+    },
+    {
+        "id": "881af854eea6f26b",
+        "type": "OpenAI System",
+        "z": "d312f6d5f62126f3",
+        "name": "",
+        "instruction": "You are a smart home assistant capable of controlling a smart home.\nIf asked a command use the appropriate function to fulfill the request.",
+        "x": 220,
+        "y": 1240,
+        "wires": [
+            [
+                "a55915b38c3e6a75"
+            ]
+        ]
+    },
+    {
+        "id": "8c97d656955c94f8",
+        "type": "Call Intent",
+        "z": "d312f6d5f62126f3",
+        "name": "",
+        "registeredNodeId": "",
+        "x": 540,
+        "y": 1320,
+        "wires": []
+    },
+    {
+        "id": "18324bcf3283205b",
+        "type": "split",
+        "z": "d312f6d5f62126f3",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 390,
+        "y": 1320,
+        "wires": [
+            [
+                "8c97d656955c94f8"
+            ]
+        ]
+    },
+    {
+        "id": "a63ae38cd3768628",
+        "type": "debug",
+        "z": "d312f6d5f62126f3",
+        "name": "debug 45",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 720,
+        "y": 1220,
+        "wires": []
+    },
+    {
+        "id": "441f8a05100623f4",
+        "type": "Register Intent",
+        "z": "d312f6d5f62126f3",
+        "name": "armHome",
+        "description": "Turn on the alarm for the house",
+        "excludeFromOpenAi": false,
+        "x": 500,
+        "y": 1220,
+        "wires": [
+            [
+                "a63ae38cd3768628"
+            ]
+        ]
+    },
+    {
+        "id": "a79bdb00f60eb779",
+        "type": "comment",
+        "z": "d312f6d5f62126f3",
+        "name": "Example: Combining Call Intent with Register Intent node",
+        "info": "You can add `Call Intent` node to the \nresponse from OpenAI. If OpenAI responds\nusing function call, then the response will\ndynamically call the correct registered node",
+        "x": 310,
+        "y": 1120,
+        "wires": []
+    },
+    {
+        "id": "50803a6c3a41949e",
+        "type": "comment",
+        "z": "d312f6d5f62126f3",
+        "name": "Register Intent nodes automatically are added to OpenAI and can be called",
+        "info": "",
+        "x": 700,
+        "y": 1180,
+        "wires": []
+    }
+]
