@@ -48,14 +48,20 @@
                     typeField: "#node-input-message-type"
                 })
 
-               $("#node-input-registeredNodeId").typedInput({
-                    types: [
-                        {
-                            value: "",
-                            options: intentOptions
-                        }
-                    ]
-                })
+                 $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
+                    const options = getIntentOptions(data)
+
+                    $("#node-input-registeredNodeId").typedInput({
+                         types: [
+                             {
+                                 value: "",
+                                 options: options
+                             }
+                         ]
+                     })
+                });
+
+               
             }
 
         });
