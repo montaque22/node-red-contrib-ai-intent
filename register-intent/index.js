@@ -37,12 +37,13 @@ module.exports = function (RED) {
       // get intent data for given node id
       var intent = await storage.get(nodeId);
 
-      if (doesIntentWithNameExist(nodeId, context)) {
-        this.error(
-          `You cannot have two Register intent node with the same name "${context[nodeId].name}".
-          You will get unintended results.`
-        );
-      } else if (!intent) {
+      // if (doesIntentWithNameExist(nodeId, context)) {
+      //   this.error(
+      //     `You cannot have two Register intent node with the same name "${context[nodeId].name}".
+      //     You will get unintended results.`
+      //   );
+      // } else
+      if (!intent) {
         // Intent is new. Store the intent since it doesn't exist
         await storage.setItem(nodeId, context[nodeId]);
       } else if (intent.nodeId !== nodeId) {

@@ -12,13 +12,13 @@
         return options
     }
     $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
-        const intentOptions = getIntentOptions(data)
-
-        initialize(intentOptions)
+        window.__intentOptions = getIntentOptions(data)
+         
+        initialize()
     });
 
 
-    const initialize = (intentOptions = []) => {
+    const initialize = () => {
         RED.nodes.registerType("Call Intent", {
             category: 'AI Intent',
             color: '#74b9ff',
@@ -28,7 +28,7 @@
                 registeredNodeId: {
                     value: getIntentOptions(RED.settings.callIntentRegistry),
                     validate: (value) => {
-                        return intentOptions.some(option => {
+                        return window.__intentOptions.some(option => {
                             return option.value === value
                         })
                     }
@@ -49,13 +49,13 @@
                 })
 
                  $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
-                    const options = getIntentOptions(data)
+                    window.__intentOptions = getIntentOptions(data)
 
                     $("#node-input-registeredNodeId").typedInput({
                          types: [
                              {
                                  value: "",
-                                 options: options
+                                 options: window.__intentOptions
                              }
                          ]
                      })
