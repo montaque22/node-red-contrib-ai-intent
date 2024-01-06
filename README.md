@@ -61,3 +61,7 @@ Make sure you restart node-red once you save this file. This method is more comp
 ### Watch this video to learn how to use this plugin
 
 [![AI-Intent Tutorial](https://raw.githubusercontent.com/montaque22/node-red-contrib-ai-intent/master/images/finally.jpg)](https://youtu.be/J0_mi7U0wCM)
+
+> Channel members have early access
+
+> Video will publicly release Sat, Jan 6, 2024 @ 5AM PST
