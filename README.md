@@ -57,3 +57,7 @@ Alternatively, you can add your token to the settings.js file. The file can be f
 ```
 
 Make sure you restart node-red once you save this file. This method is more complicated than the Configuration node however you can freely share and export your flows and automations as the token will be hidden from the flow.
+
+Watch this video to learn how to use this plugin
+
+[![AI-Intent Tutorial](https://raw.githubusercontent.com/montaque22/node-red-contrib-ai-intent/master/images/finally.jpg)](https://youtu.be/J0_mi7U0wCM)
