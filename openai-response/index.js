@@ -1,4 +1,5 @@
 const { end } = require("../globalUtils");
+const Sugar = require("sugar");
 
 module.exports = function (RED) {
   function OpenAIResponseHandlerNode(config) {
@@ -25,19 +26,19 @@ module.exports = function (RED) {
 
         if (tool_calls) {
           tool_calls.forEach((tool) => {
+            const deepCopyPayload = Sugar.Object.clone(payload, true);
+
             if (tool.type === "function") {
-              payload.args = {
+              deepCopyPayload.args = {
                 ...JSON.parse(tool.function.arguments),
               };
-              payload.nodeName = tool.function.name;
-              output.push(payload);
+              deepCopyPayload.nodeName = tool.function.name;
+              output.push(deepCopyPayload);
             }
           });
         } else {
           output.push(payload);
         }
-
-        return payload;
       });
 
       msg.payload = output;
