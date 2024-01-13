@@ -77,6 +77,10 @@ module.exports = function (RED) {
       if (removed) {
         getDatabase(async (storage) => {
           console.log("Remove: ", config.name);
+          const context = globalContext.get(INTENT_STORE) || {};
+          delete context[nodeId];
+          globalContext.set(INTENT_STORE, context);
+
           await storage.removeItem(nodeId);
           PubSub.unsubscribe(token);
           end(done);
