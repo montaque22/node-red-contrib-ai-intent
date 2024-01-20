@@ -13,7 +13,7 @@ This node creates a subscription that can be activated by the **Call Intent** no
 Triggers the associated **Register Intent** node. When this node is attached directly after the **OpenAI Response** node, it can dynamically trigger Registered intents. To see this in action check the examples folder and look for the `openai-call-registered-intent-example.json`.
 
 **To learn more about both the Call and Register Intent, watch the video below.**
-[![Call/Register Intent](https://raw.githubusercontent.com/montaque22/node-red-contrib-ai-intent/master/images/call_register_intent.jpg)](https://youtu.be/oWP8es4g4D0)
+[![Call/Register Intent](https://raw.githubusercontent.com/montaque22/node-red-contrib-ai-intent/master/images/call_register_intent.jpeg)](https://youtu.be/oWP8es4g4D0)
 
 ### OpenAI Chat
 
