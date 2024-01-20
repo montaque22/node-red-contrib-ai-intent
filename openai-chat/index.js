@@ -9,6 +9,9 @@ const { end } = require("../globalUtils");
 const createFunctionsFromContext = (context = {}) => {
   return (
     Object.values(context)
+      .filter((payload) => {
+        return payload.type === "Register Intent";
+      })
       .map((payload) => {
         if (payload.excludeFromOpenAi) {
           return undefined;
@@ -57,7 +60,7 @@ const getChatCompletionProps = (msg, config) => {
   const { user, system } = msg;
   const messages = [system, user].filter(Boolean);
   const tools = msg?.tools || [];
-  const tool_choice = tools.length ? "auto" : "none";
+  const tool_choice = msg.payload?.tool_choice || config?.tool_choice || "auto";
 
   return {
     model,
@@ -70,6 +73,57 @@ const getChatCompletionProps = (msg, config) => {
     tool_choice,
     tools,
   };
+};
+
+/**
+ * Based on the tool_choice the tool properties will be created. This is based off
+ * https://cookbook.openai.com/examples/how_to_call_functions_with_chat_models
+ *
+ * @param {Object} context - contains all the saved nodes that represents functions
+ * @param {*} tools - All the tools to be sent as functions
+ * @param {*} toolChoice - Specifies which tools to use
+ * @returns
+ */
+const determineToolProperties = (
+  context = {},
+  tools = [],
+  toolChoice = "auto"
+) => {
+  const props = {
+    tools,
+    tool_choice: toolChoice,
+  };
+
+  if (toolChoice === "none") {
+    return {};
+  } else if (toolChoice === "auto") {
+    return props;
+  } else if (context[toolChoice].type === "OpenAI Tool") {
+    const tool = JSON.parse(context[toolChoice].tool);
+    props.tool_choice = {
+      type: tool.type,
+      function: { name: tool.function.name },
+    };
+
+    const doesExist = tools.some((_tool) => {
+      return _tool.function.name === tool.function.name;
+    });
+
+    if (!doesExist) {
+      throw new Error(
+        `The OpenAI Tool node "${context[toolChoice].name}" is missing from the flow.`
+      );
+    }
+
+    return props;
+  } else {
+    props.tool_choice = {
+      type: "function",
+      function: { name: context[toolChoice].name },
+    };
+
+    return props;
+  }
 };
 
 module.exports = function (RED) {
@@ -88,14 +142,11 @@ module.exports = function (RED) {
       const tools = [...apiProps.tools, ...registeredIntentFunctions].filter(
         Boolean
       );
-      const toolProps = {};
-
-      // Tools cannot be an empty array so we add it
-      // only if there are tools
-      if (!!tools.length) {
-        toolProps.tools = tools;
-        toolProps.tool_choice = "auto";
-      }
+      const toolProps = determineToolProperties(
+        context,
+        tools,
+        apiProps.tool_choice
+      );
 
       send =
         send ||

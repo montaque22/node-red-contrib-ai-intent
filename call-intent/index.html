@@ -3,7 +3,9 @@
     
 
     const getIntentOptions = (intents = []) => {
-        const options = intents.map(intent => {
+        const options = intents.filter(option => {
+            return option.type === "Register Intent"
+        }).map(intent => {
             return { value: intent.id, label: intent.name }
         })
 
@@ -13,7 +15,7 @@
     }
     $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
         window.__intentOptions = getIntentOptions(data)
-         
+        
         initialize()
     });
 

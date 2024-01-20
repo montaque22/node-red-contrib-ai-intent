@@ -1,10 +1,32 @@
 <script type="text/javascript">
+    const DYNAMIC_OPTIONS = [
+        { value: "auto", label: "Automatic" },
+        { value: "none", label: "None" }
+    ]
+     $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
+        
+            window.__tools = getToolOptions(data)
+
+            initialize()
+        });
+
+        const getToolOptions = (intents = []) => {
+                const options = intents.map(intent => {
+                    return { value: intent.id, label: intent.name }
+                })
+
+                return [...DYNAMIC_OPTIONS, ...options]
+            }
+            
     RED.nodes.registerType("OpenAI Chat", {
         category: 'AI Intent',
         color: '#e67e22',
         icon:"font-awesome/fa-comment",
         defaults: {
             name: { value: "" },
+            tool_choice: {
+                value: getToolOptions(RED.settings.callIntentRegistry),
+            },
             token: {value: "", type: "openai-configuration", required: false},
             model: { value: "gpt-4-1106-preview", required: true },
             temperature: { value: .7, required: true },
@@ -36,6 +58,19 @@
             $("#node-input-presence_penalty").typedInput({
                 type: "num",
             })
+
+            $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
+                window.__tools = getToolOptions(data)
+
+                $("#node-input-tool_choice").typedInput({
+                    types: [
+                        {
+                            value: "",
+                            options: window.__tools
+                        }
+                    ]
+                })
+            });
         }
     });
 
@@ -53,6 +88,10 @@
     <div class="form-row">
         <label for="node-input-model"> Model</label>
         <input type="text" id="node-input-model" placeholder="gpt-3.5-turbo">
+    </div>
+    <div class="form-row">
+        <label for="node-input-tool_choice"> Tool Choice</label>
+        <input type="text" id="node-input-tool_choice" placeholder="Automatic">
     </div>
     <div class="form-row">
         <label for="node-input-temperature"> Temperature</label>
@@ -90,7 +129,7 @@
     </pre>
 
     Alternatively, you can add the token via the token configuration dropdown. 
-    See the [Read Me](https://github.com/montaque22/node-red-contrib-ai-intent) for more information 
+    See the <a href="https://github.com/montaque22/node-red-contrib-ai-intent" target="_blank">Read Me</a> for more information 
 
     <h3>Inputs</h3>
     <dl class="message-properties">
@@ -99,7 +138,20 @@
         </dt>
         <dd> Required field that dictates the model to use when calling OpenAI </dd>
     </dl>
-    <p>To learn more about the other properties, look at <a href="https://platform.openai.com/docs/api-reference/chat/create">OpenAI's documentation</a></p>
+    <dl class="message-properties">
+        <dt class="required">Tool Choice
+            <span class="property-type">Dropdown</span>
+        </dt>
+        <dd> This setting controls whether or not GPT uses the provided functions to respond.
+            If you want to force GPT to use a specific function, selected it from the dropdown.
+            <b>Automatic</b> lets GPT decides what is best (This is the default). <b>None</b> disables the use of functions.
+            to further optimize the API call, AI-Intent will not pass any of the tools
+            to save tokens if "None" is selected. Check documentation for more detail on 
+            how tools work: <a href="https://cookbook.openai.com/examples/how_to_call_functions_with_chat_models" target="_blank">Function Calling & Tools</a>
+        </dd>
+    </dl>
+
+    <p>To learn more about the other properties, look at <a target="_blank" href="https://platform.openai.com/docs/api-reference/chat/create">OpenAI's documentation</a></p>
     
     <h3>Details</h3>
     <p>At minimum the OpenAI User node should be used before this node. The OpenAI User node adds necessary 
