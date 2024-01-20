@@ -34,6 +34,19 @@ class ContextDatabase {
     this.globalContext.set(INTENT_STORE, this.nodeStore);
   }
 
+  deleteNode(cb = () => {}) {
+    getDatabase(async (storage) => {
+      console.log("Removing: ", this.config.name);
+      const nodeId = this.config.id;
+      const nodeStore = this.globalContext.get(INTENT_STORE) || {};
+      delete nodeStore[nodeId];
+      this.globalContext.set(INTENT_STORE, nodeStore);
+
+      await storage.removeItem(nodeId);
+      cb();
+    });
+  }
+
   getNodesFromStore() {
     return new Promise((resolve) => {
       getDatabase((storage) => {

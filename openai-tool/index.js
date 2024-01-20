@@ -35,6 +35,16 @@ module.exports = function (RED) {
       send(msg);
       done();
     });
+
+    this.on("close", function (removed, done) {
+      if (removed) {
+        nodeDB.deleteNode(() => {
+          end(done);
+        });
+      } else {
+        end(done);
+      }
+    });
   }
 
   RED.nodes.registerType("OpenAI Tool", OpenAIFunctionHandlerNode);
