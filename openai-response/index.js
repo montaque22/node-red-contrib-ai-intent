@@ -1,6 +1,19 @@
 const { end } = require("../globalUtils");
 const Sugar = require("sugar");
 
+/**
+ * Returns a formatted string based on the settings of the node
+ * @param {object} node - represents the current node and it's settings
+ * @param {string} content - the string response that came back from GPT
+ * @returns
+ */
+const getResponse = (node, content = "") => {
+  if (node.keepFormatting) {
+    return content;
+  }
+  return content?.replaceAll("\n", "").trim();
+};
+
 module.exports = function (RED) {
   function OpenAIResponseHandlerNode(config) {
     RED.nodes.createNode(this, config);
@@ -20,7 +33,7 @@ module.exports = function (RED) {
 
         const payload = {
           args: {
-            response: content?.replaceAll("\n", "").trim(),
+            response: getResponse(config, content),
           },
         };
 

@@ -5,6 +5,7 @@
         icon:"font-awesome/fa-commenting-o",
         defaults: {
             name: { value: "" },
+            keepFormatting: {value: false}
         },
         inputs: 1,
         outputs: 1,
@@ -26,6 +27,15 @@
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
+
+    <div style="display: flex; justify-content: space-around;">
+    
+        <label for="node-input-keepFormatting" style="display: flex;">
+            <i class="fa fa-tag"></i>
+            <span style="margin-left: 5px;">Keep Formatting</span>
+            <input style="display: inline-block;margin-left: 1rem;" type="checkbox" id="node-input-keepFormatting"
+                name="keep formatting"></label>
+    </div>
 </script>
 
 <script type="text/html" data-help-name="OpenAI Response">
@@ -33,4 +43,10 @@
 
     <h3>Details</h3>
     <p>This node must be used directly after the <code>OpenAI Chat</code> node.</p>
+
+    <h4>Keep Formatting</h4>
+    By default this node will strip the response from GPT to return a clean string. 
+    This is to prevent anomolies caused by how different outputs (for example outputting to
+     telegram vs text-to-speech). However, if you would like to keep the formatting GPT returns,
+     mark the checkbox.
 </script>
