@@ -160,7 +160,7 @@ module.exports = function (RED) {
           "Api key missing for OpenAI. Please add openaiAPIKey key-value paire to the functionGlobalContext."
         );
       }
-      if (!toolProps.tools.length) {
+      if (!toolProps.tools?.length) {
         delete toolProps.tools;
         delete toolProps.tool_choice;
         node.warn(
