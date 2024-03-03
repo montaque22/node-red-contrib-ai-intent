@@ -61,6 +61,8 @@ Alternatively, you can add your token to the settings.js file. The file can be f
 
 Make sure you restart node-red once you save this file. This method is more complicated than the Configuration node however you can freely share and export your flows and automations as the token will be hidden from the flow.
 
+> Home Assistant Users: if you installed node-red as an addon, your settings.js file may be in a different location. Try looking for a folder called **addon_configs** and look for a folder ending with **\_nodered**. You may need the Samba Addon in order to see all the folders.
+
 ### Watch this video to learn how to use this plugin
 
 [![AI-Intent Tutorial](https://raw.githubusercontent.com/montaque22/node-red-contrib-ai-intent/master/images/finally.jpg)](https://youtu.be/J0_mi7U0wCM)
