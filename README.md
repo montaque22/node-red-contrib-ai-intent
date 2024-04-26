@@ -2,6 +2,8 @@
 
 This is a collection of nodes to help enhance existing automations to be utilized by chatbots and take advantage of LLM's like GPT. There are 4 Nodes in this collection:
 
+> Note: This uses GPT's Chat Completion API which is now considered Legacy. If it becomes deprecated. I will do my best to update this to leverage something equivalent.
+
 ### Register Intent
 
 This node creates a subscription that can be activated by the **Call Intent** node. At minimum this node can be used as a way to link automations in different flows very similar to the native `Link In`/`Link Out` nodes but it is unrestricted in where it can be used. Additionally, these nodes are automatically added to the **OpenAI Chat** node's payload as functions OpenAI can call. If this negatively affects your results, you can exclude them from the payload using the `excludeFromOpenAI` checkbox.

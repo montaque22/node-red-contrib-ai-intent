@@ -93,12 +93,14 @@ const determineToolProperties = (
     tools,
     tool_choice: toolChoice,
   };
-
   if (toolChoice === "none") {
+    // No tools chosen
     return {};
   } else if (toolChoice === "auto") {
+    // set the choice to auto
     return props;
-  } else if (context[toolChoice].type === "OpenAI Tool") {
+  } else if (context[toolChoice]?.type === "OpenAI Tool") {
+    // User chose a specific tool from the dropdown list
     const tool = JSON.parse(context[toolChoice].tool);
     props.tool_choice = {
       type: tool.type,
@@ -116,7 +118,8 @@ const determineToolProperties = (
     }
 
     return props;
-  } else {
+  } else if (context[toolChoice]?.name) {
+    // ???
     props.tool_choice = {
       type: "function",
       function: { name: context[toolChoice].name },
@@ -124,6 +127,11 @@ const determineToolProperties = (
 
     return props;
   }
+  // Something funky happened so we will use auto instead
+  return {
+    tools,
+    tool_choice: "auto",
+  };
 };
 
 module.exports = function (RED) {
