@@ -27,6 +27,7 @@
             tool_choice: {
                 value: getToolOptions(RED.settings.callIntentRegistry),
             },
+            conversation_id: { value: "" },
             token: {value: "", type: "openai-configuration", required: false},
             model: { value: "gpt-4-1106-preview", required: true },
             temperature: { value: .7, required: true },
@@ -86,6 +87,10 @@
         <input type="text" id="node-input-token" placeholder="0a1b2c3b4d5e6f">
     </div>
     <div class="form-row">
+        <label for="node-input-conversation_id"><i class="fa fa-tag"></i> Conversation Id</label>
+        <input type="text" id="node-input-conversation_id" placeholder="any arbitrary name">
+    </div>
+    <div class="form-row">
         <label for="node-input-model"> Model</label>
         <input type="text" id="node-input-model" placeholder="gpt-3.5-turbo">
     </div>
@@ -132,6 +137,17 @@
     See the <a href="https://github.com/montaque22/node-red-contrib-ai-intent" target="_blank">Read Me</a> for more information 
 
     <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt class="optional">Conversation ID
+            <span class="property-type">string</span>
+        </dt>
+        <dd> By including this identifier, AI-Intent will save the conversation in the global context 
+            and will pass the entire conversation to the LLM when any Chat node with the same conversation id 
+        is triggered. This mean that you can have many Chat nodes in different flows with the same conversation id
+    and AI-Intent will ensure that conversation context is maintained between them. It should be noted that only 
+    <b>one</b> System message will be maintained. As a result the flow with the current System node will 
+overwrite any system prompt that was previously saved.</dd>
+    </dl>
     <dl class="message-properties">
         <dt class="required">model
             <span class="property-type">string</span>

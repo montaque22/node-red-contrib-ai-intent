@@ -1,8 +1,5 @@
 const PubSub = require("pubsub-js");
-const { INTENT_STORE } = require("../constants");
-const { getDatabase } = require("../db");
-const { end } = require("../globalUtils");
-let intents;
+const { end, ContextDatabase } = require("../globalUtils");
 
 /**
  * Searches context for an object whose `name` or `id` property matches the given name parameter
@@ -35,14 +32,25 @@ const getNode = (nameOrId, context, callback) => {
   }
 };
 
+const normalizeNames = (intents = []) => {
+  return intents.map((intent) => {
+    if (!intent.name && intent.type === "OpenAI Tool") {
+      const tool = JSON.parse(intent.tool);
+      return { ...intent, name: tool.function.name };
+    }
+    return intent;
+  });
+};
+
 module.exports = function (RED) {
   function CallIntentHandlerNode(config) {
     RED.nodes.createNode(this, config);
     const node = this;
+    const globalContext = this.context().global;
+    const nodeDB = new ContextDatabase(globalContext, config);
 
     this.on("input", function (msg, send, done = () => {}) {
-      const globalContext = node.context().global;
-      const context = globalContext.get(INTENT_STORE) || {};
+      const nodeStore = nodeDB.getNodeStore();
       const { registeredNodeId = "" } = config;
 
       send =
@@ -55,7 +63,7 @@ module.exports = function (RED) {
         msg.payload.forEach((payload) => {
           const { nodeName } = payload;
 
-          getNode(nodeName, context, (err, registeredNode) => {
+          getNode(nodeName, nodeStore, (err, registeredNode) => {
             if (err) {
               node.warn(err);
             } else {
@@ -67,7 +75,7 @@ module.exports = function (RED) {
       } else {
         const nameOrId = msg.payload?.nodeName || registeredNodeId;
 
-        getNode(nameOrId, context, (err, registeredNode) => {
+        getNode(nameOrId, nodeStore, (err, registeredNode) => {
           if (err) {
             node.warn(err);
           } else {
@@ -78,25 +86,21 @@ module.exports = function (RED) {
       }
       end(done);
     });
-  }
 
-  getDatabase(async (storage) => {
-    intents = await storage.values();
-
-    RED.nodes.registerType("Call Intent", CallIntentHandlerNode, {
-      settings: {
-        callIntentRegistry: {
-          value: intents,
-          exportable: true,
-        },
-      },
-    });
-  });
-
-  RED.httpAdmin.get("/registered-intents", function (req, res) {
-    getDatabase(async (storage) => {
-      intents = await storage.values();
+    RED.httpAdmin.get("/registered-intents", function (req, res) {
+      const nodeStore = nodeDB.getNodeStore();
+      const intents = normalizeNames(Object.values(nodeStore));
+      console.log("INTENTS: ", intents);
       res.json(intents);
     });
+  }
+
+  RED.nodes.registerType("Call Intent", CallIntentHandlerNode, {
+    settings: {
+      callIntentRegistry: {
+        value: [],
+        exportable: true,
+      },
+    },
   });
 };

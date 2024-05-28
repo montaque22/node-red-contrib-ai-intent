@@ -1,0 +1,185 @@
+<script type="text/javascript">
+   
+    RED.nodes.registerType("LocalAI Chat", {
+        category: 'AI Intent',
+        color: 'rgba(22,160,133,.45)',
+        icon:"font-awesome/fa-comment",
+        defaults: {
+            name: { value: "" },
+            local_settings: {value: "", type: "localai-configuration", required: true},
+            conversation_id: { value: "" },
+            model: { value: "phi3", required: true },
+            temperature: { value: .7, required: true },
+            max_tokens: { value: 1200, required: true },
+            top_p: { value: 1, required: true },
+            frequency_penalty: { value: 0, required: true },
+            presence_penalty: { value: 0, required: true },
+            stream: {value: false, required: true},
+            keep_alive: {value: 5, required: true},
+            seed: { value: 42, required: true }
+        },
+        inputs: 1,
+        outputs: 1,
+
+        label: function () {
+            return this.name || "LocalAI Chat";
+        },
+
+        oneditprepare: function(x){
+            $("#node-input-temperature").typedInput({
+                type: "num",
+            })
+            $("#node-input-max_tokens").typedInput({
+                type: "num",
+            })
+            $("#node-input-top_p").typedInput({
+                type: "num",
+            })
+            $("#node-input-frequency_penalty").typedInput({
+                type: "num",
+            })
+            $("#node-input-presence_penalty").typedInput({
+                type: "num",
+            })
+
+            $("#node-input-keep_alive").typedInput({
+                type: "num",
+            })
+
+            $("#node-input-seed").typedInput({
+                type: "num",
+            })
+         
+        }
+    });
+
+</script>
+
+<script type="text/html" data-template-name="LocalAI Chat">
+    <div class="form-row">
+        <label for="node-input-name"> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-token">Local Settings</label>
+        <input type="text" id="node-input-local_settings" placeholder="0a1b2c3b4d5e6f">
+    </div>
+    <div class="form-row">
+        <label for="node-input-conversation_id"><i class="fa fa-tag"></i> Conversation Id</label>
+        <input type="text" id="node-input-conversation_id" placeholder="any arbitrary name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-model"> Model</label>
+        <input type="text" id="node-input-model" placeholder="gpt-3.5-turbo">
+    </div>
+
+    <div class="form-tips"><b>Tip:</b> For reproducible outputs, set temperature to 0 and seed to a number</div>
+    <div class="form-row">
+       
+        <label for="node-input-temperature"> Temperature</label>
+        <input type="number" id="node-input-temperature" placeholder="0.7">
+    </div>
+    <div class="form-row">
+        <label for="node-input-max_tokens"> Max Tokens</label>
+        <input type="number" id="node-input-max_tokens" placeholder="1200">
+    </div>
+    <div class="form-row">
+        <label for="node-input-top_p"> Top P</label>
+        <input type="number" id="node-input-top_p" placeholder="0">
+    </div>
+    <div class="form-row">
+        <label for="node-input-frequency_penalty"> Frequency Penalty</label>
+        <input type="number" id="node-input-frequency_penalty" placeholder="0">
+    </div>
+    <div class="form-row">
+        <label for="node-input-presence_penalty"> Presence Penalty</label>
+        <input type="number" id="node-input-presence_penalty" placeholder="0">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-seed">Seed</label>
+        <input type="number" id="node-input-seed">
+    </div>
+
+    <div class="form-tips"><b>Tip:</b> Set to -1 to keep cache indefinately. Set to 0 to clear cache immediately</div>
+    <div class="form-row" style="display: flex; align-items: center;">
+
+        <label for="node-input-keep_alive"> Keep Alive</label>
+        <div style="display: flex; align-items: baseline;">
+            <input type="num" id="node-input-keep_alive">
+            <p style="margin-left: 5px">Minutes</p>
+        </div>
+    </div>
+        
+    <div class="form-row" style="display: flex; justify-content: center;">
+        <label for="node-input-stream" style="display: flex;">Stream
+            <input type="checkbox" id="node-input-stream" style="margin-left: 1rem">
+        </label>
+       
+    </div>
+   
+</script>
+
+<script type="text/html" data-help-name="LocalAI Chat">
+    <p>Calls a local LLM API and returns the response. This was tested using Ollama but it
+        can work with other local systems as long as they have the same interface as Ollama or OpenAI
+    </p>
+    
+    <h3>Important</h3>
+    <p>The local setting stores the URL to your locall LLM. If you are using a system other than Ollama,
+        You must either make sure that the interface for the endpoint matches the signature of Ollama/OpenAI or
+        you must write a middleware (Proxy) layer that matches the expected interface.
+    </p>
+
+
+    <h3>Inputs</h3>
+    <p>The local LLMs do not natively support function calling so the Tool Choice option has been removed.
+    </p>
+<dl class="message-properties">
+    <dt class="optional">Conversation ID
+        <span class="property-type">string</span>
+    </dt>
+    <dd> By including this identifier, AI-Intent will save the conversation in the global context
+        and will pass the entire conversation to the LLM when any Chat node with the same conversation id
+        is triggered. This mean that you can have many Chat nodes in different flows with the same conversation id
+        and AI-Intent will ensure that conversation context is maintained between them. It should be noted that only
+        <b>one</b> System message will be maintained. As a result the flow with the current System node will
+        overwrite any system prompt that was previously saved.
+    </dd>
+</dl>
+    <dl class="message-properties">
+        <dt class="required">model
+            <span class="property-type">string</span>
+        </dt>
+        <dd> Required field that dictates the model to use when calling Ollama. 
+            Ensure that you use the exact same name as the model you downloaded to your local environment</dd>
+    </dl>
+    <dl class="message-properties">
+        <dt class="required">
+            <span class="property-type">Keep Alive</span>
+        </dt>
+        <dd> 
+            This property will keep store LLM cache for the specified amount of time (the number represents minutes).
+            This can improve performance speed as the LLM does not need to cold start.
+            Using a negative number will keep the cache alive forever while specifiying 0 will clear the cache immediately.
+        </dd>
+    </dl>
+
+    <dl class="message-properties">
+        <dt class="required">
+            <span class="property-type">Stream</span>
+        </dt>
+        <dd>
+           Will cause the node to send the data in chunks. Instead of waiting for the entire object to arrive.
+           Be careful that this could have negative impact on your system if you try to do too much while
+           the data is streaming. To provide a stable experience and prevent other AI-Intent features from
+           breaking, the streamed output will only be saved at the end of the stream if a <pre>conversation_id</pre>
+           is provided
+        </dd>
+    </dl>
+        
+    <h3>Details</h3>
+    <p>At minimum the OpenAI User node should be used before this node. The OpenAI User node adds necessary 
+        information to the msg object to allow the chat to work.</p>
+
+</script>

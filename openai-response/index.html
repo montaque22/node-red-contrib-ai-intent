@@ -5,7 +5,8 @@
         icon:"font-awesome/fa-commenting-o",
         defaults: {
             name: { value: "" },
-            keepFormatting: {value: false}
+            keepFormatting: {value: false},
+            clearConversation: {value: false}
         },
         inputs: 1,
         outputs: 1,
@@ -34,7 +35,15 @@
             <i class="fa fa-tag"></i>
             <span style="margin-left: 5px;">Keep Formatting</span>
             <input style="display: inline-block;margin-left: 1rem;" type="checkbox" id="node-input-keepFormatting"
-                name="keep formatting"></label>
+                name="keep formatting">
+        </label>
+
+        <label for="node-input-clearConversation" style="display: flex;">
+            <i class="fa fa-tag"></i>
+            <span style="margin-left: 5px;">Clear Conversation</span>
+            <input style="display: inline-block;margin-left: 1rem;" type="checkbox" id="node-input-clearConversation"
+                name="removes the conversation from context">
+        </label>
     </div>
 </script>
 
@@ -49,4 +58,9 @@
     This is to prevent anomolies caused by how different outputs (for example outputting to
      telegram vs text-to-speech). However, if you would like to keep the formatting GPT returns,
      mark the checkbox.
+
+    <h4>Clear Conversation</h4>
+    If the previous Chat node in the flow has a conversation id, then this node will clean up after 
+    it and delete the any saved conversation under the given <pre>conversation_id</pre>. This option can be 
+    dynamically triggered by setting **msg.clearConversation** to <pre>`true`</pre>
 </script>

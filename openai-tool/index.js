@@ -7,7 +7,8 @@ module.exports = function (RED) {
     const node = this;
     const globalContext = this.context().global;
     const nodeDB = new ContextDatabase(globalContext, config);
-    nodeDB.initialize();
+
+    nodeDB.saveIntent(config);
 
     this.on("input", function (msg, send, done = () => {}) {
       let content = msg.payload?.tool || config.tool;
@@ -38,12 +39,11 @@ module.exports = function (RED) {
 
     this.on("close", function (removed, done) {
       if (removed) {
-        nodeDB.deleteNode(() => {
-          end(done);
-        });
+        nodeDB.removeIntent(config);
       } else {
-        end(done);
+        nodeDB.saveIntent(config);
       }
+      end(done);
     });
   }
 
