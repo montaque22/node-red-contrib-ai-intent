@@ -7,17 +7,26 @@ class ChatLedger {
     this.node = node;
   }
 
-  addResponseToConversationAndSave = (request, response) => {
+  addResponseToConversationAndSave = (
+    request,
+    response,
+    type = "OpenAI Tool"
+  ) => {
     const conversation = [];
 
     request.messages.forEach((message) => {
       conversation.push(message);
     });
 
-    response.choices.forEach(({ message }) => {
-      const { role, content = "" } = message;
-      return conversation.push({ role, content });
-    });
+    if (type === "OpenAI Tool") {
+      response.choices.forEach(({ message }) => {
+        const { role, content = "" } = message;
+        conversation.push({ role, content });
+      });
+    } else {
+      const { role, content = "" } = response.message;
+      conversation.push({ role, content });
+    }
 
     return this.saveConversation(conversation);
   };

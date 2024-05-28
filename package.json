@@ -32,7 +32,6 @@
   "license": "ISC",
   "dependencies": {
     "jsonrepair": "^3.4.1",
-    "node-persist": "^3.1.3",
     "ollama": "^0.5.1",
     "openai": "^4.20.0",
     "pubsub-js": "^1.9.4",

@@ -28,10 +28,11 @@ class ChatController {
   mergeResponseWithMessage = (response, request) => {
     const { user, system, tools, ...rest } = this.msg;
     const ledger = new ChatLedger(this.config.conversation_id, this.node);
-    // const fullConversation = ledger.addResponseToConversationAndSave(
-    //   request,
-    //   response
-    // );
+    const fullConversation = ledger.addResponseToConversationAndSave(
+      request,
+      response,
+      this.node.type
+    );
 
     return {
       ...rest,
@@ -39,7 +40,7 @@ class ChatController {
       _debug: {
         ...request,
         type: this.node.type,
-        // fullConversation,
+        fullConversation,
         conversation_id: this.config.conversation_id,
       },
     };
