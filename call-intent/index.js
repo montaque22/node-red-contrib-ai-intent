@@ -90,7 +90,6 @@ module.exports = function (RED) {
     RED.httpAdmin.get("/registered-intents", function (req, res) {
       const nodeStore = nodeDB.getNodeStore();
       const intents = normalizeNames(Object.values(nodeStore));
-      console.log("INTENTS: ", intents);
       res.json(intents);
     });
   }

@@ -10,7 +10,7 @@ class ChatLedger {
   addResponseToConversationAndSave = (
     request,
     response,
-    type = "OpenAI Tool"
+    type = "OpenAI Chat"
   ) => {
     const conversation = [];
 
@@ -18,7 +18,7 @@ class ChatLedger {
       conversation.push(message);
     });
 
-    if (type === "OpenAI Tool") {
+    if (type === "OpenAI Chat") {
       response.choices.forEach(({ message }) => {
         const { role, content = "" } = message;
         conversation.push({ role, content });

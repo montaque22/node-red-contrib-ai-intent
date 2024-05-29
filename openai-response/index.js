@@ -61,6 +61,31 @@ module.exports = function (RED) {
       return output;
     };
 
+    const formatPayloadForGeminiAI = (msg) => {
+      const output = [];
+      // Goes through the OpenAI Response and creates a standard uniformed output
+      const { functions, message } = msg.payload;
+
+      if (functions.length > 0) {
+        functions.forEach((tool) => {
+          const { name, args } = tool;
+          const payload = createConsistentPayload(message.content);
+
+          output.push({
+            args: {
+              ...payload.args,
+              ...args,
+            },
+            nodeName: name,
+          });
+        });
+      } else {
+        output.push(createConsistentPayload(message.content));
+      }
+
+      return output;
+    };
+
     this.on("input", function (msg, send, done = () => {}) {
       send =
         send ||
@@ -73,6 +98,10 @@ module.exports = function (RED) {
       switch (msg._debug.type) {
         case "OpenAI Chat": {
           msg.payload = formatPayloadForOpenAI(msg);
+          break;
+        }
+        case "GeminiAI Chat": {
+          msg.payload = formatPayloadForGeminiAI(msg);
           break;
         }
         case "LocalAI Chat": {

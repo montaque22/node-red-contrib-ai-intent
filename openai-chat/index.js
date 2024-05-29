@@ -1,10 +1,8 @@
 const OpenAI = require("openai");
 const { OPEN_AI_KEY } = require("../constants");
 const { end } = require("../globalUtils");
-const {
-  ChatController,
-  getValueFromGlobalContext,
-} = require("../utilities/chat-controller");
+const { ChatController } = require("../utilities/chat-controller");
+const { GlobalContext } = require("../utilities/global-context");
 
 module.exports = function (RED) {
   function OpenAIChatHandlerNode(config) {
@@ -15,8 +13,9 @@ module.exports = function (RED) {
 
     this.on("input", function (msg, send, done = () => {}) {
       const controller = new ChatController(node, config, msg, RED);
+      const nodeDB = new GlobalContext(node);
       const apiKey =
-        node.token?.api || getValueFromGlobalContext(OPEN_AI_KEY, node);
+        node.token?.api || nodeDB.getValueFromGlobalContext(OPEN_AI_KEY);
 
       send =
         send ||

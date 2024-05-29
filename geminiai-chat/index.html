@@ -1,0 +1,178 @@
+<script type="text/javascript">
+    // const DYNAMIC_OPTIONS = [
+    //     { value: "auto", label: "Automatic" },
+    //     { value: "none", label: "None" }
+    // ]
+    //  $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
+        
+    //         window.__tools = getToolOptions(data)
+
+    //         initialize()
+    //     });
+
+        // const getToolOptions = (intents = []) => {
+        //         const options = intents.map(intent => {
+        //             return { value: intent.id, label: intent.name }
+        //         })
+
+        //         return [...DYNAMIC_OPTIONS, ...options]
+        //     }
+            
+    RED.nodes.registerType("GeminiAI Chat", {
+        category: 'AI Intent',
+        color: '#e67e22',
+        icon:"font-awesome/fa-comment",
+        defaults: {
+            name: { value: "" },
+            // tool_choice: {
+            //     value: getToolOptions(RED.settings.callIntentRegistry),
+            // },
+            conversation_id: { value: "" },
+            token: {value: "", type: "geminiai-configuration", required: false},
+            model: { value: "gemini-1.5-flash", required: true },
+            temperature: { value: .7, required: true },
+            max_tokens: { value: 1200, required: true },
+            top_p: { value: 1, required: true },
+            top_k: { value: 16, required: true },
+        },
+        inputs: 1,
+        outputs: 1,
+
+        label: function () {
+            return this.name || "GeminiAI Chat";
+        },
+
+        oneditprepare: function(x){
+            $("#node-input-temperature").typedInput({
+                type: "num",
+            })
+            $("#node-input-max_tokens").typedInput({
+                type: "num",
+            })
+            $("#node-input-top_p").typedInput({
+                type: "num",
+            })
+            $("#node-input-top_k").typedInput({
+                type: "num",
+            })
+
+                $("#node-input-tool_choice").typedInput({
+                    types: [
+                        {
+                            value: "",
+                            options: window.__tools
+                        }
+                    ]
+                })
+
+            // $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
+            //     window.__tools = getToolOptions(data)
+
+            //     $("#node-input-tool_choice").typedInput({
+            //         types: [
+            //             {
+            //                 value: "",
+            //                 options: window.__tools
+            //             }
+            //         ]
+            //     })
+            // });
+        }
+    });
+
+</script>
+
+<script type="text/html" data-template-name="GeminiAI Chat">
+    <div class="form-row">
+        <label for="node-input-name"> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-token"> Token</label>
+        <input type="text" id="node-input-token" placeholder="0a1b2c3b4d5e6f">
+    </div>
+    <div class="form-row">
+        <label for="node-input-conversation_id"><i class="fa fa-tag"></i> Conversation Id</label>
+        <input type="text" id="node-input-conversation_id" placeholder="any arbitrary name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-model"> Model</label>
+        <input type="text" id="node-input-model" placeholder="gpt-3.5-turbo">
+    </div>
+    <!-- <div class="form-row">
+        <label for="node-input-tool_choice"> Tool Choice</label>
+        <input type="text" id="node-input-tool_choice" placeholder="Automatic">
+    </div> -->
+    <div class="form-row">
+        <label for="node-input-temperature"> Temperature</label>
+        <input type="number" id="node-input-temperature" placeholder="0.7">
+    </div>
+    <div class="form-row">
+        <label for="node-input-max_tokens"> Max Tokens</label>
+        <input type="number" id="node-input-max_tokens" placeholder="1200">
+    </div>
+    <div class="form-row">
+        <label for="node-input-top_p"> Top P</label>
+        <input type="number" id="node-input-top_p" placeholder="0">
+    </div>
+    <div class="form-row">
+        <label for="node-input-top_k">Top K</label>
+        <input type="number" id="node-input-top_k" placeholder="16">
+    </div>
+
+   
+</script>
+
+<script type="text/html" data-help-name="GeminiAI Chat">
+    <p>Calls Gemini and returns the response</p>
+    
+    <h3>Important</h3>
+    <p>To use this node you need an API Key from Gemini. Add the API Key to the settings.js file in the node-red folder under
+    the functonGlobalContext section using the key "geminiaiAPIKey"</p>
+    <pre>
+    functionGlobalContext: {
+        geminiaiAPIKey: "Your Key Goes Here",
+    }
+    </pre>
+
+    Alternatively, you can add the token via the token configuration dropdown. 
+    See the <a href="https://github.com/montaque22/node-red-contrib-ai-intent" target="_blank">Read Me</a> for more information 
+
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt class="optional">Conversation ID
+            <span class="property-type">string</span>
+        </dt>
+        <dd> By including this identifier, AI-Intent will save the conversation in the global context 
+            and will pass the entire conversation to the LLM when any Chat node with the same conversation id 
+        is triggered. This mean that you can have many Chat nodes in different flows with the same conversation id
+    and AI-Intent will ensure that conversation context is maintained between them. It should be noted that only 
+    <b>one</b> System message will be maintained. As a result the flow with the current System node will 
+overwrite any system prompt that was previously saved.</dd>
+    </dl>
+    <dl class="message-properties">
+        <dt class="required">model
+            <span class="property-type">string</span>
+        </dt>
+        <dd> Required field that dictates the model to use when calling OpenAI </dd>
+    </dl>
+    <dl class="message-properties">
+        <dt class="required">Tool Choice
+            <span class="property-type">Dropdown</span>
+        </dt>
+        <dd> This setting controls whether or not GPT uses the provided functions to respond.
+            If you want to force GPT to use a specific function, selected it from the dropdown.
+            <b>Automatic</b> lets GPT decides what is best (This is the default). <b>None</b> disables the use of functions.
+            to further optimize the API call, AI-Intent will not pass any of the tools
+            to save tokens if "None" is selected. Check documentation for more detail on 
+            how tools work: <a href="https://cookbook.openai.com/examples/how_to_call_functions_with_chat_models" target="_blank">Function Calling & Tools</a>
+        </dd>
+    </dl>
+
+    <p>To learn more about the other properties, look at <a target="_blank" href="https://platform.openai.com/docs/api-reference/chat/create">OpenAI's documentation</a></p>
+    
+    <h3>Details</h3>
+    <p>At minimum the OpenAI User node should be used before this node. The OpenAI User node adds necessary 
+        information to the msg object to allow the chat to work.</p>
+
+</script>

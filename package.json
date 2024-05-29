@@ -24,13 +24,16 @@
       "openai-tool": "openai-tool/index.js",
       "openai-configuration": "openai-chat/openai-configuration/index.js",
       "localai-chat": "localai-chat/index.js",
-      "localai-configuration": "localai-chat/localai-configuration/index.js"
+      "localai-configuration": "localai-chat/localai-configuration/index.js",
+      "geminiai-chat": "geminiai-chat/index.js",
+      "geminiai-configuration": "geminiai-chat/geminiai-configuration/index.js"
     }
   },
   "author": "Michael Montaque",
   "url": "https://github.com/montaque22/node-red-contrib-ai-intent",
   "license": "ISC",
   "dependencies": {
+    "@google/generative-ai": "^0.11.4",
     "jsonrepair": "^3.4.1",
     "ollama": "^0.5.1",
     "openai": "^4.20.0",
