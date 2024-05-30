@@ -20,8 +20,8 @@
             
     RED.nodes.registerType("GeminiAI Chat", {
         category: 'AI Intent',
-        color: '#e67e22',
-        icon:"font-awesome/fa-comment",
+        color: '#A07DFC',
+        icon:"gemini.svg",
         defaults: {
             name: { value: "" },
             // tool_choice: {
@@ -154,23 +154,9 @@ overwrite any system prompt that was previously saved.</dd>
         <dt class="required">model
             <span class="property-type">string</span>
         </dt>
-        <dd> Required field that dictates the model to use when calling OpenAI </dd>
+        <dd> Required field that dictates the model to use when calling Gemini </dd>
     </dl>
-    <dl class="message-properties">
-        <dt class="required">Tool Choice
-            <span class="property-type">Dropdown</span>
-        </dt>
-        <dd> This setting controls whether or not GPT uses the provided functions to respond.
-            If you want to force GPT to use a specific function, selected it from the dropdown.
-            <b>Automatic</b> lets GPT decides what is best (This is the default). <b>None</b> disables the use of functions.
-            to further optimize the API call, AI-Intent will not pass any of the tools
-            to save tokens if "None" is selected. Check documentation for more detail on 
-            how tools work: <a href="https://cookbook.openai.com/examples/how_to_call_functions_with_chat_models" target="_blank">Function Calling & Tools</a>
-        </dd>
-    </dl>
-
-    <p>To learn more about the other properties, look at <a target="_blank" href="https://platform.openai.com/docs/api-reference/chat/create">OpenAI's documentation</a></p>
-    
+   
     <h3>Details</h3>
     <p>At minimum the OpenAI User node should be used before this node. The OpenAI User node adds necessary 
         information to the msg object to allow the chat to work.</p>
