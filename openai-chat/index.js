@@ -51,6 +51,7 @@ const getChatCompletionProps = (msg, config) => {
   const temperature = Number(msg.payload?.temperature || config.temperature);
   const max_tokens = Number(msg.payload?.max_tokens || config.max_tokens);
   const top_p = Number(msg.payload?.top_p || config.top_p);
+  const response_format = msg.payload?.response_format || config.use_json_mode ? { "type": "json_object" } : false;
   const frequency_penalty = Number(
     msg.payload?.frequency_penalty || config.frequency_penalty
   );
@@ -72,6 +73,7 @@ const getChatCompletionProps = (msg, config) => {
     messages,
     tool_choice,
     tools,
+    response_format,
   };
 };
 
@@ -141,7 +143,7 @@ module.exports = function (RED) {
     this.token = RED.nodes.getNode(config.token);
     const node = this;
 
-    this.on("input", function (msg, send, done = () => {}) {
+    this.on("input", function (msg, send, done = () => { }) {
       const globalContext = node.context().global;
       const context = globalContext.get(INTENT_STORE) || {};
       const apiKey = node.token?.api || globalContext.get(OPEN_AI_KEY);
@@ -185,7 +187,11 @@ module.exports = function (RED) {
         top_p: apiProps.top_p,
         frequency_penalty: apiProps.frequency_penalty,
         presence_penalty: apiProps.presence_penalty,
+        response_format: apiProps.response_format,
       };
+      if (finalProps.response_format == false) {
+        delete finalProps.response_format;
+      }
 
       openai.chat.completions
 

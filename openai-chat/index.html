@@ -3,37 +3,38 @@
         { value: "auto", label: "Automatic" },
         { value: "none", label: "None" }
     ]
-     $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
-        
-            window.__tools = getToolOptions(data)
+    $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
 
-            initialize()
-        });
+        window.__tools = getToolOptions(data)
 
-        const getToolOptions = (intents = []) => {
-                const options = intents.map(intent => {
-                    return { value: intent.id, label: intent.name }
-                })
+        initialize()
+    });
 
-                return [...DYNAMIC_OPTIONS, ...options]
-            }
-            
+    const getToolOptions = (intents = []) => {
+        const options = intents.map(intent => {
+            return { value: intent.id, label: intent.name }
+        })
+
+        return [...DYNAMIC_OPTIONS, ...options]
+    }
+
     RED.nodes.registerType("OpenAI Chat", {
         category: 'AI Intent',
         color: '#e67e22',
-        icon:"font-awesome/fa-comment",
+        icon: "font-awesome/fa-comment",
         defaults: {
             name: { value: "" },
             tool_choice: {
                 value: getToolOptions(RED.settings.callIntentRegistry),
             },
-            token: {value: "", type: "openai-configuration", required: false},
+            token: { value: "", type: "openai-configuration", required: false },
             model: { value: "gpt-4-1106-preview", required: true },
             temperature: { value: .7, required: true },
             max_tokens: { value: 1200, required: true },
             top_p: { value: 1, required: true },
             frequency_penalty: { value: 0, required: true },
             presence_penalty: { value: 0, required: true },
+            use_json_mode: { value: false, required: true },
         },
         inputs: 1,
         outputs: 1,
@@ -42,7 +43,7 @@
             return this.name || "OpenAI Chat";
         },
 
-        oneditprepare: function(x){
+        oneditprepare: function (x) {
             $("#node-input-temperature").typedInput({
                 type: "num",
             })
@@ -113,6 +114,14 @@
         <label for="node-input-presence_penalty"> Presence Penalty</label>
         <input type="number" id="node-input-presence_penalty" placeholder="0">
     </div>
+    <div style="display: flex; justify-content: space-around;">
+
+        <label for="node-input-use_json_mode" style="display: flex;">
+            <i class="fa fa-tag"></i>
+            <span style="margin-left: 5px;">Use JSON mode</span>
+            <input style="display: inline-block;margin-left: 1rem;" type="checkbox" id="node-input-use_json_mode"
+                name="enable JSON mode"></label>
+    </div>
    
 </script>
 
@@ -148,6 +157,14 @@
             to further optimize the API call, AI-Intent will not pass any of the tools
             to save tokens if "None" is selected. Check documentation for more detail on 
             how tools work: <a href="https://cookbook.openai.com/examples/how_to_call_functions_with_chat_models" target="_blank">Function Calling & Tools</a>
+        </dd>
+    </dl>
+    <dl class="message-properties">
+        <dt class="required">Use JSON mode
+            <span class="property-type">Checkbox</span>
+        </dt>
+        <dd> This setting controls whether or not to use OpenAI's JSON response format. This can be useful to have more easily parsable results from ChatGPT and
+            can be used when requiring a more determinitic result. Please note that a system message telling chat GPT to respond in JSON format will be required on your end.
         </dd>
     </dl>
 
