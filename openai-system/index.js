@@ -1,4 +1,5 @@
 const Sugar = require("sugar");
+const { TYPES } = require("../constants");
 
 module.exports = function (RED) {
   function OpenAISystemHandlerNode(config) {
@@ -17,11 +18,11 @@ module.exports = function (RED) {
           node.send.apply(node, arguments);
         };
 
-      msg.system = { role: "system", content };
+      msg.system = { role: TYPES.OpenAISystem, content };
       send(msg);
       done();
     });
   }
 
-  RED.nodes.registerType("OpenAI System", OpenAISystemHandlerNode);
+  RED.nodes.registerType(TYPES.OpenAISystem, OpenAISystemHandlerNode);
 };

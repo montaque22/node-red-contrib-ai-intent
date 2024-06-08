@@ -1,6 +1,7 @@
 const { end } = require("../globalUtils");
 const Sugar = require("sugar");
 const { ChatLedger } = require("../utilities/chat-ledger");
+const { TYPES } = require("../constants");
 
 module.exports = function (RED) {
   function OpenAIResponseHandlerNode(config) {
@@ -96,15 +97,15 @@ module.exports = function (RED) {
       msg.originalResponse = msg.payload;
 
       switch (msg._debug.type) {
-        case "OpenAI Chat": {
+        case TYPES.OpenAIChat: {
           msg.payload = formatPayloadForOpenAI(msg);
           break;
         }
-        case "GeminiAI Chat": {
+        case TYPES.GeminiaiChat: {
           msg.payload = formatPayloadForGeminiAI(msg);
           break;
         }
-        case "LocalAI Chat": {
+        case TYPES.LocalAIChat: {
           msg.payload = formatPayloadForLocalAI(msg);
           break;
         }
@@ -125,5 +126,5 @@ module.exports = function (RED) {
     });
   }
 
-  RED.nodes.registerType("OpenAI Response", OpenAIResponseHandlerNode);
+  RED.nodes.registerType(TYPES.OpenAIResponse, OpenAIResponseHandlerNode);
 };

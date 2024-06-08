@@ -1,4 +1,5 @@
 const Sugar = require("sugar");
+const { TYPES, ROLES } = require("../constants");
 
 module.exports = function (RED) {
   function OpenAIUserHandlerNode(config) {
@@ -15,11 +16,11 @@ module.exports = function (RED) {
           node.send.apply(node, arguments);
         };
 
-      msg.user = { role: "user", content };
+      msg.user = { role: ROLES.User, content };
       send(msg);
       done();
     });
   }
 
-  RED.nodes.registerType("OpenAI User", OpenAIUserHandlerNode);
+  RED.nodes.registerType(TYPES.OpenAIUser, OpenAIUserHandlerNode);
 };

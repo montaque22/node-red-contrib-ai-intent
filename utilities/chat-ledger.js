@@ -1,4 +1,4 @@
-const { CONVERSATION_CONTEXT } = require("../constants");
+const { CONVERSATION_CONTEXT, TYPES } = require("../constants");
 const { GlobalContext } = require("./global-context");
 
 class ChatLedger {
@@ -10,7 +10,7 @@ class ChatLedger {
   addResponseToConversationAndSave = (
     request,
     response,
-    type = "OpenAI Chat"
+    type = TYPES.OpenAIChat
   ) => {
     const conversation = [];
 
@@ -18,10 +18,22 @@ class ChatLedger {
       conversation.push(message);
     });
 
-    if (type === "OpenAI Chat") {
+    if (type === TYPES.OpenAIChat) {
       response.choices.forEach(({ message }) => {
-        const { role, content = "" } = message;
-        conversation.push({ role, content });
+        const { role, content = "", tool_calls } = message;
+
+        if (content) {
+          conversation.push({ role, content });
+        } else if (tool_calls) {
+          const toolMessage = tool_calls.reduce((message, tool) => {
+            return `${message} ${JSON.stringify(
+              tool.function.arguments,
+              null,
+              2
+            )}`;
+          }, "");
+          conversation.push({ role, content: toolMessage });
+        }
       });
     } else {
       const { role, content = "" } = response.message;
@@ -36,12 +48,21 @@ class ChatLedger {
     let combined = [...existingConversation, userOrAssistant];
 
     if (existingConversation[0]?.role === "system" && system) {
+      //Replace the existing system with the new system
       combined[0] = system;
     } else if (system) {
+      // Add the system to the beginning of the array
       combined = [system, ...combined];
     }
 
-    return combined;
+    // Remove entries with empty content. API breaks if content is empty
+    return combined
+      .map((conversation) => {
+        if (conversation.content) {
+          return conversation;
+        }
+      })
+      .filter(Boolean);
   };
 
   clearConversation = () => {

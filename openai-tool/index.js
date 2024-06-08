@@ -1,5 +1,6 @@
 const { jsonrepair } = require("jsonrepair");
 const { end, ContextDatabase } = require("../globalUtils");
+const { TYPES } = require("../constants");
 
 module.exports = function (RED) {
   function OpenAIFunctionHandlerNode(config) {
@@ -47,5 +48,5 @@ module.exports = function (RED) {
     });
   }
 
-  RED.nodes.registerType("OpenAI Tool", OpenAIFunctionHandlerNode);
+  RED.nodes.registerType(TYPES.OpenAITool, OpenAIFunctionHandlerNode);
 };

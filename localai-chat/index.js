@@ -1,3 +1,4 @@
+const { TYPES } = require("../constants");
 const { end } = require("../globalUtils");
 const Ollama = require("ollama").Ollama;
 const { ChatController } = require("../utilities/chat-controller");
@@ -16,8 +17,6 @@ module.exports = function (RED) {
 
       try {
         const response = await ollama.chat(finalProps);
-
-        console.log("STREAM MODE: ", config.stream);
         let streamedContent = "";
         let payload = undefined;
 
@@ -101,5 +100,5 @@ module.exports = function (RED) {
         });
     });
   }
-  RED.nodes.registerType("LocalAI Chat", LocalAIChatHandlerNode);
+  RED.nodes.registerType(TYPES.LocalAIChat, LocalAIChatHandlerNode);
 };

@@ -1,6 +1,6 @@
 const PubSub = require("pubsub-js");
 const { end, ContextDatabase } = require("../globalUtils");
-
+const { TYPES } = require("../constants");
 /**
  * Searches context for an object whose `name` or `id` property matches the given name parameter
  * and returns the matching object.
@@ -10,7 +10,10 @@ const { end, ContextDatabase } = require("../globalUtils");
  */
 const getMatchingIntentFromContext = (nameOrID = "", context) => {
   return Object.values(context).find((intent) => {
-    return intent.name === nameOrID || intent.id === nameOrID;
+    return (
+      (intent.name === nameOrID || intent.id === nameOrID) &&
+      intent.type === TYPES.RegisterIntent
+    );
   });
 };
 
@@ -34,7 +37,7 @@ const getNode = (nameOrId, context, callback) => {
 
 const normalizeNames = (intents = []) => {
   return intents.map((intent) => {
-    if (!intent.name && intent.type === "OpenAI Tool") {
+    if (!intent.name && intent.type === TYPES.OpenAITool) {
       const tool = JSON.parse(intent.tool);
       return { ...intent, name: tool.function.name };
     }
@@ -42,12 +45,15 @@ const normalizeNames = (intents = []) => {
   });
 };
 
+const STORE = {};
+
 module.exports = function (RED) {
   function CallIntentHandlerNode(config) {
     RED.nodes.createNode(this, config);
     const node = this;
     const globalContext = this.context().global;
     const nodeDB = new ContextDatabase(globalContext, config);
+    STORE.db = nodeDB;
 
     this.on("input", function (msg, send, done = () => {}) {
       const nodeStore = nodeDB.getNodeStore();
@@ -86,15 +92,16 @@ module.exports = function (RED) {
       }
       end(done);
     });
-
-    RED.httpAdmin.get("/registered-intents", function (req, res) {
-      const nodeStore = nodeDB.getNodeStore();
-      const intents = normalizeNames(Object.values(nodeStore));
-      res.json(intents);
-    });
   }
 
-  RED.nodes.registerType("Call Intent", CallIntentHandlerNode, {
+  RED.httpAdmin.get("/registered-intents", function (req, res) {
+    const { db } = STORE;
+    const nodeStore = db.getNodeStore();
+    const intents = normalizeNames(Object.values(nodeStore));
+    res.json(intents);
+  });
+
+  RED.nodes.registerType(TYPES.CallIntent, CallIntentHandlerNode, {
     settings: {
       callIntentRegistry: {
         value: [],

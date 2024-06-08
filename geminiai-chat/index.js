@@ -1,4 +1,4 @@
-const { GEMINI_AI_KEY } = require("../constants");
+const { GEMINI_AI_KEY, TYPES } = require("../constants");
 const { end } = require("../globalUtils");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { GlobalContext } = require("../utilities/global-context");
@@ -80,5 +80,5 @@ module.exports = function (RED) {
     });
   }
 
-  RED.nodes.registerType("GeminiAI Chat", GeminiAIChatHandlerNode);
+  RED.nodes.registerType(TYPES.GeminiaiChat, GeminiAIChatHandlerNode);
 };

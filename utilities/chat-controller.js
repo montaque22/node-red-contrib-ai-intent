@@ -1,4 +1,4 @@
-const { INTENT_STORE } = require("../constants");
+const { INTENT_STORE, TYPES } = require("../constants");
 const { ChatLedger } = require("./chat-ledger");
 const { GlobalContext } = require("./global-context");
 
@@ -191,7 +191,7 @@ const determineToolProperties = (
   } else if (toolChoice === "auto") {
     // set the choice to auto
     return props;
-  } else if (context[toolChoice]?.type === "OpenAI Tool") {
+  } else if (context[toolChoice]?.type === TYPES.OpenAITool) {
     // User chose a specific tool from the dropdown list
     const tool = JSON.parse(context[toolChoice].tool);
     props.tool_choice = {

@@ -3,16 +3,33 @@
         { value: "auto", label: "Automatic" },
         { value: "none", label: "None" }
     ]
-     $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
-        
-            window.__tools = getToolOptions(data)
 
+    const removeDuplicates = (data) => {
+        const intents = {}
+        const tools = []
+
+        data.forEach((intent => {
+            if (intent.type === "OpenAI Tool") {
+                if (!intents[intent.name]) {
+                    intents[intent.name] = true
+                    tools.push(intent)
+                }
+            } else {
+                tools.push(intent)
+            }
+        }))
+        return tools
+    }
+     $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
+            const tools = removeDuplicates(data)
+            window.__tools =   getToolOptions(tools)
             initialize()
         });
 
         const getToolOptions = (intents = []) => {
                 const options = intents.map(intent => {
-                    return { value: intent.id, label: intent.name }
+                    const suffix = intent.type === "Register Intent" ? " (Registered Intent)" : ""
+                    return { value: intent.id, label: `${intent.name}${suffix}`}
                 })
 
                 return [...DYNAMIC_OPTIONS, ...options]
@@ -61,7 +78,8 @@
             })
 
             $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
-                window.__tools = getToolOptions(data)
+                const tools = removeDuplicates(data)
+                window.__tools = getToolOptions(tools)
 
                 $("#node-input-tool_choice").typedInput({
                     types: [

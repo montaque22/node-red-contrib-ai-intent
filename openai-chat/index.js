@@ -1,8 +1,20 @@
 const OpenAI = require("openai");
-const { OPEN_AI_KEY } = require("../constants");
+const { OPEN_AI_KEY, TYPES } = require("../constants");
 const { end } = require("../globalUtils");
 const { ChatController } = require("../utilities/chat-controller");
 const { GlobalContext } = require("../utilities/global-context");
+
+const STORE = {};
+
+const normalizeNames = (intents = []) => {
+  return intents.map((intent) => {
+    if (!intent.name && intent.type === TYPES.OpenAITool) {
+      const tool = JSON.parse(intent.tool);
+      return { ...intent, name: tool.function.name };
+    }
+    return intent;
+  });
+};
 
 module.exports = function (RED) {
   function OpenAIChatHandlerNode(config) {
@@ -10,7 +22,6 @@ module.exports = function (RED) {
     // Retrieve the config node with API token data.
     this.token = RED.nodes.getNode(config.token);
     const node = this;
-
     this.on("input", function (msg, send, done = () => {}) {
       const controller = new ChatController(node, config, msg, RED);
       const nodeDB = new GlobalContext(node);
@@ -55,5 +66,5 @@ module.exports = function (RED) {
     });
   }
 
-  RED.nodes.registerType("OpenAI Chat", OpenAIChatHandlerNode);
+  RED.nodes.registerType(TYPES.OpenAIChat, OpenAIChatHandlerNode);
 };
