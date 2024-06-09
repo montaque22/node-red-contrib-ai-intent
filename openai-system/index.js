@@ -1,5 +1,5 @@
 const Sugar = require("sugar");
-const { TYPES } = require("../constants");
+const { TYPES, ROLES } = require("../constants");
 
 module.exports = function (RED) {
   function OpenAISystemHandlerNode(config) {
@@ -18,7 +18,7 @@ module.exports = function (RED) {
           node.send.apply(node, arguments);
         };
 
-      msg.system = { role: TYPES.OpenAISystem, content };
+      msg.system = { role: ROLES.System, content };
       send(msg);
       done();
     });
