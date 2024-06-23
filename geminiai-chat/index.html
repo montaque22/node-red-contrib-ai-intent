@@ -1,84 +1,96 @@
 <script type="text/javascript">
-    // const DYNAMIC_OPTIONS = [
-    //     { value: "auto", label: "Automatic" },
-    //     { value: "none", label: "None" }
-    // ]
-    //  $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
-        
-    //         window.__tools = getToolOptions(data)
+   (() => {
+         const DYNAMIC_OPTIONS = [
+           { value: "auto", label: "Automatic" },
+           { value: "any", label: "Any" },
+           { value: "none", label: "None" }
+       ]
+         const removeDuplicates = (data) => {
+           const intents = {}
+           const tools = []
 
-    //         initialize()
-    //     });
+           data.forEach((intent => {
+               if (intent.type === "OpenAI Tool") {
+                   if (!intents[intent.name]) {
+                       intents[intent.name] = true
+                       tools.push(intent)
+                   }
+               } else {
+                   tools.push(intent)
+               }
+           }))
+           return tools
+       }
+       
+       $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
+           const tools = removeDuplicates(data)
+           window.__tools = getToolOptions(tools)
+           initialize()
+       });
 
-        // const getToolOptions = (intents = []) => {
-        //         const options = intents.map(intent => {
-        //             return { value: intent.id, label: intent.name }
-        //         })
+      const getToolOptions = (intents = []) => {
+           const options = intents.map(intent => {
+               const suffix = intent.type === "Register Intent" ? " (Registered Intent)" : ""
+               return { value: intent.id, label: `${intent.name}${suffix}` }
+           })
 
-        //         return [...DYNAMIC_OPTIONS, ...options]
-        //     }
-            
-    RED.nodes.registerType("GeminiAI Chat", {
-        category: 'AI Intent',
-        color: '#A07DFC',
-        icon:"gemini.svg",
-        defaults: {
-            name: { value: "" },
-            // tool_choice: {
-            //     value: getToolOptions(RED.settings.callIntentRegistry),
-            // },
-            conversation_id: { value: "" },
-            token: {value: "", type: "geminiai-configuration", required: false},
-            model: { value: "gemini-1.5-flash", required: true },
-            temperature: { value: .7, required: true },
-            max_tokens: { value: 1200, required: true },
-            top_p: { value: 1, required: true },
-            top_k: { value: 16, required: true },
-        },
-        inputs: 1,
-        outputs: 1,
+           return [...DYNAMIC_OPTIONS, ...options]
+       }
 
-        label: function () {
-            return this.name || "GeminiAI Chat";
-        },
+       RED.nodes.registerType("GeminiAI Chat", {
+           category: 'AI Intent',
+           color: '#9EFF00',
+           icon: "gemini-icon.svg",
+           defaults: {
+               name: { value: "" },
+               tool_choice: {
+                   value: getToolOptions(RED.settings.callIntentRegistry),
+               },
+               conversation_id: { value: "" },
+               token: { value: "", type: "geminiai-configuration", required: false },
+               model: { value: "gemini-1.5-flash", required: true },
+               temperature: { value: .7, required: true },
+               max_tokens: { value: 1200, required: true },
+               top_p: { value: 1, required: true },
+               top_k: { value: 16, required: true },
+           },
+           inputs: 1,
+           outputs: 1,
 
-        oneditprepare: function(x){
-            $("#node-input-temperature").typedInput({
-                type: "num",
-            })
-            $("#node-input-max_tokens").typedInput({
-                type: "num",
-            })
-            $("#node-input-top_p").typedInput({
-                type: "num",
-            })
-            $("#node-input-top_k").typedInput({
-                type: "num",
-            })
+           label: function () {
+               return this.name || "GeminiAI Chat";
+           },
 
-                $("#node-input-tool_choice").typedInput({
-                    types: [
-                        {
-                            value: "",
-                            options: window.__tools
-                        }
-                    ]
-                })
+           oneditprepare: function (x) {
+               $("#node-input-temperature").typedInput({
+                   type: "num",
+               })
+               $("#node-input-max_tokens").typedInput({
+                   type: "num",
+               })
+               $("#node-input-top_p").typedInput({
+                   type: "num",
+               })
+               $("#node-input-top_k").typedInput({
+                   type: "num",
+               })
 
-            // $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
-            //     window.__tools = getToolOptions(data)
+               $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
+                   const tools = removeDuplicates(data)
+                   window.__tools = getToolOptions(tools)
 
-            //     $("#node-input-tool_choice").typedInput({
-            //         types: [
-            //             {
-            //                 value: "",
-            //                 options: window.__tools
-            //             }
-            //         ]
-            //     })
-            // });
-        }
-    });
+                   $("#node-input-tool_choice").typedInput({
+                       types: [
+                           {
+                               value: "",
+                               options: window.__tools
+                           }
+                       ]
+                   })
+               });
+           }
+       });
+   })()
 
 </script>
 
@@ -99,10 +111,10 @@
         <label for="node-input-model"> Model</label>
         <input type="text" id="node-input-model" placeholder="gpt-3.5-turbo">
     </div>
-    <!-- <div class="form-row">
+    <div class="form-row">
         <label for="node-input-tool_choice"> Tool Choice</label>
         <input type="text" id="node-input-tool_choice" placeholder="Automatic">
-    </div> -->
+    </div>
     <div class="form-row">
         <label for="node-input-temperature"> Temperature</label>
         <input type="number" id="node-input-temperature" placeholder="0.7">

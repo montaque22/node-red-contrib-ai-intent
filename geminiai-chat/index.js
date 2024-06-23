@@ -31,7 +31,7 @@ module.exports = function (RED) {
         );
       }
 
-      const { apiProperties, toolProperties, tools } = controller;
+      const { apiProperties, toolProperties } = controller;
 
       const generationConfig = {
         maxOutputTokens: apiProperties.maxOutputTokens,
@@ -54,7 +54,13 @@ module.exports = function (RED) {
       const model = genAI.getGenerativeModel({
         model: finalProps.model,
         generationConfig,
-        tools,
+        tools: finalProps.tools,
+        tool_config: {
+          function_calling_config: {
+            mode: finalProps.tool_choice.toUpperCase(),
+            allowed_function_names: finalProps.allowFunctionNames,
+          },
+        },
       });
 
       const chat = model.startChat({

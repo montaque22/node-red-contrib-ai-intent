@@ -51,6 +51,7 @@ module.exports = function (RED) {
           return send(finalResult);
         }
       } catch (err) {
+        console.error(err);
         throw err;
       }
     }
@@ -60,7 +61,8 @@ module.exports = function (RED) {
       const stream = msg?.payload?.stream ?? config.stream;
       const seed = Number(msg?.payload?.seed ?? config.seed);
       const keep_alive = (msg?.payload?.keep_alive ?? config.keep_alive) + "m";
-
+      const useJSONFormat = msg?.payload?.json ?? config.json;
+      const format = useJSONFormat ? "json" : undefined;
       send =
         send ||
         function () {
@@ -74,7 +76,7 @@ module.exports = function (RED) {
         );
       }
 
-      const { apiProperties, toolProperties } = controller;
+      const { apiProperties } = controller;
 
       const finalProps = {
         model: apiProperties.model,
@@ -88,6 +90,7 @@ module.exports = function (RED) {
           seed,
         },
         stream,
+        format,
         keep_alive,
       };
 

@@ -14,9 +14,10 @@
             top_p: { value: 1, required: true },
             frequency_penalty: { value: 0, required: true },
             presence_penalty: { value: 0, required: true },
-            stream: {value: false, required: true},
+            stream: {value: false},
             keep_alive: {value: 5, required: true},
-            seed: { value: 42, required: true }
+            seed: { value: 42, required: true },
+            json: { value: false  }
         },
         inputs: 1,
         outputs: 1,
@@ -49,6 +50,7 @@
             $("#node-input-seed").typedInput({
                 type: "num",
             })
+            
          
         }
     });
@@ -115,7 +117,9 @@
         <label for="node-input-stream" style="display: flex;">Stream
             <input type="checkbox" id="node-input-stream" style="margin-left: 1rem">
         </label>
-       
+        <label for="node-input-json" style="display: flex;">JSON Format
+            <input type="checkbox" id="node-input-json" style="margin-left: 1rem">
+        </label>
     </div>
    
 </script>

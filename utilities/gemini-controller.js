@@ -1,4 +1,4 @@
-const { INTENT_STORE } = require("../constants");
+const { INTENT_STORE, TOOL_CHOICE } = require("../constants");
 const { ChatLedger } = require("./chat-ledger");
 const { GlobalContext } = require("./global-context");
 
@@ -26,6 +26,7 @@ class GeminiController {
     );
 
     this.toolProperties = validateToolProperties(toolProperties, node);
+    this.tools;
   }
 
   mergeResponseWithMessage = (payload, request) => {
@@ -81,8 +82,8 @@ class GeminiController {
  * If no tools exist, then remove tools and toolChoice from the payload
  */
 validateToolProperties = (toolProperties, node) => {
-  if (!toolProperties.tools?.length) {
-    const { tools, toolChoice, ...rest } = toolProperties;
+  if (!toolProperties.tools?.functionDeclarations?.length) {
+    const { toolChoice, ...rest } = toolProperties;
 
     if (toolChoice && toolChoice !== "none") {
       node.warn(
@@ -208,31 +209,32 @@ createFunctionsFromContext = (rawIntents = {}) => {
 const determineToolProperties = (
   context = {},
   tools = [],
-  toolChoice = "auto"
+  toolChoice = TOOL_CHOICE.Auto
 ) => {
   const props = {
     tools,
     tool_choice: toolChoice,
   };
-  if (toolChoice === "none") {
+  if (toolChoice === TOOL_CHOICE.None) {
     // No tools chosen
-    return {};
-  } else if (toolChoice === "auto") {
-    // set the choice to auto
+    props.tools = [];
+    return props;
+  } else if (
+    toolChoice === TOOL_CHOICE.Auto ||
+    toolChoice === TOOL_CHOICE.Any
+  ) {
+    // set the choice to auto or any
     return props;
   } else if (context[toolChoice]?.name) {
-    // ???
-    props.tool_choice = {
-      type: "function",
-      function: { name: context[toolChoice].name },
-    };
-
+    // A specific tool was chosen
+    props.tool_choice = TOOL_CHOICE.Any;
+    props.allowedFunctionNames = [context[toolChoice].name];
     return props;
   }
   // Something funky happened so we will use auto instead
   return {
     tools,
-    tool_choice: "auto",
+    tool_choice: TOOL_CHOICE.Auto,
   };
 };
 

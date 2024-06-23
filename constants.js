@@ -9,7 +9,7 @@ module.exports = {
     CallIntent: "Call Intent",
     OpenAIChat: "OpenAI Chat",
     LocalAIChat: "LocalAI Chat",
-    GeminiaiChat: "Geminiai Chat",
+    GeminiaiChat: "GeminiAI Chat",
     OpenAITool: "OpenAI Tool",
     OpenAIUser: "OpenAI User",
     OpenAISystem: "OpenAI System",
@@ -19,5 +19,10 @@ module.exports = {
     User: "user",
     System: "system",
     Assistant: "assistant",
+  },
+  TOOL_CHOICE: {
+    Any: "any",
+    None: "none",
+    Auto: "auto",
   },
 };

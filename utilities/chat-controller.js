@@ -105,10 +105,17 @@ getChatCompletionProps = (msg, config, node) => {
   const presence_penalty = Number(
     msg.payload?.presence_penalty || config.presence_penalty
   );
+  const _format = { format: msg.payload?.json || config.json };
   const tools = msg?.tools || [];
   const tool_choice = msg.payload?.tool_choice || config?.tool_choice || "auto";
   const ledger = new ChatLedger(config.conversation_id, node);
   const messages = ledger.combineExistingMessages(msg.user, msg.system);
+
+  if (!_format.format) {
+    delete _format.format;
+  } else {
+    _format.format = "json";
+  }
 
   return {
     model,
@@ -120,6 +127,7 @@ getChatCompletionProps = (msg, config, node) => {
     messages,
     tool_choice,
     tools,
+    ..._format,
   };
 };
 

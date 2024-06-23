@@ -65,7 +65,7 @@ module.exports = function (RED) {
     const formatPayloadForGeminiAI = (msg) => {
       const output = [];
       // Goes through the OpenAI Response and creates a standard uniformed output
-      const { functions, message } = msg.payload;
+      const { functions = [], message } = msg.payload;
 
       if (functions.length > 0) {
         functions.forEach((tool) => {
