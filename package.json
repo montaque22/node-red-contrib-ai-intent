@@ -36,6 +36,7 @@
   "dependencies": {
     "@google/generative-ai": "^0.11.5",
     "jsonrepair": "^3.4.1",
+    "node-localstorage": "^3.0.5",
     "ollama": "^0.5.1",
     "openai": "^4.20.0",
     "pubsub-js": "^1.9.4",

@@ -45,15 +45,12 @@ const normalizeNames = (intents = []) => {
   });
 };
 
-const STORE = {};
-
 module.exports = function (RED) {
+  const nodeDB = new ContextDatabase();
+
   function CallIntentHandlerNode(config) {
     RED.nodes.createNode(this, config);
     const node = this;
-    const globalContext = this.context().global;
-    const nodeDB = new ContextDatabase(globalContext, config);
-    STORE.db = nodeDB;
 
     this.on("input", function (msg, send, done = () => {}) {
       const nodeStore = nodeDB.getNodeStore();
@@ -95,8 +92,7 @@ module.exports = function (RED) {
   }
 
   RED.httpAdmin.get("/registered-intents", function (req, res) {
-    const { db } = STORE;
-    const nodeStore = db.getNodeStore();
+    const nodeStore = nodeDB.getNodeStore();
     const intents = normalizeNames(Object.values(nodeStore));
     res.json(intents);
   });

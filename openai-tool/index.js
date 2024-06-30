@@ -6,9 +6,7 @@ module.exports = function (RED) {
   function OpenAIFunctionHandlerNode(config) {
     RED.nodes.createNode(this, config);
     const node = this;
-    const globalContext = this.context().global;
-    const nodeDB = new ContextDatabase(globalContext, config);
-
+    const nodeDB = new ContextDatabase();
     nodeDB.saveIntent(config);
 
     this.on("input", function (msg, send, done = () => {}) {

@@ -1,4 +1,5 @@
 const { INTENT_STORE } = require("./constants");
+const { localStorage } = require("./database");
 
 function end(done, error) {
   if (done) {
@@ -7,26 +8,28 @@ function end(done, error) {
 }
 
 class ContextDatabase {
-  constructor(globalContext) {
-    this.globalContext = globalContext;
+  constructor() {
+    this.globalContext = localStorage;
   }
 
-  getNodeStore(id) {
-    return this.globalContext.get(INTENT_STORE) || {};
+  getNodeStore() {
+    const stringStore = this.globalContext.getItem(INTENT_STORE) || "{}";
+
+    return JSON.parse(stringStore);
   }
 
   saveIntent(config) {
     const nodeStore = this.getNodeStore();
     nodeStore[config.id] = config;
 
-    this.globalContext.set(INTENT_STORE, nodeStore);
+    this.globalContext.setItem(INTENT_STORE, JSON.stringify(nodeStore));
   }
 
   removeIntent(config) {
     const nodeStore = this.getNodeStore();
     delete nodeStore[config.id];
 
-    this.globalContext.set(INTENT_STORE, nodeStore);
+    this.globalContext.setItem(INTENT_STORE, JSON.stringify(nodeStore));
   }
 }
 

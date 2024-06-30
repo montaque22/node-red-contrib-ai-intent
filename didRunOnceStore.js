@@ -1,12 +1,13 @@
+const { localStorage } = require("./database");
 const KEY = "didRunOnce";
 
 class DidRunOnce {
-  constructor(globalContext) {
-    this.context = globalContext;
+  constructor() {
+    this.context = localStorage;
   }
 
   setForKey = (key, value) => {
-    const STORE = this.context.get(KEY) || {};
+    const STORE = this.context.getItem(KEY) || {};
 
     STORE[key] = value;
 
@@ -16,17 +17,17 @@ class DidRunOnce {
       }
     });
 
-    this.context.set(KEY, STORE);
+    this.context.setItem(KEY, STORE);
   };
 
   getForKey = (key) => {
-    const STORE = this.context.get(KEY) || {};
+    const STORE = this.context.getItem(KEY) || {};
 
     return STORE[key];
   };
 
   reset = () => {
-    this.context.set(KEY, {});
+    this.context.setItem(KEY, {});
   };
 }
 

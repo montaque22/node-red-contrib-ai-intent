@@ -4,18 +4,6 @@ const { end } = require("../globalUtils");
 const { ChatController } = require("../utilities/chat-controller");
 const { GlobalContext } = require("../utilities/global-context");
 
-const STORE = {};
-
-const normalizeNames = (intents = []) => {
-  return intents.map((intent) => {
-    if (!intent.name && intent.type === TYPES.OpenAITool) {
-      const tool = JSON.parse(intent.tool);
-      return { ...intent, name: tool.function.name };
-    }
-    return intent;
-  });
-};
-
 module.exports = function (RED) {
   function OpenAIChatHandlerNode(config) {
     RED.nodes.createNode(this, config);
