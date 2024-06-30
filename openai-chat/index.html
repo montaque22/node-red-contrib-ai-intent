@@ -37,7 +37,7 @@
             
     RED.nodes.registerType("OpenAI Chat", {
         category: 'AI Intent',
-        color: '#1FA280',
+        color: 'rgba(255, 0, 119, .75)',
         icon:"chatgpt-icon.svg",
         defaults: {
             name: { value: "" },
@@ -55,9 +55,9 @@
         },
         inputs: 1,
         outputs: 1,
-
+        paletteLabel: "OpenAI",
         label: function () {
-            return this.name || "OpenAI Chat";
+            return this.name || "OpenAI";
         },
 
         oneditprepare: function(x){

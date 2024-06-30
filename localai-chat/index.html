@@ -2,7 +2,7 @@
    
     RED.nodes.registerType("LocalAI Chat", {
         category: 'AI Intent',
-        color: 'rgba(22,160,133,.45)',
+        color: 'rgba(255, 0, 119, .75)',
         icon:"llama.svg",
         defaults: {
             name: { value: "" },
@@ -21,9 +21,9 @@
         },
         inputs: 1,
         outputs: 1,
-
+        paletteLabel: "Local LLM",
         label: function () {
-            return this.name || "LocalAI Chat";
+            return this.name || "Local LLM";
         },
 
         oneditprepare: function(x){

@@ -1,7 +1,7 @@
 <script type="text/javascript">
     RED.nodes.registerType("OpenAI System", {
         category: 'AI Intent',
-        color: '#f1c40f', 
+        color: 'rgba(255, 0, 119, .5)',
         icon:"font-awesome/fa-tasks",
         defaults: {
             name: { value: "" },
@@ -9,9 +9,9 @@
         },
         inputs: 1,
         outputs: 1,
-
+        paletteLabel: "System",
         label: function () {
-            return this.name || "OpenAI System";
+            return this.name || "System";
         },
         oneditprepare: function () {
             this.editor = RED.editor.createEditor({

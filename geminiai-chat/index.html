@@ -39,7 +39,7 @@
 
        RED.nodes.registerType("GeminiAI Chat", {
            category: 'AI Intent',
-           color: '#9EFF00',
+           color: 'rgba(255, 0, 119, .75)',
            icon: "gemini-icon.svg",
            defaults: {
                name: { value: "" },
@@ -56,9 +56,9 @@
            },
            inputs: 1,
            outputs: 1,
-
+           paletteLabel: "Gemini",
            label: function () {
-               return this.name || "GeminiAI Chat";
+               return this.name || "GeminiAI";
            },
 
            oneditprepare: function (x) {
