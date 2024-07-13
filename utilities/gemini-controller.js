@@ -81,7 +81,7 @@ class GeminiController {
 /**
  * If no tools exist, then remove tools and toolChoice from the payload
  */
-validateToolProperties = (toolProperties, node) => {
+const validateToolProperties = (toolProperties, node) => {
   if (!toolProperties.tools?.functionDeclarations?.length) {
     const { toolChoice, ...rest } = toolProperties;
 
@@ -102,7 +102,7 @@ validateToolProperties = (toolProperties, node) => {
  * @param {Record<string, any>} config
  * @returns
  */
-getChatCompletionProps = (msg, config, node) => {
+const getChatCompletionProps = (msg, config, node) => {
   const model = msg.payload?.model || config.model;
   const temperature = Number(msg.payload?.temperature || config.temperature);
   const max_tokens = Number(msg.payload?.max_tokens || config.max_tokens);
@@ -131,7 +131,7 @@ getChatCompletionProps = (msg, config, node) => {
   };
 };
 
-convertChatToGeminiCompatibleChat = (messages = []) => {
+const convertChatToGeminiCompatibleChat = (messages = []) => {
   const original = [...messages];
   const updated = messages.map((message) => {
     let role = message.role;
@@ -145,7 +145,7 @@ convertChatToGeminiCompatibleChat = (messages = []) => {
   return { original, updated };
 };
 
-convertToolsToGeminiCompatibleTools = (tools = []) => {
+const convertToolsToGeminiCompatibleTools = (tools = []) => {
   return {
     functionDeclarations: tools.map((tool) => {
       return tool.function;
@@ -163,7 +163,7 @@ convertToolsToGeminiCompatibleTools = (tools = []) => {
  *  [node_id]: node // node could be Registered Intent or Tool node
  * }
  */
-createFunctionsFromContext = (rawIntents = {}) => {
+const createFunctionsFromContext = (rawIntents = {}) => {
   return (
     Object.values(rawIntents)
       .filter((payload) => {

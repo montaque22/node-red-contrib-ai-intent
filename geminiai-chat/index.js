@@ -34,10 +34,10 @@ module.exports = function (RED) {
       const { apiProperties, toolProperties } = controller;
 
       const generationConfig = {
-        maxOutputTokens: apiProperties.maxOutputTokens,
+        maxOutputTokens: apiProperties.max_tokens,
         temperature: apiProperties.temperature,
-        topP: apiProperties.topP,
-        topK: apiProperties.topK,
+        topP: apiProperties.top_p,
+        topK: apiProperties.top_k,
       };
 
       const finalProps = {
@@ -50,8 +50,7 @@ module.exports = function (RED) {
 
       // ...
 
-      // The Gemini 1.5 models are versatile and work with most use cases
-      const model = genAI.getGenerativeModel({
+      const modelParams = {
         model: finalProps.model,
         generationConfig,
         tools: finalProps.tools,
@@ -61,7 +60,10 @@ module.exports = function (RED) {
             allowed_function_names: finalProps.allowFunctionNames,
           },
         },
-      });
+      }
+
+      // The Gemini 1.5 models are versatile and work with most use cases
+      const model = genAI.getGenerativeModel(modelParams);
 
       const chat = model.startChat({
         history: finalProps.history,
@@ -77,6 +79,7 @@ module.exports = function (RED) {
           };
         })
         .then((payload) => {
+
           send(controller.mergeResponseWithMessage(payload, finalProps));
           end(done);
         })

@@ -1,4 +1,4 @@
-const { INTENT_STORE, TYPES } = require("../constants");
+const { INTENT_STORE, TYPES, TOOL_CHOICE} = require("../constants");
 const { ChatLedger } = require("./chat-ledger");
 const { GlobalContext } = require("./global-context");
 
@@ -73,11 +73,11 @@ class ChatController {
 /**
  * If no tools exist, then remove tools and toolChoice from the payload
  */
-validateToolProperties = (toolProperties, node) => {
+const validateToolProperties = (toolProperties, node) => {
   if (!toolProperties.tools?.length) {
     const { tools, toolChoice, ...rest } = toolProperties;
 
-    if (toolChoice && toolChoice !== "none") {
+    if (toolChoice && toolChoice !== TOOL_CHOICE.None) {
       node.warn(
         "Removing tools from payload since no tools are available. Flow will continue."
       );
@@ -94,7 +94,7 @@ validateToolProperties = (toolProperties, node) => {
  * @param {Record<string, any>} config
  * @returns
  */
-getChatCompletionProps = (msg, config, node) => {
+const getChatCompletionProps = (msg, config, node) => {
   const model = msg.payload?.model || config.model;
   const temperature = Number(msg.payload?.temperature || config.temperature);
   const max_tokens = Number(msg.payload?.max_tokens || config.max_tokens);
@@ -107,7 +107,7 @@ getChatCompletionProps = (msg, config, node) => {
   );
   const _format = { format: msg.payload?.json || config.json };
   const tools = msg?.tools || [];
-  const tool_choice = msg.payload?.tool_choice || config?.tool_choice || "auto";
+  const tool_choice = msg.payload?.tool_choice || config?.tool_choice || TOOL_CHOICE.Auto;
   const ledger = new ChatLedger(config.conversation_id, node);
   const messages = ledger.combineExistingMessages(msg.user, msg.system);
 
@@ -141,7 +141,7 @@ getChatCompletionProps = (msg, config, node) => {
  *  [node_id]: node // node could be Registered Intent or Tool node
  * }
  */
-createFunctionsFromContext = (rawIntents = {}) => {
+const createFunctionsFromContext = (rawIntents = {}) => {
   return (
     Object.values(rawIntents)
       .filter((payload) => {
@@ -187,16 +187,16 @@ createFunctionsFromContext = (rawIntents = {}) => {
 const determineToolProperties = (
   context = {},
   tools = [],
-  toolChoice = "auto"
+  toolChoice = TOOL_CHOICE.Auto
 ) => {
   const props = {
     tools,
     tool_choice: toolChoice,
   };
-  if (toolChoice === "none") {
+  if (toolChoice === TOOL_CHOICE.None || tools.length === 0) {
     // No tools chosen
     return {};
-  } else if (toolChoice === "auto") {
+  }else if (toolChoice === TOOL_CHOICE.Auto) {
     // set the choice to auto
     return props;
   } else if (context[toolChoice]?.type === TYPES.OpenAITool) {
@@ -230,7 +230,7 @@ const determineToolProperties = (
   // Something funky happened so we will use auto instead
   return {
     tools,
-    tool_choice: "auto",
+    tool_choice: TOOL_CHOICE.Auto,
   };
 };
 

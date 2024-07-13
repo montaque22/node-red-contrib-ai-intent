@@ -1,8 +1,67 @@
 [
     {
+        "id": "1fa43f81455fbfaa",
+        "type": "GeminiAI Chat",
+        "z": "9b143868e984b7d2",
+        "name": "",
+        "tool_choice": [
+            {
+                "value": "auto",
+                "label": "Automatic"
+            },
+            {
+                "value": "any",
+                "label": "Any"
+            },
+            {
+                "value": "none",
+                "label": "None"
+            }
+        ],
+        "conversation_id": "",
+        "token": "",
+        "model": "gemini-1.5-flash",
+        "temperature": 0.7,
+        "max_tokens": 1200,
+        "top_p": 1,
+        "top_k": 16,
+        "x": 980,
+        "y": 1040,
+        "wires": [
+            [
+                "743157a166429126"
+            ]
+        ]
+    },
+    {
+        "id": "02b5d6d18a1d0464",
+        "type": "LocalAI Chat",
+        "z": "9b143868e984b7d2",
+        "name": "",
+        "local_settings": "d2693fb6d73b277d",
+        "conversation_id": "",
+        "model": "HomeAssistantAI:latest",
+        "temperature": 0.7,
+        "max_tokens": 1200,
+        "top_p": 1,
+        "frequency_penalty": 0,
+        "presence_penalty": 0,
+        "stream": false,
+        "keep_alive": 5,
+        "seed": 42,
+        "json": false,
+        "x": 990,
+        "y": 1000,
+        "wires": [
+            [
+                "666c8eec91e99263"
+            ]
+        ]
+    },
+    {
         "id": "4629835899ef6a94",
         "type": "inject",
-        "z": "d312f6d5f62126f3",
+        "z": "9b143868e984b7d2",
         "name": "",
         "props": [
             {
@@ -21,8 +80,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 220,
-        "y": 600,
+        "x": 620,
+        "y": 1040,
         "wires": [
             [
                 "34bc5dbf3f85c1c6"
@@ -32,7 +91,7 @@
     {
         "id": "8c4e6be9d8f809b2",
         "type": "debug",
-        "z": "d312f6d5f62126f3",
+        "z": "9b143868e984b7d2",
         "name": "debug 44",
         "active": true,
         "tosidebar": true,
@@ -42,29 +101,33 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 460,
-        "y": 720,
+        "x": 1340,
+        "y": 1040,
         "wires": []
     },
     {
         "id": "34bc5dbf3f85c1c6",
         "type": "OpenAI User",
-        "z": "d312f6d5f62126f3",
+        "z": "9b143868e984b7d2",
         "name": "",
         "content": "What color is the sky",
-        "x": 210,
-        "y": 640,
+        "x": 770,
+        "y": 1040,
         "wires": [
             [
-                "265bcb5f2a387d15"
+                "265bcb5f2a387d15",
+                "02b5d6d18a1d0464",
+                "1fa43f81455fbfaa"
             ]
         ]
     },
     {
         "id": "265bcb5f2a387d15",
         "type": "OpenAI Chat",
-        "z": "d312f6d5f62126f3",
+        "z": "9b143868e984b7d2",
         "name": "",
+        "tool_choice": "auto",
+        "conversation_id": "",
         "token": "",
         "model": "gpt-3.5-turbo",
         "temperature": 0.7,
@@ -72,21 +135,21 @@
         "top_p": 1,
         "frequency_penalty": 0,
         "presence_penalty": 0,
-        "x": 210,
-        "y": 680,
+        "x": 980,
+        "y": 1080,
         "wires": [
             [
-                "743157a166429126"
+                "1fcf3793f61d08cf"
             ]
         ]
     },
     {
         "id": "743157a166429126",
         "type": "OpenAI Response",
-        "z": "d312f6d5f62126f3",
+        "z": "9b143868e984b7d2",
         "name": "",
-        "x": 190,
-        "y": 720,
+        "x": 1180,
+        "y": 1040,
         "wires": [
             [
                 "8c4e6be9d8f809b2"
@@ -96,11 +159,76 @@
     {
         "id": "4aec75bc6fa6f5a8",
         "type": "comment",
-        "z": "d312f6d5f62126f3",
-        "name": "Example: Simple question to GPT with only the OpenAI User node",
+        "z": "9b143868e984b7d2",
+        "name": "Example: Simple question to GPT, Gemini, and Local LLM with only the OpenAI User node",
         "info": "",
-        "x": 320,
-        "y": 560,
+        "x": 990,
+        "y": 960,
         "wires": []
+    },
+    {
+        "id": "0dd4a932f110a383",
+        "type": "debug",
+        "z": "9b143868e984b7d2",
+        "name": "debug 45",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1340,
+        "y": 1080,
+        "wires": []
+    },
+    {
+        "id": "1fcf3793f61d08cf",
+        "type": "OpenAI Response",
+        "z": "9b143868e984b7d2",
+        "name": "",
+        "x": 1180,
+        "y": 1080,
+        "wires": [
+            [
+                "0dd4a932f110a383"
+            ]
+        ]
+    },
+    {
+        "id": "d72b07737e957317",
+        "type": "debug",
+        "z": "9b143868e984b7d2",
+        "name": "debug 46",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1340,
+        "y": 1000,
+        "wires": []
+    },
+    {
+        "id": "666c8eec91e99263",
+        "type": "OpenAI Response",
+        "z": "9b143868e984b7d2",
+        "name": "",
+        "x": 1180,
+        "y": 1000,
+        "wires": [
+            [
+                "d72b07737e957317"
+            ]
+        ]
+    },
+    {
+        "id": "d2693fb6d73b277d",
+        "type": "localai-configuration",
+        "url": "http://10.0.0.40/"
     }
 ]
