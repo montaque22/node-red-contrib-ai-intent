@@ -1,9 +1,9 @@
-const { localStorage } = require("./database");
+const { getStorageAtLocation } = require("./database");
 const KEY = "didRunOnce";
 
 class DidRunOnce {
   constructor() {
-    this.context = localStorage;
+    this.context = getStorageAtLocation();
   }
 
   setForKey = (key, value) => {

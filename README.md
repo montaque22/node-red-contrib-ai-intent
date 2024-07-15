@@ -62,7 +62,7 @@ This method is the easiest, but you should be careful when exporting your flows 
 exported JSON. If you share your code often or would like to not have to worry about this, you can add the token to the
 `settings.js` file
 
-### Settings.js File
+## Settings.js File
 
 You can add your token to the settings.js file. The file can be found under `.node-red/settings.js` path (or some equivalent). 
 Based on reports from various users the location seems to be slightly different based on how you installed it. 
@@ -73,11 +73,16 @@ Once you find the file search for the `functionGlobalContext` property and add t
   functionGlobalContext: {
     openaiAPIKey: "YOUR-TOKEN-API-GOES-HERE",
     geminiaiAPIKey: "Your Key Goes Here",
+    localStoragePath: "./testfolder"
   },
 
 ```
+If you encounter an error such as **no such file or directory, mkdir '<some/path/ending/with/localstore>'**, 
+you have the ability to change where intents are stored by adding the `localStoragePath` key with a new valid path.
+Make sure you restart node-red once you save this file. 
 
-Make sure you restart node-red once you save this file. This method is more complicated than the Configuration node however you can freely share and export your flows and automations as the token will be hidden from the flow.
+This method is more complicated than the Configuration node however you can freely share and export your flows and 
+automations as the token will be hidden from the flow.
 
 > Home Assistant Users: if you installed node-red as an addon, your settings.js file may be in a different location. Try looking for a folder called **addon_configs** and look for a folder ending with **\_nodered**. You may need the Samba Addon in order to see all the folders.
 
@@ -86,3 +91,5 @@ Make sure you restart node-red once you save this file. This method is more comp
 [![AI-Intent Tutorial](https://raw.githubusercontent.com/montaque22/node-red-contrib-ai-intent/master/images/finally.jpg)](https://youtu.be/J0_mi7U0wCM)
 
 Alternatively, you can check out [Chaperone](https://montaque22.github.io/#/aiIntent) to get a quick overview of each node with example automations
+
+

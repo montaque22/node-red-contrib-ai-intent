@@ -5,10 +5,10 @@ const { end, ContextDatabase } = require("../globalUtils");
 module.exports = function (RED) {
   function RegisterIntentHandlerNode(config) {
     RED.nodes.createNode(this, config);
-    const nodeDB = new ContextDatabase(this.context().global, config);
+
     const errorMessage = getErrorMessagesForConfig(config);
     const node = this;
-
+    const nodeDB = new ContextDatabase(RED);
     if (errorMessage) {
       // There was an error. Stop.
       return this.error(errorMessage);

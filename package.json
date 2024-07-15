@@ -1,6 +1,6 @@
 {
   "name": "@technithusiast/node-red-contrib-ai-intent",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A collection of nodes to elevate a user's automation interactions",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

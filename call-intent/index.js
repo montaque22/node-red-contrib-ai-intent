@@ -1,6 +1,7 @@
 const PubSub = require("pubsub-js");
 const { end, ContextDatabase } = require("../globalUtils");
-const { TYPES } = require("../constants");
+const { TYPES} = require("../constants");
+
 /**
  * Searches context for an object whose `name` or `id` property matches the given name parameter
  * and returns the matching object.
@@ -46,7 +47,7 @@ const normalizeNames = (intents = []) => {
 };
 
 module.exports = function (RED) {
-  const nodeDB = new ContextDatabase();
+  const nodeDB = new ContextDatabase(RED);
 
   function CallIntentHandlerNode(config) {
     RED.nodes.createNode(this, config);

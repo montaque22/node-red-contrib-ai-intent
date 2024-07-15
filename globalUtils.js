@@ -1,5 +1,5 @@
-const { INTENT_STORE } = require("./constants");
-const { localStorage } = require("./database");
+const { INTENT_STORE, LOCAL_STORAGE_PATH} = require("./constants");
+const { getStorageAtLocation } = require("./database");
 
 function end(done, error) {
   if (done) {
@@ -8,8 +8,11 @@ function end(done, error) {
 }
 
 class ContextDatabase {
-  constructor() {
-    this.globalContext = localStorage;
+  constructor(RED) {
+    const {functionGlobalContext = {} } = RED.settings
+    const path = functionGlobalContext[LOCAL_STORAGE_PATH]
+
+    this.globalContext = getStorageAtLocation(path);
   }
 
   getNodeStore() {
