@@ -57,7 +57,7 @@ module.exports = function (RED) {
     }
 
     this.on("input", function (msg, send, done = () => {}) {
-      const controller = new ChatController(node, config, msg);
+      const controller = new ChatController(node, config, msg, RED);
       const stream = msg?.payload?.stream ?? config.stream;
       const seed = Number(msg?.payload?.seed ?? config.seed);
       const keep_alive = (msg?.payload?.keep_alive ?? config.keep_alive) + "m";

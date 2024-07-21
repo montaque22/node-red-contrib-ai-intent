@@ -60,7 +60,7 @@ module.exports = function (RED) {
             allowed_function_names: finalProps.allowFunctionNames,
           },
         },
-      }
+      };
 
       // The Gemini 1.5 models are versatile and work with most use cases
       const model = genAI.getGenerativeModel(modelParams);
@@ -79,7 +79,6 @@ module.exports = function (RED) {
           };
         })
         .then((payload) => {
-
           send(controller.mergeResponseWithMessage(payload, finalProps));
           end(done);
         })

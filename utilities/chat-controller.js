@@ -1,16 +1,16 @@
-const { INTENT_STORE, TYPES, TOOL_CHOICE} = require("../constants");
+const { TYPES, TOOL_CHOICE } = require("../constants");
+const { ContextDatabase } = require("../globalUtils");
 const { ChatLedger } = require("./chat-ledger");
-const { GlobalContext } = require("./global-context");
 
 class ChatController {
-  constructor(node, config, msg) {
+  constructor(node, config, msg, RED) {
     this.msg = msg;
     this.node = node;
     this.config = config;
     this.apiProperties = getChatCompletionProps(msg, config, node);
 
-    const registeredIntentFunctions = this.getRegisteredIntentFunctions(node);
-    const rawIntents = this.getRawIntents(node);
+    const registeredIntentFunctions = this.getRegisteredIntentFunctions(RED);
+    const rawIntents = this.getRawIntents(RED);
 
     this.tools = [
       ...this.apiProperties.tools,
@@ -51,8 +51,8 @@ class ChatController {
    * @param {*} node
    * @returns
    */
-  getRegisteredIntentFunctions = (node) => {
-    const intents = this.getRawIntents(node);
+  getRegisteredIntentFunctions = (RED) => {
+    const intents = this.getRawIntents(RED);
     return createFunctionsFromContext(intents);
   };
 
@@ -64,9 +64,9 @@ class ChatController {
    *    [node_id]: node // could be Registered Intent or Tool node
    *  }
    */
-  getRawIntents = (node) => {
-    const globalContext = new GlobalContext(node);
-    return globalContext.getValueFromGlobalContext(INTENT_STORE) || {};
+  getRawIntents = (RED) => {
+    const context = new ContextDatabase(RED);
+    return context.getNodeStore() || {};
   };
 }
 
@@ -107,7 +107,8 @@ const getChatCompletionProps = (msg, config, node) => {
   );
   const _format = { format: msg.payload?.json || config.json };
   const tools = msg?.tools || [];
-  const tool_choice = msg.payload?.tool_choice || config?.tool_choice || TOOL_CHOICE.Auto;
+  const tool_choice =
+    msg.payload?.tool_choice || config?.tool_choice || TOOL_CHOICE.Auto;
   const ledger = new ChatLedger(config.conversation_id, node);
   const messages = ledger.combineExistingMessages(msg.user, msg.system);
 
@@ -196,7 +197,7 @@ const determineToolProperties = (
   if (toolChoice === TOOL_CHOICE.None || tools.length === 0) {
     // No tools chosen
     return {};
-  }else if (toolChoice === TOOL_CHOICE.Auto) {
+  } else if (toolChoice === TOOL_CHOICE.Auto) {
     // set the choice to auto
     return props;
   } else if (context[toolChoice]?.type === TYPES.OpenAITool) {

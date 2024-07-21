@@ -1,16 +1,16 @@
-const { INTENT_STORE, TOOL_CHOICE } = require("../constants");
+const { TOOL_CHOICE } = require("../constants");
 const { ChatLedger } = require("./chat-ledger");
-const { GlobalContext } = require("./global-context");
+const { ContextDatabase } = require("../globalUtils");
 
 class GeminiController {
-  constructor(node, config, msg) {
+  constructor(node, config, msg, RED) {
     this.msg = msg;
     this.node = node;
     this.config = config;
     this.apiProperties = getChatCompletionProps(msg, config, node);
 
-    const registeredIntentFunctions = this.getRegisteredIntentFunctions(node);
-    const rawIntents = this.getRawIntents(node);
+    const registeredIntentFunctions = this.getRegisteredIntentFunctions(RED);
+    const rawIntents = this.getRawIntents(RED);
 
     this.tools = [
       ...this.apiProperties.tools,
@@ -59,8 +59,8 @@ class GeminiController {
    * @param {*} node
    * @returns
    */
-  getRegisteredIntentFunctions = (node) => {
-    const intents = this.getRawIntents(node);
+  getRegisteredIntentFunctions = (RED) => {
+    const intents = this.getRawIntents(RED);
     return createFunctionsFromContext(intents);
   };
 
@@ -72,9 +72,9 @@ class GeminiController {
    *    [node_id]: node // could be Registered Intent or Tool node
    *  }
    */
-  getRawIntents = (node) => {
-    const globalContext = new GlobalContext(node);
-    return globalContext.getValueFromGlobalContext(INTENT_STORE) || {};
+  getRawIntents = (RED) => {
+    const context = new ContextDatabase(RED);
+    return context.getNodeStore() || {};
   };
 }
 
@@ -182,7 +182,7 @@ const createFunctionsFromContext = (rawIntents = {}) => {
             parameters: {
               type: "object",
               properties: {
-                isRegisteredIntent: { type: "boolean", enum: ["true"] },
+                isRegisteredIntent: { type: "string", enum: ["true"] },
                 response: {
                   type: "string",
                   description: "A friendly response to the given command",
