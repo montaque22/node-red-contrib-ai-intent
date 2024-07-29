@@ -1,97 +1,99 @@
 <script type="text/javascript">
-    const DYNAMIC_OPTIONS = [
-        { value: "auto", label: "Automatic" },
-        { value: "none", label: "None" }
-    ]
+    (() => {
+        const DYNAMIC_OPTIONS = [
+            { value: "auto", label: "Automatic" },
+            { value: "none", label: "None" }
+        ]
 
-    const removeDuplicates = (data) => {
-        const intents = {}
-        const tools = []
+        const removeDuplicates = (data) => {
+            const intents = {}
+            const tools = []
 
-        data.forEach((intent => {
-            if (intent.type === "OpenAI Tool") {
-                if (!intents[intent.name]) {
-                    intents[intent.name] = true
+            data.forEach((intent => {
+                if (intent.type === "OpenAI Tool") {
+                    if (!intents[intent.name]) {
+                        intents[intent.name] = true
+                        tools.push(intent)
+                    }
+                } else {
                     tools.push(intent)
                 }
-            } else {
-                tools.push(intent)
-            }
-        }))
-        return tools
-    }
-     $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
+            }))
+            return tools
+        }
+        $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
             const tools = removeDuplicates(data)
             window.__tools =   getToolOptions(tools)
             initialize()
         });
 
         const getToolOptions = (intents = []) => {
-                const options = intents.map(intent => {
-                    const suffix = intent.type === "Register Intent" ? " (Registered Intent)" : ""
-                    return { value: intent.id, label: `${intent.name}${suffix}`}
-                })
-
-                return [...DYNAMIC_OPTIONS, ...options]
-            }
-            
-    RED.nodes.registerType("OpenAI Chat", {
-        category: 'AI Intent',
-        color: 'rgba(255, 0, 119, .75)',
-        icon:"chatgpt-icon.svg",
-        defaults: {
-            name: { value: "" },
-            tool_choice: {
-                value: getToolOptions(RED.settings.callIntentRegistry),
-            },
-            conversation_id: { value: "" },
-            token: {value: "", type: "openai-configuration", required: false},
-            model: { value: "gpt-4-1106-preview", required: true },
-            temperature: { value: .7, required: true },
-            max_tokens: { value: 1200, required: true },
-            top_p: { value: 1, required: true },
-            frequency_penalty: { value: 0, required: true },
-            presence_penalty: { value: 0, required: true },
-        },
-        inputs: 1,
-        outputs: 1,
-        paletteLabel: "OpenAI",
-        label: function () {
-            return this.name || "OpenAI";
-        },
-
-        oneditprepare: function(x){
-            $("#node-input-temperature").typedInput({
-                type: "num",
-            })
-            $("#node-input-max_tokens").typedInput({
-                type: "num",
-            })
-            $("#node-input-top_p").typedInput({
-                type: "num",
-            })
-            $("#node-input-frequency_penalty").typedInput({
-                type: "num",
-            })
-            $("#node-input-presence_penalty").typedInput({
-                type: "num",
+            const options = intents.map(intent => {
+                const suffix = intent.type === "Register Intent" ? " (Registered Intent)" : ""
+                return { value: intent.id, label: `${intent.name}${suffix}`}
             })
 
-            $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
-                const tools = removeDuplicates(data)
-                window.__tools = getToolOptions(tools)
-
-                $("#node-input-tool_choice").typedInput({
-                    types: [
-                        {
-                            value: "",
-                            options: window.__tools
-                        }
-                    ]
-                })
-            });
+            return [...DYNAMIC_OPTIONS, ...options]
         }
-    });
+
+        RED.nodes.registerType("OpenAI Chat", {
+            category: 'AI Intent',
+            color: 'rgba(255, 0, 119, .75)',
+            icon:"chatgpt-icon.svg",
+            defaults: {
+                name: { value: "" },
+                tool_choice: {
+                    value: getToolOptions(RED.settings.callIntentRegistry),
+                },
+                conversation_id: { value: "" },
+                token: {value: "", type: "openai-configuration", required: false},
+                model: { value: "gpt-4-1106-preview", required: true },
+                temperature: { value: .7, required: true },
+                max_tokens: { value: 1200, required: true },
+                top_p: { value: 1, required: true },
+                frequency_penalty: { value: 0, required: true },
+                presence_penalty: { value: 0, required: true },
+            },
+            inputs: 1,
+            outputs: 1,
+            paletteLabel: "OpenAI",
+            label: function () {
+                return this.name || "OpenAI";
+            },
+
+            oneditprepare: function(x){
+                $("#node-input-temperature").typedInput({
+                    type: "num",
+                })
+                $("#node-input-max_tokens").typedInput({
+                    type: "num",
+                })
+                $("#node-input-top_p").typedInput({
+                    type: "num",
+                })
+                $("#node-input-frequency_penalty").typedInput({
+                    type: "num",
+                })
+                $("#node-input-presence_penalty").typedInput({
+                    type: "num",
+                })
+
+                $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
+                    const tools = removeDuplicates(data)
+                    window.__tools = getToolOptions(tools)
+
+                    $("#node-input-tool_choice").typedInput({
+                        types: [
+                            {
+                                value: "",
+                                options: window.__tools
+                            }
+                        ]
+                    })
+                });
+            }
+        });
+    })()
 
 </script>
 

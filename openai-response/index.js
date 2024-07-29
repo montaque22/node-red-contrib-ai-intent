@@ -32,7 +32,27 @@ module.exports = function (RED) {
 
     const formatPayloadForLocalAI = (msg) => {
       const { message } = msg.payload;
-      return [createConsistentPayload(message.content)];
+      const output = [];
+
+      message.tool_calls.forEach((answer) => {
+
+        const payload = createConsistentPayload(answer.content);
+
+        if (answer.function) {
+          const deepCopyPayload = Sugar.Object.clone(payload, true);
+
+          deepCopyPayload.args = {
+            ...answer.function.arguments,
+          };
+          deepCopyPayload.nodeName = answer.function.name;
+          output.push(deepCopyPayload);
+
+        } else {
+          output.push(payload);
+        }
+      });
+
+      return output//[createConsistentPayload(message.content)];
     };
 
     const formatPayloadForOpenAI = (msg) => {

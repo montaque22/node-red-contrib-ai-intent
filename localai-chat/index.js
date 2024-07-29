@@ -76,9 +76,10 @@ module.exports = function (RED) {
         );
       }
 
-      const { apiProperties } = controller;
+      const { apiProperties, toolProperties } = controller;
 
       const finalProps = {
+        ...toolProperties,
         model: apiProperties.model,
         messages: apiProperties.messages,
         options: {

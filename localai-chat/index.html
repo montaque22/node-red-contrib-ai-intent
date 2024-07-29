@@ -1,5 +1,41 @@
 <script type="text/javascript">
-   
+
+    const DYNAMIC_OPTIONS = [
+        { value: "auto", label: "Automatic" },
+        { value: "none", label: "None" }
+    ]
+
+    const removeDuplicates = (data) => {
+        const intents = {}
+        const tools = []
+
+        data.forEach((intent => {
+            if (intent.type === "OpenAI Tool") {
+                if (!intents[intent.name]) {
+                    intents[intent.name] = true
+                    tools.push(intent)
+                }
+            } else {
+                tools.push(intent)
+            }
+        }))
+        return tools
+    }
+    $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
+        const tools = removeDuplicates(data)
+        window.__tools =   getToolOptions(tools)
+        initialize()
+    });
+
+    const getToolOptions = (intents = []) => {
+        const options = intents.map(intent => {
+            const suffix = intent.type === "Register Intent" ? " (Registered Intent)" : ""
+            return { value: intent.id, label: `${intent.name}${suffix}`}
+        })
+
+        return [...DYNAMIC_OPTIONS, ...options]
+    }
+
     RED.nodes.registerType("LocalAI Chat", {
         category: 'AI Intent',
         color: 'rgba(255, 0, 119, .75)',
@@ -50,7 +86,20 @@
             $("#node-input-seed").typedInput({
                 type: "num",
             })
-            
+
+            $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
+                const tools = removeDuplicates(data)
+                window.__tools = getToolOptions(tools)
+
+                $("#node-input-tool_choice").typedInput({
+                    types: [
+                        {
+                            value: "",
+                            options: window.__tools
+                        }
+                    ]
+                })
+            });
          
         }
     });
@@ -74,7 +123,10 @@
         <label for="node-input-model"> Model</label>
         <input type="text" id="node-input-model" placeholder="gpt-3.5-turbo">
     </div>
-
+    <div class="form-row">
+        <label for="node-input-tool_choice"> Tool Choice</label>
+        <input type="text" id="node-input-tool_choice" placeholder="Automatic">
+    </div>
     <div class="form-tips"><b>Tip:</b> For reproducible outputs, set temperature to 0 and seed to a number</div>
     <div class="form-row">
        

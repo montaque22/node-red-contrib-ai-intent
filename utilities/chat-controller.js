@@ -161,7 +161,7 @@ const createFunctionsFromContext = (rawIntents = {}) => {
             parameters: {
               type: "object",
               properties: {
-                isRegisteredIntent: { enum: [true] },
+                isRegisteredIntent: { type:"boolean", const: true },
                 response: {
                   type: "string",
                   description: "A friendly response to the given command",
