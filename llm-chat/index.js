@@ -1,6 +1,7 @@
 const { end } = require("../globalUtils");
 const {chatGPTHelper} = require("../openai-chat/ChatGPTHelper");
 const {ollamaHelper} = require("./OllamaHelper");
+const {geminiHelper} = require("./GeminiHelper");
 const {TYPES} = require("../constants");
 
 const PLATFORM =  [
@@ -25,6 +26,7 @@ module.exports = function (RED) {
           ollamaHelper({node, RED, config, msg}, finish)
            break
          case "gemini":
+           geminiHelper({node, RED, config, msg}, finish)
            break
          default:
            node.status({fill:"red",shape:"ring",text:"Invalid configuration platform"});

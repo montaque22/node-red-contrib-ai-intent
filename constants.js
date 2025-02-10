@@ -26,5 +26,6 @@ module.exports = {
     Any: "any",
     None: "none",
     Auto: "auto",
+    Required: "required"
   },
 };

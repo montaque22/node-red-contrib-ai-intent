@@ -1,31 +1,6 @@
 const Sugar = require("sugar");
 
 class Format {
-
-    // formatResponse(choices){
-    //     msg.originalResponse = msg.payload;
-    //
-    //     switch (msg._debug.type) {
-    //         case TYPES.OpenAIChat: {
-    //             return this.formatPayloadForOpenAI(choices);
-    //             break;
-    //         }
-    //         case TYPES.GeminiaiChat: {
-    //             msg.payload = this.formatPayloadForGeminiAI(msg);
-    //             break;
-    //         }
-    //         case TYPES.LocalAIChat: {
-    //             msg.payload = this.formatPayloadForLocalAI(msg);
-    //             break;
-    //         }
-    //         default:
-    //             node.warn(
-    //                 `Not sure where ${msg._debug.type} came from but it isn't supported`
-    //             );
-    //     }
-    // }
-
-
    createConsistentPayload(content){
         return {
             args: {
@@ -66,7 +41,6 @@ class Format {
 
     formatPayloadForOpenAI (choices) {
         const output = [];
-        // Goes through the OpenAI Response and creates a standard uniformed output
         choices.forEach((answer) => {
             const { content = "", tool_calls } = answer.message;
             const payload = this.createConsistentPayload(content);
@@ -93,14 +67,12 @@ class Format {
 
     formatPayloadForGeminiAI (msg) {
         const output = [];
-        // Goes through the OpenAI Response and creates a standard uniformed output
-        const { functions = [], message } = msg.payload;
+        const { functions = [], text } = msg;
+        const payload = this.createConsistentPayload(text);
 
         if (functions.length > 0) {
             functions.forEach((tool) => {
                 const { name, args } = tool;
-                const payload = createConsistentPayload(message.content);
-
                 output.push({
                     args: {
                         ...payload.args,
@@ -110,7 +82,7 @@ class Format {
                 });
             });
         } else {
-            output.push(createConsistentPayload(message.content));
+            output.push(payload);
         }
 
         return output;
