@@ -34,27 +34,31 @@ module.exports = function (RED) {
       const { message } = msg.payload;
       const output = [];
 
-      message.tool_calls.forEach((answer) => {
+      if(message.tool_calls){
+        message.tool_calls.forEach((answer) => {
 
-        const payload = createConsistentPayload(answer.content);
+          const payload = createConsistentPayload(answer.content);
 
-        if (answer.function) {
-          const deepCopyPayload = Sugar.Object.clone(payload, true);
+          if (answer.function) {
+            const deepCopyPayload = Sugar.Object.clone(payload, true);
 
-          deepCopyPayload.args = {
-            ...answer.function.arguments,
-          };
-          deepCopyPayload.nodeName = answer.function.name;
-          output.push(deepCopyPayload);
+            deepCopyPayload.args = {
+              ...answer.function.arguments,
+            };
+            deepCopyPayload.nodeName = answer.function.name;
+            output.push(deepCopyPayload);
 
-        } else {
-          output.push(payload);
-        }
-      });
+          } else {
+            output.push(payload);
+          }
+        });
+      }
+      else{
+        output.push(createConsistentPayload(message.content));
+      }
 
-      return output//[createConsistentPayload(message.content)];
-    };
-
+      return output
+    }; 
     const formatPayloadForOpenAI = (msg) => {
       const output = [];
       // Goes through the OpenAI Response and creates a standard uniformed output

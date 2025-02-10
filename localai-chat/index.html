@@ -43,6 +43,9 @@
         defaults: {
             name: { value: "" },
             local_settings: {value: "", type: "localai-configuration", required: true},
+            tool_choice: {
+                value: getToolOptions(RED.settings.callIntentRegistry),
+            },
             conversation_id: { value: "" },
             model: { value: "phi3", required: true },
             temperature: { value: .7, required: true },
