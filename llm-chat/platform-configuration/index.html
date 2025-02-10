@@ -1,0 +1,73 @@
+<style>
+    .hidden{
+        display: none;
+    }
+</style>
+
+<script type="text/javascript">
+    RED.nodes.registerType('platform-configuration', {
+        category: 'config',
+        defaults: {
+            name: { value: "", required: true },
+            platform: {value: "gpt", required: true},
+            url: {value: ""},
+            model: { value: "gpt-4o", required: true },
+        },
+        credentials: {
+            api: {type:"text"},
+        },
+        label: function () {
+            return this.name
+        },
+        oneditprepare: function (){
+            $("#node-config-input-platform").typedInput({
+                types: [
+                    {
+                        value: "gpt",
+                        options: [
+                            { value: "gpt", label: "ChatGPT"},
+                            { value: "gemini", label: "Gemini"},
+                            { value: "ollama", label: "Ollama"},
+                        ]
+                    }
+                ]
+            }).on("change", function() {
+                if ($(this).val() === "ollama") {
+                    $("#api").addClass("hidden");
+                    $("#url").removeClass("hidden");
+                } else {
+                    $("#api").removeClass("hidden");
+                    $("#url").addClass("hidden");
+                }
+            })
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="platform-configuration">
+    <div class="form-row" id="name">
+        <label for="node-config-input-name">Name</label>
+        <input type="text" id="node-config-input-name">
+    </div>
+
+    <div class="form-row" id="platform">
+        <label for="node-config-input-platform">Platform</label>
+        <input type="text" id="node-config-input-platform">
+    </div>
+
+    <div class="form-row" id="model">
+        <label for="node-config-input-model">Model</label>
+        <input type="text" id="node-config-input-model">
+    </div>
+
+
+    <div class="form-row" id="api">
+        <label for="node-config-input-api"><i class="fa fa-bookmark"></i> API Token</label>
+        <input type="text" id="node-config-input-api">
+    </div>
+
+    <div class="form-row hidden" id="url">
+        <label for="node-config-input-url"><i class="fa fa-internet-explorer"></i>Ollama URL</label>
+        <input type="text" id="node-config-input-url">
+    </div>
+</script>

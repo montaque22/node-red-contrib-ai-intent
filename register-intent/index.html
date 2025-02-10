@@ -6,13 +6,30 @@
         defaults: {
             name: { value: "", required: true, validate: RED.validators.regex(/^[a-zA-Z0-9_-]{1,64}$/) },
             description: { value: "", required: true},
-            excludeFromOpenAi: { value: false }, 
+            excludeFromOpenAi: { value: false },
+            code: {value: "{}", required: false}
         },
         inputs: 0,
         outputs: 1,
         label: function () {
             return this.name || "Register Intent";
         },
+        oneditprepare: function(){
+            this.editor = RED.editor.createEditor({
+                id: 'node-code',
+                mode: 'ace/mode/json',
+                value: this.code
+            });
+        },
+        oneditsave: function() {
+            this.code = this.editor.getValue();
+            this.editor.destroy();
+            delete this.editor;
+        },
+        oneditcancel: function() {
+            this.editor.destroy();
+            delete this.editor;
+        }
 
     });
 
@@ -30,7 +47,7 @@
     <div>
         
         <div class="form-row">
-            <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+            <label for="node-input-name">Name</label>
             <input type="text" id="node-input-name" placeholder="Name">
         </div>
         <div class="form-tips"><b>Tip:</b> Name should be alphanumeric including underscores and hyphens (no spaces).</div>
@@ -38,15 +55,21 @@
     
 
     <div class="form-row">
-        <label for="node-input-description"><i class="fa fa-tag"></i>Intent Description</label>
+        <label for="node-input-description">Intent Description</label>
         <input type="text" id="node-input-description" placeholder="Description">
     </div>
+
+    <div class="form-row">
+        <label for="node-code"><i class="fa fa-code"></i>Intent Description</label>
+        <div style="height: 250px; min-height:150px;" class="node-text-editor" id="node-code"></div>
+    </div>
+
 
     <div style="display: flex; justify-content: space-around;">
 
         <label for="node-input-excludeFromOpenAi" style="display: flex;">
             <i class="fa fa-tag"></i>
-            <span style="margin-left: 5px;">Exclude from OpenAI</span>
+            <span style="margin-left: 5px;">Exclude from OpenAI (Deprecated)</span>
             <input style="display: inline-block;margin-left: 1rem;" type="checkbox" id="node-input-excludeFromOpenAi"
                 name="enable conversation"></label>
     </div>

@@ -1,0 +1,193 @@
+<style>
+    .disabled{
+        opacity: .5;
+        pointer-events: none;
+    }
+</style>
+<script type="text/javascript">
+    (() => {
+        const TOOL_CHOICE = [
+            { value: "none", label: "None" },
+            { value: "auto", label: "Automatic" },
+            { value: "required", label: "Required" }
+        ]
+
+        const removeDuplicates = (data) => {
+            const intents = {}
+            const tools = []
+
+            data.forEach((intent => {
+                if (intent.type === "OpenAI Tool") {
+                    if (!intents[intent.name]) {
+                        intents[intent.name] = true
+                        tools.push(intent)
+                    }
+                } else {
+                    tools.push(intent)
+                }
+            }))
+            return tools
+        }
+
+        $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
+            const tools = removeDuplicates(data)
+            window.__tools =   getToolOptions(tools)
+            initialize()
+        });
+
+        const getToolOptions = (intents = []) => {
+            const options = intents.map(intent => {
+
+                if(intent.type === "Register Intent"){
+                    return { value: intent.name, label: `${intent.name} (Registered Intent)`}
+                }else {
+                    const tool = JSON.parse(intent.tool)
+                    return { value: tool.function.name, label: `${intent.name} (Deprecated)`}
+                }
+            })
+
+            return [...options]
+        }
+
+        RED.nodes.registerType("LLM Chat", {
+            category: 'AI Intent',
+            color: 'rgb(241,0,104)',
+            icon:"bot-message-square.svg",
+            defaults: {
+                name: { value: "" },
+                platform: { value: "", type: "platform-configuration", required: false },
+                tools: {value: ""},
+                tool_choice: {value: "none"},
+                conversation_id: {value: ""}
+
+            },
+            inputs: 1,
+            outputs: 1,
+            paletteLabel: "LLM Chat",
+            label: function () {
+                return this.name || "Chat";
+            },
+
+            oneditprepare: function(){
+                $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
+                    const tools = removeDuplicates(data)
+                    window.__tools = getToolOptions(tools)
+
+                    $("#node-input-tools").typedInput({
+                        types: [
+                            {
+                                value: "",
+                                multiple: true,
+                                options: window.__tools
+                            }
+                        ]
+                    })
+                });
+                $("#node-input-tool_choice").typedInput({
+                    types: [
+                        {
+                            value: "",
+                            options: TOOL_CHOICE
+                        }
+                    ]
+                }).on("change", function() {
+                    if ($(this).val() === "none") {
+                        $("#tools").addClass("disabled");
+                    } else {
+                        $("#tools").removeClass("disabled");
+                    }
+                })
+            }
+        });
+    })()
+
+</script>
+
+<script type="text/html" data-template-name="LLM Chat">
+    <div class="form-row">
+        <label for="node-input-name"> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-platform"> Configuration</label>
+        <input type="text" id="node-input-platform" placeholder="0a1b2c3b4d5e6f">
+    </div>
+
+
+    <div class="form-row">
+        <label for="node-input-conversation_id"> Conversation Id</label>
+
+        <input type="text" id="node-input-conversation_id">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-tool_choice">Tool Choice</label>
+
+        <input type="text" id="node-input-tool_choice">
+    </div>
+
+    <div class="form-row" id="tools">
+        <label for="node-input-tools"> Tools</label>
+        <input type="text" id="node-input-tools">
+    </div>
+   
+</script>
+
+<script type="text/html" data-help-name="LLM Chat">
+    <p>Calls an LLM and returns the response.</p>
+
+    <h3>Important</h3>
+    <p>To use this node you need to configure the connection details.  Consult the documentation for your chosen LLM platform (e.g., OpenAI, Ollama, Gemini) for specific instructions.</p>
+
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <dt><code>msg.payload</code> <span class="property-type">object</span></dt>
+        <dd>
+            <p>The main input to the LLM.  Should contain <code>user</code> and optionally <code>system</code> messages.</p>
+            <p>Example: <code>msg.payload = { system: "You are a helpful assistant.", user: "What is the capital of Alaska?" }</code></p>
+        </dd>
+        <dt><code>msg.payload.options</code> <span class="property-type">object</span></dt>
+        <dd>Optional.  Allows passing additional parameters to the LLM.  See the LLM's documentation for available options (e.g., <code>temperature</code>, <code>max_tokens</code>, <code>format</code> for your platform).</dd>
+        <dt><code>msg.clearChatHistory</code> <span class="property-type">boolean</span></dt>
+        <dd>Optional. If set to <code>true</code>, the conversation history will be cleared for the specified <code>Conversation Id</code>.</dd>
+    </dl>
+
+
+    <h3>Node Configuration</h3>
+    <dl>
+        <dt>Conversation Id <span class="property-type">string</span></dt>
+        <dd>The value provided will be used as a key to store the conversation. The node will keep track of all the messages. If a different node uses the same key, the conversation will be connected and will use the same conversation history. If omitted, each call to the LLM will be isolated.</dd>
+
+        <dt>Tool Choice <span class="property-type">dropdown</span></dt>
+        <dd>This property lets you decide if the LLM should use function calling.  If you are using Ollama, not every model supports function calling.
+            <ul>
+                <li><code>None</code>: Disables the Tools setting and the LLM will not use any functions.</li>
+                <li><code>Automatic</code>: Lets the LLM decide if it should choose one of the selected tools.</li>
+                <li><code>Required</code>: Forces the LLM to use at least one of the selected functions.</li>
+            </ul>
+        </dd>
+
+        <dt>Tools <span class="property-type">string</span></dt>
+        <dd>This field is populated by Register Intent nodes. You can choose zero or more functions. Any selected function will be sent to the LLM, which will determine whether or not to call the function depending on the Tool Choice setting.</dd>
+    </dl>
+
+    <h3>System and User Messages</h3>
+    <p>You can pass messages to the LLM by setting <code>msg.payload = { system, user }</code> where <code>system</code> and <code>user</code> are string values. You don't always have to pass <code>system</code>, but the <code>user</code> property is required.  For example:</p>
+    <pre>
+        msg.payload = {
+            system: "You are a helpful assistant.",
+            user: "What is the capital of Alaska?"
+        };
+    </pre>
+    <p>To pass additional options (like temperature or max tokens), use <code>msg.payload.options</code>:</p>
+    <pre>
+        msg.payload = {
+            user: "What is capital of alaska. Respond using JSON.",
+            options: {
+                format: "json" // Example for Ollama
+            }
+        };
+    </pre>
+
+</script>

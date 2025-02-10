@@ -23,8 +23,10 @@
       "openai-tool": "openai-tool/index.js",
       "openai-user": "openai-user/index.js",
       "openai-response": "openai-response/index.js",
+      "llm-chat": "llm-chat/index.js",
       "call-intent": "call-intent/index.js",
       "register-intent": "register-intent/index.js",
+      "platform-configuration": "llm-chat/platform-configuration/index.js",
       "openai-configuration": "openai-chat/openai-configuration/index.js",
       "localai-configuration": "localai-chat/localai-configuration/index.js",
       "geminiai-configuration": "geminiai-chat/geminiai-configuration/index.js"
@@ -35,6 +37,8 @@
   "license": "ISC",
   "dependencies": {
     "@google/generative-ai": "^0.11.5",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
     "jsonrepair": "^3.4.1",
     "node-localstorage": "^3.0.5",
     "ollama": "^0.5.1",

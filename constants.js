@@ -9,6 +9,7 @@ module.exports = {
     RegisterIntent: "Register Intent",
     CallIntent: "Call Intent",
     OpenAIChat: "OpenAI Chat",
+    LLMChat: "LLM Chat",
     LocalAIChat: "LocalAI Chat",
     GeminiaiChat: "GeminiAI Chat",
     OpenAITool: "OpenAI Tool",
