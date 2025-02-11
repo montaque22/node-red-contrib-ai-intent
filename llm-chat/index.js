@@ -1,5 +1,5 @@
 const { end } = require("../globalUtils");
-const {chatGPTHelper} = require("../openai-chat/ChatGPTHelper");
+const {chatGPTHelper} = require("./ChatGPTHelper");
 const {ollamaHelper} = require("./OllamaHelper");
 const {geminiHelper} = require("./GeminiHelper");
 const {TYPES} = require("../constants");
@@ -49,9 +49,10 @@ module.exports = function (RED) {
           send(payload)
         }else if (payload){
           config.send.apply(node, arguments);
+          end(done)
         }
         node.status({fill:"grey",shape:"dot",text:"Done"});
-        end(done)
+
       }
     });
   }

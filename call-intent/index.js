@@ -64,15 +64,15 @@ module.exports = function (RED) {
         };
 
       if (Array.isArray(msg.payload)) {
-        msg.payload.forEach((payload) => {
+        msg.payload.forEach((payload, index) => {
           const { nodeName } = payload;
-
+          const body = {...msg, index}
           getNode(nodeName, nodeStore, (err, registeredNode) => {
             if (err) {
               node.warn(err);
             } else {
-              PubSub.publishSync(registeredNode.id, msg);
-              send(msg);
+              PubSub.publishSync(registeredNode.id, body);
+              send(body);
             }
           });
         });

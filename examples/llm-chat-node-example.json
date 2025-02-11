@@ -1,0 +1,208 @@
+[
+    {
+        "id": "26ee7fb33da44441",
+        "type": "debug",
+        "z": "63287583ae175fca",
+        "name": "debug 210",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 770,
+        "y": 1960,
+        "wires": []
+    },
+    {
+        "id": "8bdac3a059f6e50a",
+        "type": "inject",
+        "z": "63287583ae175fca",
+        "name": "1. What is your name",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 220,
+        "y": 1880,
+        "wires": [
+            [
+                "2f3c668301d9dd35"
+            ]
+        ]
+    },
+    {
+        "id": "c2a53eff4506daf9",
+        "type": "LLM Chat",
+        "z": "63287583ae175fca",
+        "name": "",
+        "platform": "0144091d53bfe539",
+        "tools": "operate_home",
+        "tool_choice": "none",
+        "conversation_id": "test example",
+        "x": 610,
+        "y": 1960,
+        "wires": [
+            [
+                "26ee7fb33da44441"
+            ]
+        ]
+    },
+    {
+        "id": "0d20cfa2bd7a00a0",
+        "type": "inject",
+        "z": "63287583ae175fca",
+        "name": "2. Smart home question",
+        "props": [
+            {
+                "p": "lights",
+                "v": "[\"bathroom\", \"kitchen\"]",
+                "vt": "json"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 220,
+        "y": 1960,
+        "wires": [
+            [
+                "dd7ca9ae9b5a3e99"
+            ]
+        ]
+    },
+    {
+        "id": "e80e71a1321731c0",
+        "type": "inject",
+        "z": "63287583ae175fca",
+        "name": "4. Clear Chat History",
+        "props": [
+            {
+                "p": "clearChatHistory",
+                "v": "true",
+                "vt": "bool"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 450,
+        "y": 2100,
+        "wires": [
+            [
+                "c2a53eff4506daf9"
+            ]
+        ]
+    },
+    {
+        "id": "2f3c668301d9dd35",
+        "type": "template",
+        "z": "63287583ae175fca",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "json",
+        "syntax": "mustache",
+        "template": "{\n    \"user\": \"What is your name\",\n    \"system\": \"your name is ke and you control my smart home\"\n}",
+        "output": "json",
+        "x": 400,
+        "y": 1880,
+        "wires": [
+            [
+                "c2a53eff4506daf9"
+            ]
+        ]
+    },
+    {
+        "id": "dd7ca9ae9b5a3e99",
+        "type": "template",
+        "z": "63287583ae175fca",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "json",
+        "syntax": "mustache",
+        "template": "{\n    \"user\": \"What lights are on?\",\n    \"system\": \"The {{lights}} lights are on in the home\"\n}",
+        "output": "json",
+        "x": 420,
+        "y": 1960,
+        "wires": [
+            [
+                "c2a53eff4506daf9"
+            ]
+        ]
+    },
+    {
+        "id": "1a95ff1229b2200c",
+        "type": "inject",
+        "z": "63287583ae175fca",
+        "name": "3. Ask last",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 180,
+        "y": 2040,
+        "wires": [
+            [
+                "4996cba3fc79aecf"
+            ]
+        ]
+    },
+    {
+        "id": "4996cba3fc79aecf",
+        "type": "template",
+        "z": "63287583ae175fca",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "json",
+        "syntax": "mustache",
+        "template": "{\n    \"user\": \"What was the first question i asked?\"\n}",
+        "output": "json",
+        "x": 420,
+        "y": 2040,
+        "wires": [
+            [
+                "c2a53eff4506daf9"
+            ]
+        ]
+    },
+    {
+        "id": "fb35636977cc1eea",
+        "type": "inject",
+        "z": "63287583ae175fca",
+        "name": "5. Ask last",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 180,
+        "y": 2160,
+        "wires": [
+            [
+                "4996cba3fc79aecf"
+            ]
+        ]
+    },
+    {
+        "id": "0144091d53bfe539",
+        "type": "platform-configuration",
+        "name": "GPT 4o Model",
+        "platform": "gpt",
+        "url": "",
+        "model": "gpt-4o"
+    }
+]

@@ -71,3 +71,48 @@
         <input type="text" id="node-config-input-url">
     </div>
 </script>
+
+<script type="text/html" data-help-name="platform-configuration">
+    <p>This configuration node allows you to set up an AI platform for use with other AI-related nodes in Node-RED.</p>
+
+    <h3>Configuration Options</h3>
+    <dl class="message-properties">
+        <dt class="required">Name
+            <span class="property-type">string</span>
+        </dt>
+        <dd>A custom name for this configuration.</dd>
+
+        <dt class="required">Platform
+            <span class="property-type">dropdown</span>
+        </dt>
+        <dd>Select the AI platform to use:
+            <ul>
+                <li><b>ChatGPT</b> – OpenAI models (e.g., GPT-4o)</li>
+                <li><b>Gemini</b> – Google AI models</li>
+                <li><b>Ollama</b> – Local AI models</li>
+            </ul>
+        </dd>
+
+        <dt class="required">Model
+            <span class="property-type">string</span>
+        </dt>
+        <dd>The specific AI model to use. Defaults to "gpt-4o" for OpenAI.</dd>
+
+        <dt class="optional">API Token
+            <span class="property-type">string</span>
+        </dt>
+        <dd>Required for cloud-based models (OpenAI, Gemini). Enter your API key to authenticate requests.</dd>
+
+        <dt class="optional">Ollama URL
+            <span class="property-type">string</span>
+        </dt>
+        <dd>Required only when using Ollama. Enter the local Ollama server URL.</dd>
+    </dl>
+
+    <h3>Behavior</h3>
+    <p>If "Ollama" is selected as the platform, the API Token field is hidden, and the Ollama URL field is shown instead.</p>
+
+    <h3>Usage</h3>
+    <p>This configuration node is referenced by AI-related nodes to send requests to the selected AI platform. Ensure it is set up correctly before use.</p>
+
+</script>

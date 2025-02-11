@@ -6,8 +6,21 @@
         defaults: {
             name: { value: "", required: true, validate: RED.validators.regex(/^[a-zA-Z0-9_-]{1,64}$/) },
             description: { value: "", required: true},
+            advanceMode: {value: "false"},
             excludeFromOpenAi: { value: false },
-            code: {value: "{}", required: false}
+            code: {
+                value: "",
+                validate: function(code){
+                    if(this.advanceMode === "true"){
+                        try{
+                            return code.trim() && !!JSON.parse(code)
+                        }catch(e){
+                            return false
+                        }
+                    }
+                    return true
+                }
+            }
         },
         inputs: 0,
         outputs: 1,
@@ -20,6 +33,19 @@
                 mode: 'ace/mode/json',
                 value: this.code
             });
+
+            $("#node-input-advanceMode").typedInput({
+                type:"bool",
+                types:["bool"],
+                typeField: "#node-input-advanceMode-type"
+            }).on("change",function () {
+                this.advanceMode = $(this).val()
+                if ($(this).val() === "true") {
+                    $("#code").slideDown()
+                } else {
+                    $("#code").slideUp();
+                }
+            })
         },
         oneditsave: function() {
             this.code = this.editor.getValue();
@@ -60,7 +86,13 @@
     </div>
 
     <div class="form-row">
-        <label for="node-code"><i class="fa fa-code"></i>Intent Description</label>
+        <label for="node-input-advanceMode">Advance Mode</label>
+        <input type="text" id="node-input-advanceMode">
+        <input type="hidden" id="node-input-advanceMode-type">
+    </div>
+
+    <div class="form-row" id="code">
+        <label for="node-code"><i class="fa fa-code"></i>Tool Schema (parameters)</label>
         <div style="height: 250px; min-height:150px;" class="node-text-editor" id="node-code"></div>
     </div>
 
@@ -77,35 +109,121 @@
 </script>
 
 <script type="text/html" data-help-name="Register Intent">
-    <p>Creates a listener for specific event and fires when event is triggered</p>
-    
+    <p>Registers an intent for use with the <code>Call Intent</code> node.  This allows you to define custom actions that can be triggered by other flows or, optionally, by an AI assistant like OpenAI.</p>
+
     <h3>Inputs</h3>
     <dl class="message-properties">
-        <dt>Name
-            <span class="property-type">string</span>
-        </dt>
-        <dd>This must be a unique to identify an automation. This must also use camel-case </dd>
+        <dt>Name <span class="property-type">string</span></dt>
+        <dd>A unique name for this intent.  This name is used to identify the intent when calling it from other nodes.  It should be alphanumeric and can include underscores and hyphens (no spaces).  Maximum length is 64 characters.</dd>
 
-        <dt>description
-            <span class="property-type">string</span>
-        </dt>
-        <dd>Describes what the registered intent should be used for. OpenAI will use this as a description when 
-            sending this intent as a function payload.</dd>
-    
-        <dt class="optional">excludeFromOpenAi
-            <span class="property-type">boolean</span>
-        </dt>
-        <dd>If true, this intent will not be sent to OpenAI as a function it can call</dd>
-    
+        <dt>Description <span class="property-type">string</span></dt>
+        <dd>A clear and concise description of the intent's purpose.  This description is used by AI assistants (if enabled) to understand when the intent should be triggered.  A good description helps the AI choose the appropriate function to call.</dd>
+
+        <dt>Advanced Mode <span class="property-type">boolean</span></dt>
+        <dd>Enables/Disables advanced configuration of the intent. If checked, the Tool Schema field will be displayed and required.</dd>
+
+        <dt>Tool Schema <span class="property-type">JSON (when Advanced Mode is enabled)</span></dt>
+        <dd>A JSON object defining the schema of the tool, enabling more structured interactions with AI assistants. This schema describes the parameters the tool expects, allowing the AI to provide the correct inputs.  Must be valid JSON.</dd>
+
+        <dt>Exclude from OpenAI (Deprecated) <span class="property-type">boolean</span></dt>
+        <dd><em>Deprecated: This option is no longer used.</em>  Previously, this option controlled whether the intent was exposed to OpenAI as a callable function. This is now handled automatically based on your flow configuration.
+        </dd>
     </dl>
-    
+
     <h3>Details</h3>
-    <p>Place this node at the begining of an automation to register it to be called by the <code>Call-Intent</code> node.
-    Registering an intent is useful for integrating with AI's as the AI can use the <b>description</b> to 
-determine the circumstances the intent should be called. As a result, make the <b>description</b> as clear and succinct
-as possible.</p>
-<p>Because this node is a custom trigger, OpenAI by default will add it to its list of functions it can call in order
-    handle user requests. If you this is negatively affecting OpenAI's results or you don't want this function
-    to be considered by OpenAI, set <b>excludeFromOpenAi</b> to <code>true</code> 
-</p>
+    <p>Place this node at the beginning of a flow to register an intent.  The registered intent can then be called by a <code>Call Intent</code> node.  This mechanism allows you to create modular and reusable flows that can be triggered by various events or AI assistants.</p>
+
+    <p>When integrating with AI assistants, the <strong>Description</strong> field is crucial.  It provides the AI with the context needed to determine when to call this intent.  Therefore, write descriptive and concise descriptions that clearly explain the intent's functionality.</p>
+
+    <p>The <strong>Advanced Mode</strong> and <strong>Tool Schema</strong> fields allow you to define a structured interface for AI interactions.  The schema describes the input parameters expected by the intent, ensuring that the AI provides valid data when calling the associated flow.</p>
+
+    <p><strong>Example:</strong>  Imagine you have a flow that controls your living room lights.  You could create a "Living Room Lights" intent with a description like "Controls the living room lights. Accepts 'on', 'off', and 'dim' commands."  Then, in your AI assistant, you could configure it to call this intent when the user says something like "Turn on the living room lights."</p>
+
+    <h3>Important</h3>
+    <p>The JSON provide will vary greatly based on the LLM platform. Some Schema features in OpenAI is not support in Gemini while many models in Ollama are not supported at all.
+    Please consult the various function calling documentation for your specified platform</p>
+
+    <h4>Example</h4>
+    The following is an example of a OpenAI function definition.
+    You only need to provide the `parameters` property of the schema.
+    A typical full function schema looks like this:
+    <pre>
+        {
+            type: "function",
+            function:{
+                name: "",
+                description: "",
+                parameters: {
+                    type: "object"
+                    properties: {...}
+                }
+        }
+    </pre>
+
+   <p> You only need to provide the `parameters` property for your schema</p>
+    <pre>
+    {
+        "type": "object",
+        "properties": {
+            "eventName": {
+                "type": "string",
+                "description": "A unique name for the event. Used to identify the event in the schedule."
+            },
+            "eventTime": {
+                "type": "string",
+                "format": "date-time",
+                "description": "The time for the one-off event in ISO8601 format (e.g., 2025-01-26T18:30:00)."
+            },
+            "eventPayload": {
+                "type": "string",
+                "description": "Command to give the smart home when the timer finishes"
+            }
+        },
+        "required": [
+            "eventName",
+            "eventTime"
+        ],
+        "additionalProperties": false
+    }
+    </pre>
+    <p>Check the function calling documentation for your platform of choice</p>
+    <ul>
+        <li><a href="https://platform.openai.com/docs/guides/function-calling">OpenAI</a></li>
+        <li><a href="https://ai.google.dev/gemini-api/docs/function-calling">Gemini</a></li>
+        <li><a href="https://ollama.com/blog/tool-support">Ollama</a></li>
+    </ul>
 </script>
+
+<!--<script type="text/html" data-help-name="Register Intent">-->
+<!--    <p>Creates a listener for specific event and fires when event is triggered</p>-->
+
+<!--    <h3>Inputs</h3>-->
+<!--    <dl class="message-properties">-->
+<!--        <dt>Name-->
+<!--            <span class="property-type">string</span>-->
+<!--        </dt>-->
+<!--        <dd>This must be a unique to identify an automation. This must also use camel-case </dd>-->
+
+<!--        <dt>description-->
+<!--            <span class="property-type">string</span>-->
+<!--        </dt>-->
+<!--        <dd>Describes what the registered intent should be used for. OpenAI will use this as a description when-->
+<!--            sending this intent as a function payload.</dd>-->
+
+<!--        <dt class="optional">excludeFromOpenAi-->
+<!--            <span class="property-type">boolean</span>-->
+<!--        </dt>-->
+<!--        <dd>If true, this intent will not be sent to OpenAI as a function it can call</dd>-->
+
+<!--    </dl>-->
+
+<!--    <h3>Details</h3>-->
+<!--    <p>Place this node at the begining of an automation to register it to be called by the <code>Call-Intent</code> node.-->
+<!--    Registering an intent is useful for integrating with AI's as the AI can use the <b>description</b> to-->
+<!--determine the circumstances the intent should be called. As a result, make the <b>description</b> as clear and succinct-->
+<!--as possible.</p>-->
+<!--<p>Because this node is a custom trigger, OpenAI by default will add it to its list of functions it can call in order-->
+<!--    handle user requests. If you this is negatively affecting OpenAI's results or you don't want this function-->
+<!--    to be considered by OpenAI, set <b>excludeFromOpenAi</b> to <code>true</code>-->
+<!--</p>-->
+<!--</script>-->

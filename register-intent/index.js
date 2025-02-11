@@ -10,7 +10,7 @@ module.exports = function (RED) {
     const errorMessage = getErrorMessagesForConfig(config);
     const node = this;
     try{
-      if(config.code.trim()){
+      if(config.advanceMode){
         const schema = JSON.parse(config.code)
         const result = validateOpenAISchema(schema)
         if(!result.isValid){
@@ -24,7 +24,8 @@ module.exports = function (RED) {
         node.status({fill:"blue",shape:"dot",text:"Ready (Simple)"});
       }
     }catch(e){
-
+      node.status({fill:"red",shape:"dot",text:"Error"});
+      node.error(e)
     }
 
     const nodeDB = new ContextDatabase(RED);
