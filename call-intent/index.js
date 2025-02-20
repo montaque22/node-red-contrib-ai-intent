@@ -76,7 +76,8 @@ module.exports = function (RED) {
             }
           });
         });
-      } else {
+      }
+      else {
         const nameOrId = msg.payload?.nodeName || registeredNodeId;
 
         getNode(nameOrId, nodeStore, (err, registeredNode) => {
@@ -94,7 +95,7 @@ module.exports = function (RED) {
 
   RED.httpAdmin.get("/registered-intents", function (req, res) {
     const nodeStore = nodeDB.getNodeStore();
-    const intents = normalizeNames(Object.values(nodeStore));
+    const intents = normalizeNames(Object.values(nodeStore))
     res.json(intents);
   });
 

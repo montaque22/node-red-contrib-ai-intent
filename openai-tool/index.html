@@ -9,9 +9,9 @@
         },
         inputs: 1,
         outputs: 1,
-        paletteLabel: "Tool",
+        paletteLabel: "Tool (Deprecated)",
         label: function () {
-            return this.name || "Tool";
+            return this.name ? `${this.name} (Deprecated)` : "Tool (Deprecated)";
         },
          oneditprepare: function () {
 

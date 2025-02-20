@@ -1,7 +1,7 @@
 <script type="text/javascript">
     RED.nodes.registerType("Register Intent", {
         category: 'AI Intent',
-        color: 'rgba(255, 0, 119, .25)',
+        color: '#1abc9c',
         icon:"register-icon.svg",
         defaults: {
             name: { value: "", required: true, validate: RED.validators.regex(/^[a-zA-Z0-9_-]{1,64}$/) },
@@ -65,7 +65,7 @@
 <script type="text/html" data-template-name="Register Intent">
 
     <div style="display: flex; justify-content: center; margin-bottom: 25px;">
-        <a href="https://youtu.be/oWP8es4g4D0" target="_blank" referrerpolicy="no-referrer"
+        <a href="https://youtu.be/FvP04OToeLQ" target="_blank" referrerpolicy="no-referrer"
             style="color: #f53b57"><i class="fa fa-youtube"></i><span style="padding-left: 10px;">Watch
             Register Intent Node Tutorial</span></a>
     </div>
@@ -193,37 +193,3 @@
         <li><a href="https://ollama.com/blog/tool-support">Ollama</a></li>
     </ul>
 </script>
-
-<!--<script type="text/html" data-help-name="Register Intent">-->
-<!--    <p>Creates a listener for specific event and fires when event is triggered</p>-->
-
-<!--    <h3>Inputs</h3>-->
-<!--    <dl class="message-properties">-->
-<!--        <dt>Name-->
-<!--            <span class="property-type">string</span>-->
-<!--        </dt>-->
-<!--        <dd>This must be a unique to identify an automation. This must also use camel-case </dd>-->
-
-<!--        <dt>description-->
-<!--            <span class="property-type">string</span>-->
-<!--        </dt>-->
-<!--        <dd>Describes what the registered intent should be used for. OpenAI will use this as a description when-->
-<!--            sending this intent as a function payload.</dd>-->
-
-<!--        <dt class="optional">excludeFromOpenAi-->
-<!--            <span class="property-type">boolean</span>-->
-<!--        </dt>-->
-<!--        <dd>If true, this intent will not be sent to OpenAI as a function it can call</dd>-->
-
-<!--    </dl>-->
-
-<!--    <h3>Details</h3>-->
-<!--    <p>Place this node at the begining of an automation to register it to be called by the <code>Call-Intent</code> node.-->
-<!--    Registering an intent is useful for integrating with AI's as the AI can use the <b>description</b> to-->
-<!--determine the circumstances the intent should be called. As a result, make the <b>description</b> as clear and succinct-->
-<!--as possible.</p>-->
-<!--<p>Because this node is a custom trigger, OpenAI by default will add it to its list of functions it can call in order-->
-<!--    handle user requests. If you this is negatively affecting OpenAI's results or you don't want this function-->
-<!--    to be considered by OpenAI, set <b>excludeFromOpenAi</b> to <code>true</code>-->
-<!--</p>-->
-<!--</script>-->

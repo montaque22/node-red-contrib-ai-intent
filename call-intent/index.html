@@ -3,11 +3,12 @@
     
 
     const getIntentOptions = (intents = []) => {
-        const options = intents.filter(option => {
-            return option.type === "Register Intent"
-        }).map(intent => {
-            return { value: intent.id, label: intent.name }
-        })
+        const options = intents
+            .filter(option => {
+                return option.type === "Register Intent" && !option.excludeFromOpenAi
+            }).map(intent => {
+                return { value: intent.id, label: intent.name}
+            })
 
         options.push(DYNAMIC_OPTION)
 
@@ -23,7 +24,7 @@
     const initialize = () => {
         RED.nodes.registerType("Call Intent", {
             category: 'AI Intent',
-            color: 'rgba(255, 0, 119, .25)',
+            color: '#1abc9c',
             icon: "promotion-icon.svg",
             defaults: {
                 name: { value: "" },
@@ -75,7 +76,7 @@
 
 <script type="text/html" data-template-name="Call Intent">
     <div style="display: flex; justify-content: center; margin-bottom: 25px;">
-        <a href="https://youtu.be/oWP8es4g4D0" target="_blank" referrerpolicy="no-referrer" style="color: #f53b57"><i
+        <a href="https://youtu.be/FvP04OToeLQ" target="_blank" referrerpolicy="no-referrer" style="color: #f53b57"><i
                 class="fa fa-youtube"></i><span style="padding-left: 10px;">Watch
                 Call Intent Node Tutorial</span></a>
     </div>

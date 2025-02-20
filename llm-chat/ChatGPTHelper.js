@@ -129,7 +129,8 @@ const createFunctionsFromContext = (rawIntents = {}) => {
                 if (payload.excludeFromOpenAi) {
                     return undefined;
                 }
-                const parameters = payload.code.trim() ?
+
+                const parameters = payload.code?.trim() ?
                     JSON.parse(payload.code) : {type: "object", properties: {}, required: []};
 
 

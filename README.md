@@ -1,95 +1,233 @@
-# AI Intent
+# AI Intent Version 3
 
 This is a collection of nodes to help enhance existing automations to be utilized by chatbots and take advantage of LLM's like GPT. There are 4 Nodes in this collection:
 
 > Note: This uses GPT's Chat Completion API which is now considered Legacy. If it becomes deprecated. I will do my best to update this to leverage something equivalent.
 ### Breaking Changes
+
+#### v1 - v2
 There were changes under the hood how Intents are saved. This may cause some of your **Register Intent** and **Call Intent**
 nodes to become invalid. Usually opening and closing the configuration of the nodes and redeploying should work. 
 If this doesn't work, you may need to redo the nodes from the palette. 
 
-## Register Intent
+#### v2 - v3
+A lot of the nodes are being deprecated. The **User node**, **System Node**, **Response Node**, **Tool Node**, **Response Node**
+**ChatGPT Node**, **Gemini Node**, **LocalAI Node**. Instead, use the **LLM Chat node**. This node replaces all of those nodes.
+You can now write Function tools in the Register intent node which gives greater versatility.
+> **PLEASE MIGRATE YOUR AUTOMATIONS TO USE THE LLM CHAT NODE.**
+---
 
-This node creates a subscription that can be activated by the **Call Intent** node. At minimum this node can be used as a way to link automations in different flows very similar to the native `Link In`/`Link Out` nodes but it is unrestricted in where it can be used. Additionally, these nodes are automatically added to the **OpenAI Chat** node's payload as functions OpenAI can call. If this negatively affects your results, you can exclude them from the payload using the `excludeFromOpenAI` checkbox.
+## LLM Chat Node
 
-> You cannot have to Register Intent nodes with the same name. This will lead to unintended results
+The **LLM Chat** node enables users to interact with a Large Language Model (LLM) and receive responses. It supports system and user messages, conversation tracking, and additional configuration options.
+> Watch tutorial: https://youtu.be/2Efb1X6F5UY
+---
 
-## Call Intent
+## **Important**
+To use this node, you need to configure the connection details. Consult the documentation for your chosen LLM platform (e.g., OpenAI, Ollama, Gemini) for specific instructions.
 
-Triggers the associated **Register Intent** node. When this node is attached directly after the **OpenAI Response** node, it can dynamically trigger Registered intents. To see this in action check the examples folder and look for the `openai-call-registered-intent-example.json`.
+---
 
-**To learn more about both the Call and Register Intent, watch the video below.**
-[![Call/Register Intent](https://raw.githubusercontent.com/montaque22/node-red-contrib-ai-intent/master/images/call_register_intent.jpeg)](https://youtu.be/oWP8es4g4D0)
+## **Inputs**
 
-## OpenAI / Local LLM / Gemini
+### **1. Main Input (`msg.payload`)**
+The primary input for the LLM. It must include a `user` message and may optionally contain a `system` message.
 
-These represent the various services you can use within your automations. 
-By constructing a payload using the information from **User**, **System**, and **Tools***, these services can return the
-processed data using their respective infrastructure. OpenAI is the most stable and provides a reliable experience. 
-Gemini works very similar to OpenAI however I have seen some strange quirks when using **Tools** node based on how you
-define the schema. LocalAI is the least stable of the 3. I do not have a system with adequate GPU, so it is slow for me.
-However, your Local LLM may provide superior results than mine so use at your own discretion. 
-> Remember you need to use at minimum the **User** node before using any of the three Service nodes.
-
-## User
-
-Provides the message with role = user to use in OpenAI's chat completion Payload. This node is also capable of utilizing string substitution and can replace tokenized content in the string payload with data from the msg object. Any text wrapped in single curly brace `{}` will be treated as a key in the msg object.
-
-## System
-
-Provides the message with role = system to use in OpenAI's chat completion Payload. This node is also capable of utilizing string substitution and can replace tokenized content in the string payload with data from the msg object. Any text wrapped in single curly brace `{}` will be treated as a key in the msg object.
-
-## Tool
-
-Provide functions the Open AI can use to handle unique requests. These nodes can be chained with other **OpenAI Tool** nodes and the system will automatically append subsequent functions to the same payload.
-
-## Response
-
-Sanitizes the response from OpenAI. This provides a consistent easy to read output, but it will also pass the original OpenAI output in a separate property called `originalResponse`.
-
-## How to use
-
-> NOTE: You need to have a valid token from OpenAI for this to work. Visit [OpenAI](https://platform.openai.com/).
-
-Once you have a valid token there are two ways to install it.
-
-### Configuration Node
-
-![](https://raw.githubusercontent.com/montaque22/node-red-contrib-ai-intent/master/images/set-config-node.gif)
-When you use the **OpenAI** node or **Gemini** node, they require an API token. You can add one via the UI Configuration
-by clicking the pencil icon and paste the token key into the text box and click add. 
-This method is the easiest, but you should be careful when exporting your flows as the token will be added to the 
-exported JSON. If you share your code often or would like to not have to worry about this, you can add the token to the
-`settings.js` file
-
-## Settings.js File
-
-You can add your token to the settings.js file. The file can be found under `.node-red/settings.js` path (or some equivalent). 
-Based on reports from various users the location seems to be slightly different based on how you installed it. 
-You may want to do a global search for it if you're having trouble. 
-Once you find the file search for the `functionGlobalContext` property and add the following:
-
+#### **Example:**
+```javascript
+msg.payload = {
+    system: "You are a helpful assistant.",
+    user: "What is the capital of Alaska?"
+};
 ```
-  functionGlobalContext: {
-    openaiAPIKey: "YOUR-TOKEN-API-GOES-HERE",
-    geminiaiAPIKey: "Your Key Goes Here",
-    localStoragePath: "./testfolder"
-  },
+- **`system`** (optional): Provides instructions to guide the model’s behavior.
+- **`user`** (required): Contains the user's query or command.
 
+---
+
+### **2. Additional Options (`msg.payload.options`)**
+Allows users to send extra parameters to customize LLM responses.
+
+#### **Example:**
+```javascript
+msg.payload = {
+    user: "What is the capital of Alaska? Respond using JSON.",
+    options: {
+        format: "json" // Example for Ollama
+    }
+};
 ```
-If you encounter an error such as **no such file or directory, mkdir '<some/path/ending/with/localstore>'**, 
-you have the ability to change where intents are stored by adding the `localStoragePath` key with a new valid path.
-Make sure you restart node-red once you save this file. 
 
-This method is more complicated than the Configuration node however you can freely share and export your flows and 
-automations as the token will be hidden from the flow.
+The available options depend on the LLM platform and may include parameters such as:
+- **`temperature`**: Controls randomness.
+- **`max_tokens`**: Limits response length.
+- **`format`**: Defines response structure (e.g., JSON).
 
-> Home Assistant Users: if you installed node-red as an addon, your settings.js file may be in a different location. Try looking for a folder called **addon_configs** and look for a folder ending with **\_nodered**. You may need the Samba Addon in order to see all the folders.
+Refer to the LLM's documentation for more details.
 
-## Watch this video to learn how to use this plugin
+---
 
-[![AI-Intent Tutorial](https://raw.githubusercontent.com/montaque22/node-red-contrib-ai-intent/master/images/finally.jpg)](https://youtu.be/J0_mi7U0wCM)
+### **3. Clear Chat History (`msg.clearChatHistory`)**
+- **Type**: `boolean` (optional)
+- **Behavior**: If set to `true`, the conversation history will be cleared for the specified **Conversation Id**.
 
-Alternatively, you can check out [Chaperone](https://montaque22.github.io/#/aiIntent) to get a quick overview of each node with example automations
+#### **Example:**
+```javascript
+msg.clearChatHistory = true;
+```
+
+---
+
+## **Node Configuration**
+
+### **1. Conversation Id**
+- **Type**: `string`
+- **Description**: This value is used as a key to store and track conversation history. If multiple nodes share the same Conversation Id, they will share the same conversation context.
+- **If omitted**: Each call to the LLM will be independent, without historical context.
+
+---
+
+### **2. Tool Choice**
+Defines whether the LLM should use function calling.
+
+#### **Options:**
+- **`None`**: Disables tools; the LLM won’t use functions.
+- **`Automatic`**: Allows the LLM to decide when to use selected tools.
+- **`Required`**: Forces the LLM to use at least one selected tool.
+
+> **Note:** For Ollama, not all models support function calling.
+
+---
+
+### **3. Tools**
+- **Type**: `string`
+- **Description**: This field is populated by **Register Intent** nodes. It allows selecting one or more functions that the LLM can use.
+- **Behavior**: The LLM will consider calling the selected functions based on the **Tool Choice** setting.
+
+---
+
+## **System and User Messages**
+Messages must be passed in the `msg.payload` object:
+```javascript
+msg.payload = {
+    system: "You are a helpful assistant.",
+    user: "What is the capital of Alaska?"
+};
+```
+
+The **system message** is optional but helps set the LLM’s behavior. The **user message** is required for every interaction.
+
+To include additional response options:
+```javascript
+msg.payload = {
+    user: "What is the capital of Alaska? Respond using JSON.",
+    options: {
+        format: "json" // Example for Ollama
+    }
+};
+```
+
+---
+
+## **Summary**
+- Use `msg.payload` with `user` (required) and `system` (optional) messages.
+- Customize responses with `msg.payload.options`.
+- Set `msg.clearChatHistory = true` to reset conversation history.
+- Configure **Conversation Id** to maintain or separate conversation history.
+- Choose **Tool Choice** and **Tools** to enable function calling when supported.
+
+For more details, refer to the documentation of your selected LLM platform.
 
 
+
+---
+## Register Intent Node
+
+### Purpose
+The **Register Intent Node** allows users to define custom actions (intents) that can be triggered by the **Call Intent Node** or AI assistants like OpenAI.
+> Watch Tutorial: https://youtu.be/FvP04OToeLQ
+
+### Configuration
+- **Name (string):** A unique identifier for the intent (alphanumeric, underscores, hyphens, max 64 characters).
+- **Description (string):** A clear explanation of the intent’s purpose. If using AI assistants, this helps them understand when to trigger the intent.
+- **Advanced Mode (boolean):** Enables structured AI interactions using a JSON-based schema.
+- **Tool Schema (JSON, required if Advanced Mode is enabled):** Defines the expected parameters for AI-generated inputs.
+
+### Usage
+Place this node at the beginning of a flow to register an intent. Other flows or AI models can then call this intent dynamically. For AI integrations, ensure the description field is precise to improve intent recognition.
+
+### Example JSON Schema for OpenAI
+```json
+{
+    "type": "object",
+    "properties": {
+        "eventName": {
+            "type": "string",
+            "description": "Unique event identifier."
+        },
+        "eventTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO8601 formatted event time."
+        },
+        "eventPayload": {
+            "type": "string",
+            "description": "Command for smart home actions."
+        }
+    },
+    "required": ["eventName", "eventTime"],
+    "additionalProperties": false
+}
+```
+
+### AI Platform Considerations
+Different AI platforms may have unique function calling mechanisms. Refer to the official documentation for specifics:
+- [OpenAI Function Calling](https://platform.openai.com/docs/guides/function-calling)
+- [Google Gemini API](https://ai.google.dev/gemini-api/docs/function-calling)
+- [Ollama Tool Support](https://ollama.com/blog/tool-support)
+
+---
+## Call Intent Node
+
+### Purpose
+The **Call Intent Node** is used to trigger an intent that has been previously registered using the **Register Intent Node**.
+
+### Configuration
+- **Name (string):** A label for the node.
+- **Registered Node Name (string):** Select from a dropdown list of available registered intents or pass the intent dynamically via `msg.payload.nodeName`.
+
+### Usage
+This node acts as a trigger for registered intents. It can:
+- Directly call an intent similar to a link node.
+- Be placed after an **LLM Chat Node**, allowing AI to determine which intent to execute dynamically.
+- Trigger multiple intents if the payload contains an array of intent names.
+
+#### Example Payload for Multiple Calls
+```json
+{
+    "payload": [
+        {"nodeName": "turn_on_lights"},
+        {"nodeName": "set_thermostat"}
+    ]
+}
+```
+
+---
+## LLM Chat Node
+
+### Purpose
+The **LLM Chat Node** integrates with various AI models to process and respond to natural language input dynamically.
+
+### Usage
+Place this node in a flow where dynamic AI-driven responses are required. It can:
+- Answer user queries.
+- Process input and pass structured responses to downstream nodes.
+- Work in conjunction with **Register Intent** and **Call Intent Nodes** to enable complex AI-driven automations.
+
+### Example Use Case
+A user asks: *"What’s the weather today?"*
+1. **LLM Chat Node** processes the request.
+2. If the AI determines a weather function is needed, it triggers a **Call Intent Node**.
+3. The **Call Intent Node** invokes a flow that retrieves weather data and returns a response.
+
+---

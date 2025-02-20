@@ -60,9 +60,9 @@
         },
         inputs: 1,
         outputs: 1,
-        paletteLabel: "Local LLM",
+        paletteLabel: "Local LLM (Deprecated)",
         label: function () {
-            return this.name || "Local LLM";
+            return this.name ? `${this.name} (Deprecated)` : "Local LLM (Deprecated)";
         },
 
         oneditprepare: function(x){

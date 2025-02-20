@@ -16,7 +16,8 @@
             const intents = {}
             const tools = []
 
-            data.forEach((intent => {
+            data
+                .forEach((intent => {
                 if (intent.type === "OpenAI Tool") {
                     if (!intents[intent.name]) {
                         intents[intent.name] = true
@@ -26,6 +27,7 @@
                     tools.push(intent)
                 }
             }))
+
             return tools
         }
 
@@ -36,7 +38,14 @@
         });
 
         const getToolOptions = (intents = []) => {
-            const options = intents.map(intent => {
+            return intents
+                .filter(option => {
+                    // Remove excluded tool selection
+                    // TODO: Deprecated
+                    console.log(option.excludeFromOpenAi)
+                    return  !option.excludeFromOpenAi
+                })
+                .map(intent => {
 
                 if(intent.type === "Register Intent"){
                     return { value: intent.name, label: `${intent.name} (Registered Intent)`}
@@ -45,13 +54,11 @@
                     return { value: tool.function.name, label: `${intent.name} (Deprecated)`}
                 }
             })
-
-            return [...options]
         }
 
         RED.nodes.registerType("LLM Chat", {
             category: 'AI Intent',
-            color: 'rgb(241,0,104)',
+            color: '#1abc9c',
             icon:"bot-message-square.svg",
             defaults: {
                 name: { value: "" },
@@ -104,6 +111,11 @@
 </script>
 
 <script type="text/html" data-template-name="LLM Chat">
+    <div style="display: flex; justify-content: center; margin-bottom: 25px;">
+        <a href="https://youtu.be/2Efb1X6F5UY" target="_blank" referrerpolicy="no-referrer"
+           style="color: #f53b57"><i class="fa fa-youtube"></i><span style="padding-left: 10px;">Watch
+           LLM Chat Node Tutorial</span></a>
+    </div>
     <div class="form-row">
         <label for="node-input-name"> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">

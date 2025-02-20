@@ -56,9 +56,9 @@
             },
             inputs: 1,
             outputs: 1,
-            paletteLabel: "OpenAI",
+            paletteLabel: "OpenAI (Deprecated)",
             label: function () {
-                return this.name || "OpenAI";
+                return this.name ? `${this.name} (Deprecated)` : "OpenAI (Deprecated)";
             },
 
             oneditprepare: function(x){

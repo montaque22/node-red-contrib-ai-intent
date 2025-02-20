@@ -10,9 +10,9 @@
         },
         inputs: 1,
         outputs: 1,
-        paletteLabel: "Response",
+        paletteLabel: "Response (Deprecated)",
         label: function () {
-            return this.name || "Response";
+            return this.name ? `${this.name} (Deprecated)` : "Response (Deprecated)";
         },
 
         oneditprepare: function(x){
