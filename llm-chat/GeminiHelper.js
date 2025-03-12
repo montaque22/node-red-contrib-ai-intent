@@ -147,7 +147,7 @@ const createFunctionsFromContext = (rawIntents = {}) => {
                 if (payload.excludeFromOpenAi) {
                     return undefined;
                 }
-                const parameters = payload.code.trim() ?
+                const parameters = payload.code?.trim() ?
                     JSON.parse(payload.code) : {type: "object", properties: {}, required: []};
 
 
@@ -231,7 +231,7 @@ const getToolProperties = (
         }
     }
 
-    if(mode !== TOOL_CHOICE.None){
+    if(mode.toLowerCase() !== TOOL_CHOICE.None) {
         [...deprecatedTools, ...allTools].forEach(tool => {
             if(allowed_function_names.includes(tool.function.name)){
                 tools.push(tool);

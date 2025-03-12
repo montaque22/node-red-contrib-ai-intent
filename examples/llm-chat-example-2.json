@@ -1,0 +1,309 @@
+[
+    {
+        "id": "9cbd7cb11a996ab6",
+        "type": "LLM Chat",
+        "z": "0952e532e64aa699",
+        "name": "",
+        "platform": "0144091d53bfe539",
+        "tools": "",
+        "tool_choice": "auto",
+        "conversation_id": "test",
+        "x": 590,
+        "y": 1540,
+        "wires": [
+            [
+                "5d4bb692cf72677d"
+            ]
+        ]
+    },
+    {
+        "id": "83da82c5fcf7341f",
+        "type": "inject",
+        "z": "0952e532e64aa699",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 240,
+        "y": 1540,
+        "wires": [
+            [
+                "39dce27b4924b0f5"
+            ]
+        ]
+    },
+    {
+        "id": "5d4bb692cf72677d",
+        "type": "debug",
+        "z": "0952e532e64aa699",
+        "name": "debug 211",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 790,
+        "y": 1540,
+        "wires": []
+    },
+    {
+        "id": "39dce27b4924b0f5",
+        "type": "template",
+        "z": "0952e532e64aa699",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "json",
+        "syntax": "mustache",
+        "template": "{\n    \"system\": \"You are Jarvis from iron man with all the knowledge of the universe and my smart home. Answer any question truthfully but with the wit and humor of Jarvis from Iron man about the state of devices in my home.\",\n    \"user\": \"turn off my lights\"\n}",
+        "output": "json",
+        "x": 420,
+        "y": 1540,
+        "wires": [
+            [
+                "9cbd7cb11a996ab6"
+            ]
+        ]
+    },
+    {
+        "id": "e066f11b88e86c9e",
+        "type": "Register Intent",
+        "z": "0952e532e64aa699",
+        "name": "answer_question",
+        "description": "Use this to answer any question asked by the user",
+        "advanceMode": "false",
+        "excludeFromOpenAi": false,
+        "code": "",
+        "x": 320,
+        "y": 1800,
+        "wires": [
+            [
+                "f669480164a94428"
+            ]
+        ]
+    },
+    {
+        "id": "3439e130b9d8088e",
+        "type": "debug",
+        "z": "0952e532e64aa699",
+        "name": "debug 212",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 890,
+        "y": 1800,
+        "wires": []
+    },
+    {
+        "id": "448a694f49ebb3d0",
+        "type": "Call Intent",
+        "z": "0952e532e64aa699",
+        "name": "",
+        "registeredNodeId": "",
+        "x": 1200,
+        "y": 1700,
+        "wires": []
+    },
+    {
+        "id": "86a74780f6f4f9df",
+        "type": "debug",
+        "z": "0952e532e64aa699",
+        "name": "debug 213",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 550,
+        "y": 1880,
+        "wires": []
+    },
+    {
+        "id": "8afb282ff5acfb35",
+        "type": "Register Intent",
+        "z": "0952e532e64aa699",
+        "name": "execute_command",
+        "description": "Use this to change the state of any given device",
+        "advanceMode": "true",
+        "excludeFromOpenAi": false,
+        "code": "{\n    \"type\": \"object\",\n    \"properties\": {\n        \"entity\": {\n            \"type\": \"string\",\n            \"description\": \"The name of the smart home device to control (e.g., 'living room light', 'bedroom fan').\"\n        },\n        \"action\": {\n            \"type\": \"string\",\n            \"enum\": [\n                \"on\",\n                \"off\"\n            ],\n            \"description\": \"The action to perform on the device, either 'on' or 'off'.\"\n        }\n    },\n    \"required\": [\n        \"entity\",\n        \"action\"\n    ]\n}",
+        "x": 330,
+        "y": 1880,
+        "wires": [
+            [
+                "86a74780f6f4f9df"
+            ]
+        ]
+    },
+    {
+        "id": "d8bbf58e2d75cb01",
+        "type": "LLM Chat",
+        "z": "0952e532e64aa699",
+        "name": "",
+        "platform": "0144091d53bfe539",
+        "tools": "answer_question,execute_command",
+        "tool_choice": "required",
+        "conversation_id": "",
+        "x": 1010,
+        "y": 1700,
+        "wires": [
+            [
+                "448a694f49ebb3d0"
+            ]
+        ]
+    },
+    {
+        "id": "a3b039b768225c0c",
+        "type": "inject",
+        "z": "0952e532e64aa699",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "What devices are currently on?",
+        "x": 250,
+        "y": 1700,
+        "wires": [
+            [
+                "c69161353a5db451"
+            ]
+        ]
+    },
+    {
+        "id": "d2205cdbd19a5ec9",
+        "type": "template",
+        "z": "0952e532e64aa699",
+        "name": "LLM Chat Props",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "{\n    \"system\": \"{{payload}}\",\n    \"user\": \"{{topic}}\"\n}",
+        "output": "json",
+        "x": 820,
+        "y": 1700,
+        "wires": [
+            [
+                "d8bbf58e2d75cb01"
+            ]
+        ]
+    },
+    {
+        "id": "78831ff147c087ea",
+        "type": "inject",
+        "z": "0952e532e64aa699",
+        "name": "",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "turn off all devices",
+        "x": 210,
+        "y": 1640,
+        "wires": [
+            [
+                "c69161353a5db451"
+            ]
+        ]
+    },
+    {
+        "id": "c69161353a5db451",
+        "type": "template",
+        "z": "0952e532e64aa699",
+        "name": "list of devices and states",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "text",
+        "syntax": "mustache",
+        "template": "bathroom light is on\nkitchen light is on\nbedroom light is off\nporch light is off",
+        "output": "str",
+        "x": 570,
+        "y": 1700,
+        "wires": [
+            [
+                "d2205cdbd19a5ec9"
+            ]
+        ]
+    },
+    {
+        "id": "49171f29499f3823",
+        "type": "LLM Chat",
+        "z": "0952e532e64aa699",
+        "name": "",
+        "platform": "0144091d53bfe539",
+        "tools": "answer_question,execute_command",
+        "tool_choice": "none",
+        "conversation_id": "",
+        "x": 710,
+        "y": 1800,
+        "wires": [
+            [
+                "3439e130b9d8088e"
+            ]
+        ]
+    },
+    {
+        "id": "f669480164a94428",
+        "type": "template",
+        "z": "0952e532e64aa699",
+        "name": "LLM Chat Props",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "{\n    \"system\": \"These are the states of the following devices: bathroom light is off. Alarm is currently set to away\",\n    \"user\": \"{{topic}}\"\n}",
+        "output": "json",
+        "x": 520,
+        "y": 1800,
+        "wires": [
+            [
+                "49171f29499f3823"
+            ]
+        ]
+    },
+    {
+        "id": "0144091d53bfe539",
+        "type": "platform-configuration",
+        "name": "OpenAI gpt-4o",
+        "platform": "gpt",
+        "url": "",
+        "model": "gpt-4o"
+    }
+]
