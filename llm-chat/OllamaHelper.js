@@ -15,7 +15,7 @@ const ollamaHelper = (props,callback) => {
         return callback("URL is missing. Please update the config to point to a valid URL for your local llm");
     }
 
-    const {options = {}, system = "", user = ""} = msg?.payload || {}
+    const {options = {}, system = "", user = "", tool = ""} = msg?.payload || {}
     const conversation_id = config.conversation_id;
     const conversationHistory = new ConversationHistory(nodeDB, conversation_id)
 
@@ -24,13 +24,14 @@ const ollamaHelper = (props,callback) => {
         node.warn("Conversation history cleared")
     }
 
-    if(!user){
+    if (!user && !tool) {
         node.status({fill:"red",shape:"dot",text:"Stopped"});
-       return node.warn("payload.user is empty. Stopping the flow ")
+        return node.warn("payload.user and payload.tool are empty. Stopping the flow.");
     }
 
-    conversationHistory.addSystemMessage(system)
-    conversationHistory.addUserMessage(user)
+    conversationHistory.addSystemMessage(system);
+    conversationHistory.addUserMessage(user);
+    conversationHistory.addToolMessage(tool);
 
     if(conversation_id) {
         conversationHistory.saveHistory()

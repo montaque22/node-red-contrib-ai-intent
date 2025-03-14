@@ -48,6 +48,15 @@ class ConversationHistory {
         this.conversation.push(entry)
         this.saveHistory()
     }
+    addToolMessage(content){
+        if(!content){
+            return false
+        }
+
+        const entry = {role: ROLES.Tool, content }
+        this.conversation.push(entry)
+        this.saveHistory()
+    }
 
     clearHistory(){
         this.conversation = []
