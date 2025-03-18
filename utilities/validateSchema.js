@@ -1,6 +1,6 @@
 const Ajv = require("ajv");
 const addFormats = require("ajv-formats");
-
+const Sugar = require("sugar");
 // Initialize AJV
 const ajv = new Ajv({ allErrors: true });
 addFormats(ajv); // Add extra format validations
@@ -28,9 +28,11 @@ function validateOpenAISchema(userSchema) {
         }
 
         // Check if type is defined and valid
-        const validTypes = ["string", "number", "integer", "boolean", "array", "object"];
-        if (!value.type || !validTypes.includes(value.type)) {
-            return { isValid: false, errorMsg: `Property '${key}' must have a valid type (string, number, integer, boolean, array, object).` };
+        const validTypes = ["string", "number", "integer", "boolean", "array", "object", "null"];
+        const listedTypes = Array.isArray(value.type) ? value.type : [value.type].filter(Boolean)
+        const intersection = Sugar.Array.intersect(listedTypes, validTypes)
+        if (!listedTypes.length || intersection.length !== listedTypes.length) {
+            return { isValid: false, errorMsg: `Property '${key}' must have a valid type (string, number, integer, boolean, array, object, null).` };
         }
 
         // If `enum` is present, ensure it is an array with at least one item
