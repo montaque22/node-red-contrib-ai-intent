@@ -18,11 +18,10 @@ const chatGPTHelper = (props,callback) => {
 
     const openai = new OpenAI({ apiKey });
     const {options = {}, system = "", user = ""} = msg?.payload || {}
-    const conversation_id = config.conversation_id;
-    const conversationHistory = new ConversationHistory(nodeDB, conversation_id)
+    const conversation_id = msg.conversationId || config.conversation_id;
+    const conversationHistory = new ConversationHistory(nodeDB, conversation_id, msg.clearChatHistory)
 
     if(msg.clearChatHistory){
-        conversationHistory.clearHistory()
         node.warn("Conversation history cleared")
     }
 
@@ -34,9 +33,6 @@ const chatGPTHelper = (props,callback) => {
     conversationHistory.addSystemMessage(system)
     conversationHistory.addUserMessage(user)
 
-    if(conversation_id) {
-        conversationHistory.saveHistory()
-    }
 
     const toolProperties = getToolProperties(config, msg.tools, RED)
     const finalProps = {
@@ -53,9 +49,10 @@ const chatGPTHelper = (props,callback) => {
             response.choices.forEach(choice => {
                 conversationHistory.addAssistantMessage(choice.message.content)
             })
+
             conversationHistory.saveHistory()
 
-            return createPayload(finalProps, response, msg, conversationHistory.conversation)
+            return createPayload({...finalProps, conversationId: conversation_id}, response, msg, conversationHistory.conversation)
         })
         .then(msg => {
             callback(null, msg)

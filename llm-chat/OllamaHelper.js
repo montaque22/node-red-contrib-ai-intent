@@ -16,11 +16,10 @@ const ollamaHelper = (props,callback) => {
     }
 
     const {options = {}, system = "", user = "", tool = ""} = msg?.payload || {}
-    const conversation_id = config.conversation_id;
-    const conversationHistory = new ConversationHistory(nodeDB, conversation_id)
+    const conversation_id = msg.conversationId || config.conversation_id;
+    const conversationHistory = new ConversationHistory(nodeDB, conversation_id, msg.clearChatHistory)
 
     if(msg.clearChatHistory){
-        conversationHistory.clearHistory()
         node.warn("Conversation history cleared")
     }
 
@@ -32,10 +31,6 @@ const ollamaHelper = (props,callback) => {
     conversationHistory.addSystemMessage(system);
     conversationHistory.addUserMessage(user);
     conversationHistory.addToolMessage(tool);
-
-    if(conversation_id) {
-        conversationHistory.saveHistory()
-    }
 
     const toolProperties = getToolProperties(config, msg.tools, RED)
     const finalProps = {
@@ -49,12 +44,10 @@ const ollamaHelper = (props,callback) => {
 
     ollama.chat(finalProps)
         .then((response) => {
-            console.log("RESPONSE: ", response)
-
             conversationHistory.addAssistantMessage(response.message.content)
             conversationHistory.saveHistory()
 
-            return createPayload(finalProps, response, msg, conversationHistory.conversation)
+            return createPayload({...finalProps, conversationId: conversation_id}, response, msg, conversationHistory.conversation)
         })
         .then(msg => {
             callback(null, msg)

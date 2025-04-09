@@ -1,16 +1,19 @@
 const {CONVERSATION_CONTEXT, ROLES} = require("../constants");
 
 class ConversationHistory {
-    constructor(nodeDB, conversationId) {
+    constructor(nodeDB, conversationId, purge) {
         this.conversationId = conversationId;
         this.nodeDB = nodeDB;
         this.conversation = []
+        this.purge = purge;
 
         if(!nodeDB){
             throw new Error("nodeDB does not exist");
-        }else if(conversationId){
+        }else if(conversationId && !purge){
             const allConversations = nodeDB.getValueFromGlobalContext(CONVERSATION_CONTEXT) || {}
             this.conversation = allConversations[conversationId] || []
+        }else if(purge && conversationId){
+            this.clearHistory()
         }
     }
 

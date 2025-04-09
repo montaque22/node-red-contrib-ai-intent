@@ -18,11 +18,10 @@ const geminiHelper = (props,callback) => {
     }
 
     const {options , system = "", user = ""} = msg?.payload || {}
-    const conversation_id = config.conversation_id;
-    const conversationHistory = new ConversationHistory(nodeDB, conversation_id)
+    const conversation_id = msg.conversationId || config.conversation_id;
+    const conversationHistory = new ConversationHistory(nodeDB, conversation_id, msg.clearChatHistory)
 
     if(msg.clearChatHistory){
-        conversationHistory.clearHistory()
         node.warn("Conversation history cleared")
     }
 
@@ -33,10 +32,6 @@ const geminiHelper = (props,callback) => {
 
     conversationHistory.addSystemMessage(system)
     conversationHistory.addUserMessage(user)
-
-    if(conversation_id) {
-        conversationHistory.saveHistory()
-    }
 
     // Access your API key as an environment variable (see "Set up your API key" above)
     const genAI = new GoogleGenerativeAI(apiKey);
@@ -70,11 +65,10 @@ const geminiHelper = (props,callback) => {
             };
         })
         .then((payload) => {
-            console.log("RESPONSE: ", payload)
             conversationHistory.addAssistantMessage(payload.text)
             conversationHistory.saveHistory()
 
-            return createPayload(finalProps, payload, msg)
+            return createPayload({...finalProps, conversationId: conversation_id}, payload, msg, conversationHistory.conversation)
         })
         .then(msg => {
             callback(null, msg)
@@ -84,7 +78,7 @@ const geminiHelper = (props,callback) => {
         });
 }
 
-const createPayload = (request, response, previousMsg) => {
+const createPayload = (request, response, previousMsg, conversationHistory) => {
     const format = new Format()
     const payload = format.formatPayloadForGeminiAI(response)
 
@@ -93,8 +87,9 @@ const createPayload = (request, response, previousMsg) => {
         payload,
         apiResponse: response,
        _debug: {
-         ...request
-       },
+            ...request,
+           messages: conversationHistory
+       }
    }
 }
 
