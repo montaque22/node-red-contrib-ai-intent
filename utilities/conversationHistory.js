@@ -66,10 +66,10 @@ class ConversationHistory {
         this.saveHistory()
     }
 
-     saveHistory(){
+     saveHistory(historyLimit = 7){
         if(this.conversationId){
             const allConversations = this.nodeDB.getValueFromGlobalContext(CONVERSATION_CONTEXT) || {}
-            allConversations[this.conversationId] = this.conversation
+            allConversations[this.conversationId] = this.conversation.slice(-1 * Math.abs(historyLimit))
             this.nodeDB.setValueToGlobalContext(allConversations, CONVERSATION_CONTEXT)
         }
      }

@@ -94,7 +94,8 @@
                 tool_choice: {value: "none"},
                 conversation_id: {value: ""},
                 user: {value: ""},
-                system: {value: ""}
+                system: {value: ""},
+                historyLimit: {value: 7}
             },
             inputs: 1,
             outputs: 1,
@@ -128,6 +129,17 @@
                 // editor
                 this.systemEditor = createEditor(this.system, "node-input-system-editor")
                 this.userEditor = createEditor(this.user, "node-input-user-editor")
+
+                $("#node-input-historyLimit").typedInput({
+                    type:"num",
+                    types:["num"],
+                    typeField: "#node-input-historyLimit-type"
+                })
+
+                $("#node-input-conversation_id").typedInput({
+                    type:"str",
+                    typeField: "#node-input-conversation_id-type"
+                })
 
                 $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
                     const tools = removeDuplicates(data)
@@ -195,13 +207,15 @@
 
     <div class="form-row">
         <label for="node-input-conversation_id"> Conversation Id</label>
-
         <input type="text" id="node-input-conversation_id">
+    </div>
+    <div class="form-row">
+        <label for="node-input-historyLimit">History Limit</label>
+        <input type="text" id="node-input-historyLimit" placeholder="7">
     </div>
 
     <div class="form-row">
         <label for="node-input-tool_choice">Tool Choice</label>
-
         <input type="text" id="node-input-tool_choice">
     </div>
 
@@ -264,6 +278,9 @@
         <dt>Conversation Id <span class="property-type">string</span></dt>
         <dd>The value provided will be used as a key to store the conversation. The node will keep track of all the messages. If a different node uses the same key, the conversation will be connected and will use the same conversation history. If omitted, each call to the LLM will be isolated.</dd>
 
+        <dt>History Limit <span class="property-type">number</span></dt>
+        <dd>This will only take effect when conversation id is filled. This will only save the last N messages based on the value. If this isn't filled out, it will save the last 7 messages.</dd>
+
         <dt>Tool Choice <span class="property-type">dropdown</span></dt>
         <dd>This property lets you decide if the LLM should use function calling.  If you are using Ollama, not every model supports function calling.
             <ul>
@@ -278,7 +295,13 @@
     </dl>
 
     <h3>System and User Messages</h3>
-    <p>You can pass messages to the LLM by setting <code>msg.payload = { system, user }</code> where <code>system</code> and <code>user</code> are string values. You don't always have to pass <code>system</code>, but the <code>user</code> property is required.  For example:</p>
+    <p>Note: You don't always have to pass <code>system</code>, but the <code>user</code> property is required. </p>
+    <p>You can set the <code>system</code> and <code>user</code> prompts by filling out the respective sections. This text editor is javascript so use correct syntax. You must return the string you want to use as the prompt. Example:</p>
+    <pre>
+        return `Hello ${msg.topic}`
+    </pre>
+    <p>You also have access to the msg object in the editor which can help dynamic inputs.</p>
+    <p>Alternatively, You can pass messages to the LLM by setting <code>msg.payload = { system, user }</code> where <code>system</code> and <code>user</code> are string values. This will override the values in the editor. For example:</p>
     <pre>
         msg.payload = {
             system: "You are a helpful assistant.",

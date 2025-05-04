@@ -66,7 +66,7 @@ const geminiHelper = (props,callback) => {
         })
         .then((payload) => {
             conversationHistory.addAssistantMessage(payload.text)
-            conversationHistory.saveHistory()
+            conversationHistory.saveHistory(config.historyLimit)
 
             return createPayload({...finalProps, conversationId: conversation_id}, payload, msg, conversationHistory.conversation)
         })

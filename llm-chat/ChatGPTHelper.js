@@ -50,7 +50,7 @@ const chatGPTHelper = (props,callback) => {
                 conversationHistory.addAssistantMessage(choice.message.content)
             })
 
-            conversationHistory.saveHistory()
+            conversationHistory.saveHistory(config.historyLimit)
 
             return createPayload({...finalProps, conversationId: conversation_id}, response, msg, conversationHistory.conversation)
         })

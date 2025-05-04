@@ -45,7 +45,7 @@ const ollamaHelper = (props,callback) => {
     ollama.chat(finalProps)
         .then((response) => {
             conversationHistory.addAssistantMessage(response.message.content)
-            conversationHistory.saveHistory()
+            conversationHistory.saveHistory(config.historyLimit)
 
             return createPayload({...finalProps, conversationId: conversation_id}, response, msg, conversationHistory.conversation)
         })
