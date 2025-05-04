@@ -56,6 +56,33 @@
             })
         }
 
+        const cleanUpEditor = (scope, property) => {
+            scope[property].destroy();
+            delete scope[property]
+        }
+
+        const createEditor = (value, id) => {
+           return  RED.editor.createEditor({
+                id: id,
+                mode: "ace/mode/nrjavascript",
+                value:value,
+                globals: {
+                    msg: true,
+                    context: true,
+                    RED: true,
+                    util: true,
+                    flow: true,
+                    global: true,
+                    console: true,
+                    Buffer: true,
+                    setTimeout: true,
+                    clearTimeout: true,
+                    setInterval: true,
+                    clearInterval: true,
+                },
+            });
+        }
+
         RED.nodes.registerType("LLM Chat", {
             category: 'AI Intent',
             color: '#1abc9c',
@@ -65,8 +92,9 @@
                 platform: { value: "", type: "platform-configuration", required: false },
                 tools: {value: ""},
                 tool_choice: {value: "none"},
-                conversation_id: {value: ""}
-
+                conversation_id: {value: ""},
+                user: {value: ""},
+                system: {value: ""}
             },
             inputs: 1,
             outputs: 1,
@@ -76,6 +104,31 @@
             },
 
             oneditprepare: function(){
+                // tabs
+                var tabs = RED.tabs.create({
+                    id: "tabs",
+                    onchange: function (tab) {
+                        $("#tabs-content").children().hide();
+                        $("#" + tab.id).show();
+                    },
+                });
+
+                tabs.addTab({
+                    id: "tab-system",
+                    iconClass: "fa fa-cog",
+                    label: 'System Prompt',
+                });
+
+                tabs.addTab({
+                    id: "tab-user",
+                    iconClass: "fa fa-user",
+                    label: 'User Prompt',
+                });
+
+                // editor
+                this.systemEditor = createEditor(this.system, "node-input-system-editor")
+                this.userEditor = createEditor(this.user, "node-input-user-editor")
+
                 $.getJSON('registered-intents', function (data = RED.settings.callIntentRegistry) {
                     const tools = removeDuplicates(data)
                     window.__tools = getToolOptions(tools)
@@ -104,18 +157,31 @@
                         $("#tools").removeClass("disabled");
                     }
                 })
-            }
+            },
+
+            oneditsave: function () {
+                this.system = this.systemEditor.getValue();
+                this.user = this.userEditor.getValue();
+                cleanUpEditor(this, "systemEditor")
+                cleanUpEditor(this, "userEditor")
+            },
+            oneditcancel: function () {
+                cleanUpEditor(this, "systemEditor")
+                cleanUpEditor(this, "userEditor")
+            },
         });
     })()
 
 </script>
 
 <script type="text/html" data-template-name="LLM Chat">
+
     <div style="display: flex; justify-content: center; margin-bottom: 25px;">
         <a href="https://youtu.be/2Efb1X6F5UY" target="_blank" referrerpolicy="no-referrer"
            style="color: #f53b57"><i class="fa fa-youtube"></i><span style="padding-left: 10px;">Watch
            LLM Chat Node Tutorial</span></a>
     </div>
+
     <div class="form-row">
         <label for="node-input-name"> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -142,6 +208,33 @@
     <div class="form-row" id="tools">
         <label for="node-input-tools"> Tools</label>
         <input type="text" id="node-input-tools">
+    </div>
+
+    <div class="form-row tabs-row">
+        <ul style="min-width: 600px; margin-bottom: 20px;" id="tabs"></ul>
+    </div>
+
+    <div id="tabs-content" style="min-height: calc(100% - 95px);">
+        <div id="tab-system" style="display:none">
+            <div class="form-row node-text-editor-row" style="position:relative">
+                <div
+                        style="height: 450px; min-height:150px;"
+                        class="node-text-editor"
+                        id="node-input-system-editor"
+                ></div>
+            </div>
+        </div>
+
+
+        <div id="tab-user" style="display:none">
+            <div class="form-row node-text-editor-row" style="position:relative">
+                <div
+                        style="height: 450px; min-height:150px;"
+                        class="node-text-editor"
+                        id="node-input-user-editor"
+                ></div>
+            </div>
+        </div>
     </div>
    
 </script>

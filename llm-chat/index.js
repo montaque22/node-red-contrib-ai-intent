@@ -3,6 +3,7 @@ const {chatGPTHelper} = require("./ChatGPTHelper");
 const {ollamaHelper} = require("./OllamaHelper");
 const {geminiHelper} = require("./GeminiHelper");
 const {TYPES} = require("../constants");
+const vm = require("vm");
 
 const PLATFORM =  [
   { value: "gpt", label: "ChatGPT"},
@@ -11,13 +12,32 @@ const PLATFORM =  [
 ];
 
 module.exports = function (RED) {
+
   function LLMChatNode (config) {
     RED.nodes.createNode(this, config);
     this.platform = RED.nodes.getNode(config.platform);
     const node = this;
+    let userFunction;
+    let systemFunction;
+
+    try {
+      // Wrap the user's code in a function
+      systemFunction = new Function('msg', 'context', 'flow', 'global', config.system);
+      userFunction = new Function('msg', 'context', 'flow', 'global', config.user);
+    } catch (err) {
+      node.error("Error parsing function: " + err.message);
+    }
+
     this.on("input", function (msg, send, done = () => {}){
+
       try{
         node.status({fill:"green",shape:"ring",text:"Working..."});
+        const context = node.context();
+        const flow = context.flow;
+        const global = context.global;
+
+        msg.payload.user = msg.payload.user || userFunction(msg, context, flow, global);
+        msg.payload.system = msg.payload.system || systemFunction(msg, context, flow, global);
        switch(node.platform.platform){
          case "gpt":
            chatGPTHelper({node, RED, config, msg}, finish)

@@ -127,8 +127,9 @@ const createFunctionsFromContext = (rawIntents = {}) => {
                     return undefined;
                 }
 
-                const parameters = payload.code?.trim() ?
-                    JSON.parse(payload.code) : {type: "object", properties: {}, required: []};
+                const {code = "", strict = true, additionalProperties = false} = payload;
+                const parameters = code.trim() ?
+                    JSON.parse(code) : {type: "object", properties: {}, required: []};
 
 
                 //TODO -  Remove after all the old versions are deprecated
@@ -145,9 +146,9 @@ const createFunctionsFromContext = (rawIntents = {}) => {
                             ...parameters,
                             properties,
                             required,
-                            additionalProperties: false
+                            additionalProperties
                         },
-                        strict: true
+                        strict
                     },
                 };
             })

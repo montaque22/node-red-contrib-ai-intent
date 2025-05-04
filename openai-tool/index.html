@@ -5,13 +5,27 @@
         icon:"font-awesome/fa-code",
         defaults: {
             name: { value: "" },
-            tool: { value: "" }
+            tool: { value: `{
+                "type": "function",
+                "name":"${this.name}",
+                "description":"",
+                "strict": false,
+                "function":{
+                    "parameters":{
+                        "type": "object",
+                        "properties":{
+                        },
+                        "required":[],
+                        "additionalProperties":false
+                    }
+                }
+            }`}
         },
         inputs: 1,
         outputs: 1,
-        paletteLabel: "Tool (Deprecated)",
+        paletteLabel: "Tool",
         label: function () {
-            return this.name ? `${this.name} (Deprecated)` : "Tool (Deprecated)";
+            return this.name;
         },
          oneditprepare: function () {
 

@@ -47,10 +47,10 @@ module.exports = function (RED) {
     // this node will only listen for its own intent
     const token = PubSub.subscribe(config.id, function (msg, data) {
       const nodeStore = nodeDB.getNodeStore();
-      const { name, description, excludeFromOpenAi, code } = nodeStore[node.id];
+      const { name, description, excludeFromOpenAi, code, strict, additionalProperties } = nodeStore[node.id];
       node.status({fill:"green",shape:"dot",text:`Received data ${new Date()}`});
       node.send([
-        { ...data, _config: { name, description, excludeFromOpenAi, code } },
+        { ...data, _config: { name, description, excludeFromOpenAi, code, strict, additionalProperties } },
       ]);
     });
 

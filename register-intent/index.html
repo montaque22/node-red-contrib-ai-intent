@@ -20,7 +20,9 @@
                     }
                     return true
                 }
-            }
+            },
+            strict: {value: "true"},
+            additionalProperties: {value: "false"},
         },
         inputs: 0,
         outputs: 1,
@@ -46,6 +48,17 @@
                     $("#code").slideUp();
                 }
             })
+
+            $("#node-input-strict").typedInput({
+                type:"bool",
+                types:["bool"],
+                typeField: "#node-input-strict-type"
+            })
+            $("#node-input-additionalProperties").typedInput({
+                type:"bool",
+                types:["bool"],
+                typeField: "#node-input-additionalProperties-type"
+            })
         },
         oneditsave: function() {
             this.code = this.editor.getValue();
@@ -56,7 +69,6 @@
             this.editor.destroy();
             delete this.editor;
         }
-
     });
 
 
@@ -98,12 +110,22 @@
 
 
     <div style="display: flex; justify-content: space-around;">
-
         <label for="node-input-excludeFromOpenAi" style="display: flex;">
             <i class="fa fa-tag"></i>
             <span style="margin-left: 5px;">Exclude from OpenAI (Deprecated)</span>
             <input style="display: inline-block;margin-left: 1rem;" type="checkbox" id="node-input-excludeFromOpenAi"
                 name="enable conversation"></label>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-strict">Strict</label>
+        <input type="text" id="node-input-strict">
+        <input type="hidden" id="node-input-strict-type">
+    </div>
+    <div class="form-row">
+        <label for="node-input-additionalProperties">Additional Properties</label>
+        <input type="text" id="node-input-additionalProperties"/>
+        <input type="hidden" id="node-input-additionalProperties-type"/>
     </div>
   
 </script>
