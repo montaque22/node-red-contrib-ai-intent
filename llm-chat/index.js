@@ -3,6 +3,7 @@ const {chatGPTHelper} = require("./ChatGPTHelper");
 const {ollamaHelper} = require("./OllamaHelper");
 const {geminiHelper} = require("./GeminiHelper");
 const {TYPES} = require("../constants");
+const Sugar = require("sugar");
 const vm = require("vm");
 
 const PLATFORM =  [
@@ -35,18 +36,21 @@ module.exports = function (RED) {
         const context = node.context();
         const flow = context.flow;
         const global = context.global;
+        const user = msg.payload?.user || userFunction(msg, context, flow, global);
+        const system = msg.payload?.system || systemFunction(msg, context, flow, global);
+        let _msg = Sugar.Object.clone(msg, true)
+        _msg = Sugar.Object.set(_msg, 'payload.user', user)
+        _msg = Sugar.Object.set(_msg, 'payload.system', system)
 
-        msg.payload.user = msg.payload.user || userFunction(msg, context, flow, global);
-        msg.payload.system = msg.payload.system || systemFunction(msg, context, flow, global);
        switch(node.platform.platform){
          case "gpt":
-           chatGPTHelper({node, RED, config, msg}, finish)
+           chatGPTHelper({node, RED, config, msg: _msg}, finish)
            break
          case "ollama":
-          ollamaHelper({node, RED, config, msg}, finish)
+          ollamaHelper({node, RED, config, msg: _msg}, finish)
            break
          case "gemini":
-           geminiHelper({node, RED, config, msg}, finish)
+           geminiHelper({node, RED, config, msg: _msg}, finish)
            break
          default:
            node.status({fill:"red",shape:"ring",text:"Invalid configuration platform"});

@@ -71,8 +71,8 @@ module.exports = function (RED) {
             if (err) {
               node.warn(err);
             } else {
-              PubSub.publishSync(registeredNode.id, body);
-              send(body);
+              PubSub.publishSync(registeredNode.id, {...body, complete: msg.payload.length - 1 === index});
+              send({...body, complete: msg.payload.length - 1 === index});
             }
           });
         });
@@ -84,8 +84,8 @@ module.exports = function (RED) {
           if (err) {
             node.warn(err);
           } else {
-            PubSub.publishSync(registeredNode.id, msg);
-            send(msg);
+            PubSub.publishSync(registeredNode.id, {...msg, complete:true});
+            send({...msg, complete:true});
           }
         });
       }

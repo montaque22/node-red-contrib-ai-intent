@@ -1,5 +1,5 @@
 const { GlobalContext } = require("../utilities/global-context");
-const { TOOL_CHOICE} = require("../constants");
+const { TOOL_CHOICE, ROLES} = require("../constants");
 const {ContextDatabase, end} = require("../globalUtils");
 const {ConversationHistory} = require("../utilities/conversationHistory");
 const {Format} = require("../utilities/format");
@@ -55,6 +55,7 @@ const geminiHelper = (props,callback) => {
         ...modelParams,
         messages: updated
     };
+
     chat
         .sendMessage(message)
         .then((result) => result.response)
@@ -65,7 +66,7 @@ const geminiHelper = (props,callback) => {
             };
         })
         .then((payload) => {
-            conversationHistory.addAssistantMessage(payload.text)
+            conversationHistory.addAssistantMessage(payload.text, "Model")
             conversationHistory.saveHistory(config.historyLimit)
 
             return createPayload({...finalProps, conversationId: conversation_id}, payload, msg, conversationHistory.conversation)
@@ -171,10 +172,11 @@ const createFunctionsFromContext = (rawIntents = {}) => {
 
 const convertChatToGeminiCompatibleChat = (messages = []) => {
     const original = Sugar.Object.clone(messages, true);
-    const updated = messages.map((message) => {
+    console.log(original)
+    const updated = messages.map((message, index) => {
         let role = message.role;
         // Gemini doesn't seem to have a system role. We wil convert it to a user
-        if (role === "system") {
+        if (role === "system" && index === 0) {
             role = "user";
         }
 

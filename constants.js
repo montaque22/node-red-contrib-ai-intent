@@ -21,6 +21,7 @@ module.exports = {
     User: "user",
     System: "system",
     Assistant: "assistant",
+    Model: "model",
     Tool: "tool"
   },
   TOOL_CHOICE: {

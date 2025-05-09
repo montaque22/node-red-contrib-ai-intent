@@ -42,12 +42,12 @@ class ConversationHistory {
         this.conversation.push(entry)
         this.saveHistory()
     }
-    addAssistantMessage(content){
+    addAssistantMessage(content, role = "Assistant"){
         if(!content){
             return false
         }
 
-        const entry = {role: ROLES.Assistant, content }
+        const entry = {role: ROLES[role], content }
         this.conversation.push(entry)
         this.saveHistory()
     }
