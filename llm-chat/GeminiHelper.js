@@ -172,7 +172,6 @@ const createFunctionsFromContext = (rawIntents = {}) => {
 
 const convertChatToGeminiCompatibleChat = (messages = []) => {
     const original = Sugar.Object.clone(messages, true);
-    console.log(original)
     const updated = messages.map((message, index) => {
         let role = message.role;
         // Gemini doesn't seem to have a system role. We wil convert it to a user

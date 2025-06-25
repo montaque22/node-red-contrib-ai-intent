@@ -64,6 +64,11 @@
             this.code = this.editor.getValue();
             this.editor.destroy();
             delete this.editor;
+
+            // Convert string values to actual booleans
+            this.advanceMode = (JSON.parse($("#node-input-advanceMode").val()));
+            this.strict = (JSON.parse($("#node-input-strict").val()));
+            this.additionalProperties = (JSON.parse($("#node-input-additionalProperties").val()));
         },
         oneditcancel: function() {
             this.editor.destroy();

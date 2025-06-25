@@ -9,14 +9,16 @@ module.exports = function (RED) {
 
     const errorMessage = getErrorMessagesForConfig(config);
     const node = this;
+    // The HTML file seems to return the boolean items as string
+    const {advanceMode = "false", strict = "false", additionalProperties = "false" } = config
+
     try{
-      if(config.advanceMode === "true"){
+      if(JSON.parse(`${advanceMode}`.toLowerCase())){
         const schema = JSON.parse(config.code)
         const result = validateOpenAISchema(schema)
         if(!result.isValid){
           node.status({fill:"red",shape:"dot",text:`${result.errorMsg}`});
           node.error(result.errorMsg)
-          console.log(`RESULT: ${config.name} - `,result.errorMsg)
         }else{
           node.status({fill:"blue",shape:"dot",text:"Ready (Advanced)"});
         }
@@ -40,6 +42,9 @@ module.exports = function (RED) {
       nodeDB.saveIntent({
         nodeId: node.id,
         ...config,
+        additionalProperties: JSON.parse(`${additionalProperties}`.toLowerCase()),
+        advanceMode: JSON.parse(`${advanceMode}`.toLowerCase()),
+        strict: JSON.parse(`${strict}`.toLowerCase()),
       });
     }
 

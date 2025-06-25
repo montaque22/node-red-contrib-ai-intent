@@ -148,7 +148,7 @@ const createFunctionsFromContext = (rawIntents = {}) => {
                             required,
                             additionalProperties
                         },
-                        strict
+                        strict: JSON.parse(strict)
                     },
                 };
             })

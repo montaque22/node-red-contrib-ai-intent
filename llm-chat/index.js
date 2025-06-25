@@ -20,7 +20,6 @@ module.exports = function (RED) {
     const node = this;
     let userFunction;
     let systemFunction;
-
     try {
       // Wrap the user's code in a function
       systemFunction = new Function('msg', 'context', 'flow', 'global', config.system);
@@ -31,6 +30,7 @@ module.exports = function (RED) {
 
     this.on("input", function (msg, send, done = () => {}){
 
+
       try{
         node.status({fill:"green",shape:"ring",text:"Working..."});
         const context = node.context();
@@ -38,19 +38,24 @@ module.exports = function (RED) {
         const global = context.global;
         const user = msg.payload?.user || userFunction(msg, context, flow, global);
         const system = msg.payload?.system || systemFunction(msg, context, flow, global);
-        let _msg = Sugar.Object.clone(msg, true)
-        _msg = Sugar.Object.set(_msg, 'payload.user', user)
-        _msg = Sugar.Object.set(_msg, 'payload.system', system)
+
+
+        msg.payload = {user, system};
+
+       if(!node?.platform?.platform){
+         throw new Error("You need to select a platform in the LLM Chat Node")
+       }
+
 
        switch(node.platform.platform){
          case "gpt":
-           chatGPTHelper({node, RED, config, msg: _msg}, finish)
+           chatGPTHelper({node, RED, config, msg}, finish)
            break
          case "ollama":
-          ollamaHelper({node, RED, config, msg: _msg}, finish)
+          ollamaHelper({node, RED, config, msg}, finish)
            break
          case "gemini":
-           geminiHelper({node, RED, config, msg: _msg}, finish)
+           geminiHelper({node, RED, config, msg}, finish)
            break
          default:
            node.status({fill:"red",shape:"ring",text:"Invalid configuration platform"});

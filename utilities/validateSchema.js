@@ -53,21 +53,6 @@ function validateOpenAISchema(userSchema) {
     return { isValid: true, errorMsg: "" };
 }
 
-// // Example: User-Submitted JSON Schema
-// const userSchema = {
-//     type: "object",
-//     properties: {
-//         query: { type: "string" },
-//         max_results: { type: "integer", minimum: 1 },
-//         mode: { type: "string", enum: ["fast", "slow", "balanced"] } // Example of an enum
-//     },
-//     required: ["query"],
-//     additionalProperties: false
-// };
-//
-// // Run validation
-// const result = validateOpenAISchema(userSchema);
-// console.log(result);
 
 
 

@@ -39,19 +39,13 @@
 
         const getToolOptions = (intents = []) => {
             return intents
-                .filter(option => {
-                    // Remove excluded tool selection
-                    // TODO: Deprecated
-                    console.log(option.excludeFromOpenAi)
-                    return  !option.excludeFromOpenAi
-                })
                 .map(intent => {
 
                 if(intent.type === "Register Intent"){
                     return { value: intent.name, label: `${intent.name} (Registered Intent)`}
                 }else {
                     const tool = JSON.parse(intent.tool)
-                    return { value: tool.function.name, label: `${intent.name} (Deprecated)`}
+                    return { value: tool.function.name, label: `${intent.name} (Tool Node)`}
                 }
             })
         }
@@ -254,68 +248,127 @@
 </script>
 
 <script type="text/html" data-help-name="LLM Chat">
-    <p>Calls an LLM and returns the response.</p>
+    <p>Calls a Large Language Model (LLM) like ChatGPT, Gemini, or Ollama, using dynamic user/system prompts and optional tool functions. Returns the model’s response in <code>msg.payload.response</code>.</p>
 
     <h3>Important</h3>
-    <p>To use this node you need to configure the connection details.  Consult the documentation for your chosen LLM platform (e.g., OpenAI, Ollama, Gemini) for specific instructions.</p>
+    <p>To use this node, you must configure a valid platform connection (ChatGPT, Gemini, or Ollama). Refer to the setup documentation for your chosen provider. Not all platforms support function calling.</p>
 
     <h3>Inputs</h3>
     <dl class="message-properties">
         <dt><code>msg.payload</code> <span class="property-type">object</span></dt>
         <dd>
-            <p>The main input to the LLM.  Should contain <code>user</code> and optionally <code>system</code> messages.</p>
-            <p>Example: <code>msg.payload = { system: "You are a helpful assistant.", user: "What is the capital of Alaska?" }</code></p>
+            <p>The primary input to the LLM. It should include:</p>
+            <ul>
+                <li><code>user</code>: The prompt/question you want to send (required)</li>
+                <li><code>system</code>: Instructions for how the LLM should behave (optional)</li>
+            </ul>
+            <p>Example:</p>
+            <pre>
+msg.payload = {
+  system: "You are a helpful assistant.",
+  user: "What is the capital of Alaska?"
+};
+      </pre>
         </dd>
+
         <dt><code>msg.payload.options</code> <span class="property-type">object</span></dt>
-        <dd>Optional.  Allows passing additional parameters to the LLM.  See the LLM's documentation for available options (e.g., <code>temperature</code>, <code>max_tokens</code>, <code>format</code> for your platform).</dd>
+        <dd>
+            Optional. Allows advanced LLM settings such as <code>temperature</code>, <code>max_tokens</code>, <code>format</code>, etc. Platform-dependent.
+            <pre>
+msg.payload = {
+  user: "What is capital of Alaska. Respond in JSON.",
+  options: {
+    format: "json" // e.g., for Ollama
+  }
+};
+      </pre>
+        </dd>
+
         <dt><code>msg.clearChatHistory</code> <span class="property-type">boolean</span></dt>
-        <dd>Optional. If set to <code>true</code>, the conversation history will be cleared for the specified <code>Conversation Id</code>.</dd>
+        <dd>If set to <code>true</code>, clears all stored messages associated with the configured <code>Conversation Id</code>.</dd>
     </dl>
 
+    <h3>Outputs</h3>
+    <dl class="message-properties">
+        <dt><code>msg.payload.response</code> <span class="property-type">string</span></dt>
+        <dd>The LLM-generated response based on the input prompt and context.</dd>
+
+        <dt><code>msg.payload.tool_call</code> <span class="property-type">object</span></dt>
+        <dd>(If applicable) Details about any tool or function the model called.</dd>
+
+        <dt><code>msg.payload.usage</code> <span class="property-type">object</span></dt>
+        <dd>May include token usage or cost data, depending on the LLM platform.</dd>
+    </dl>
 
     <h3>Node Configuration</h3>
     <dl>
         <dt>Conversation Id <span class="property-type">string</span></dt>
-        <dd>The value provided will be used as a key to store the conversation. The node will keep track of all the messages. If a different node uses the same key, the conversation will be connected and will use the same conversation history. If omitted, each call to the LLM will be isolated.</dd>
+        <dd>
+            Used to group and persist conversations across messages. Shared IDs connect message history across nodes. If omitted, the conversation is treated as isolated.
+        </dd>
 
         <dt>History Limit <span class="property-type">number</span></dt>
-        <dd>This will only take effect when conversation id is filled. This will only save the last N messages based on the value. If this isn't filled out, it will save the last 7 messages.</dd>
+        <dd>
+            Sets how many previous messages are remembered for context. Only used if <code>Conversation Id</code> is provided. Default is 7.
+        </dd>
 
         <dt>Tool Choice <span class="property-type">dropdown</span></dt>
-        <dd>This property lets you decide if the LLM should use function calling.  If you are using Ollama, not every model supports function calling.
+        <dd>
+            Determines whether function tools are used:
             <ul>
-                <li><code>None</code>: Disables the Tools setting and the LLM will not use any functions.</li>
-                <li><code>Automatic</code>: Lets the LLM decide if it should choose one of the selected tools.</li>
-                <li><code>Required</code>: Forces the LLM to use at least one of the selected functions.</li>
+                <li><code>None</code>: No tools will be made available to the LLM</li>
+                <li><code>Automatic</code>: LLM may choose to use tools</li>
+                <li><code>Required</code>: LLM must use one of the selected tools</li>
             </ul>
         </dd>
 
         <dt>Tools <span class="property-type">string</span></dt>
-        <dd>This field is populated by Register Intent nodes. You can choose zero or more functions. Any selected function will be sent to the LLM, which will determine whether or not to call the function depending on the Tool Choice setting.</dd>
+        <dd>
+            This dropdown lists all available functions from registered intents or tool nodes. These are passed to the LLM if Tool Choice is not <code>None</code>.
+        </dd>
     </dl>
 
-    <h3>System and User Messages</h3>
-    <p>Note: You don't always have to pass <code>system</code>, but the <code>user</code> property is required. </p>
-    <p>You can set the <code>system</code> and <code>user</code> prompts by filling out the respective sections. This text editor is javascript so use correct syntax. You must return the string you want to use as the prompt. Example:</p>
+    <h3>System and User Prompts</h3>
+    <p>You can define both prompts using the built-in JavaScript editors under the "System" and "User" tabs. These are executed at runtime using:</p>
     <pre>
-        return `Hello ${msg.topic}`
-    </pre>
-    <p>You also have access to the msg object in the editor which can help dynamic inputs.</p>
-    <p>Alternatively, You can pass messages to the LLM by setting <code>msg.payload = { system, user }</code> where <code>system</code> and <code>user</code> are string values. This will override the values in the editor. For example:</p>
-    <pre>
-        msg.payload = {
-            system: "You are a helpful assistant.",
-            user: "What is the capital of Alaska?"
-        };
-    </pre>
-    <p>To pass additional options (like temperature or max tokens), use <code>msg.payload.options</code>:</p>
-    <pre>
-        msg.payload = {
-            user: "What is capital of alaska. Respond using JSON.",
-            options: {
-                format: "json" // Example for Ollama
-            }
-        };
-    </pre>
+return `Hello ${msg.topic}`
+  </pre>
+    <p>Each editor runs inside a secure sandbox with access to:</p>
+    <ul>
+        <li><code>msg</code></li>
+        <li><code>context</code></li>
+        <li><code>flow</code></li>
+        <li><code>global</code></li>
+    </ul>
+    <p><strong>Important:</strong> You must return a string. The returned values are used as the actual prompts sent to the LLM.</p>
 
+    <p>If <code>msg.payload.user</code> or <code>msg.payload.system</code> are provided at runtime, they will override the prompt editors.</p>
+
+    <h3>Supported Platforms</h3>
+    <ul>
+        <li><strong>ChatGPT</strong> – via OpenAI’s API</li>
+        <li><strong>Gemini</strong> – via Google’s AI platform</li>
+        <li><strong>Ollama</strong> – for local/private models (model compatibility may vary)</li>
+    </ul>
+
+    <h3>Status</h3>
+    <ul>
+        <li><span style="color:green;">Green ring</span>: Working</li>
+        <li><span style="color:red;">Red dot</span>: Error occurred</li>
+        <li><span style="color:gray;">Gray dot</span>: Complete</li>
+    </ul>
+
+    <h3>Example Use Cases</h3>
+    <ul>
+        <li>Conversational assistants with memory</li>
+        <li>Tool-enhanced AI workflows (e.g., calculations, scheduling)</li>
+        <li>Multi-platform AI interactions with dynamic behavior</li>
+    </ul>
+
+    <p>
+        <strong>Need help?</strong>
+        <a href="https://youtu.be/2Efb1X6F5UY" target="_blank" rel="noreferrer noopener">
+            Watch the LLM Chat Node Tutorial
+        </a>
+    </p>
 </script>
