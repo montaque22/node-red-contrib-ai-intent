@@ -14,6 +14,10 @@ If this doesn't work, you may need to redo the nodes from the palette.
 A lot of the nodes are being deprecated. The **User node**, **System Node**, **Response Node**, **Tool Node**, **Response Node**
 **ChatGPT Node**, **Gemini Node**, **LocalAI Node**. Instead, use the **LLM Chat node**. This node replaces all of those nodes.
 You can now write Function tools in the Register intent node which gives greater versatility.
+> Something you may notice is that the Call Intent Nodes may show up as invalid. 
+> This is a quirk. Open and close the configuration for the node and that should fix it.
+
+ 
 > **PLEASE MIGRATE YOUR AUTOMATIONS TO USE THE LLM CHAT NODE.**
 ---
 
@@ -30,9 +34,16 @@ To use this node, you need to configure the connection details. Consult the docu
 
 ## **Inputs**
 
-### **1. Main Input (`msg.payload`)**
+### **1. LLM Chat Node**
 The primary input for the LLM. It must include a `user` message and may optionally contain a `system` message.
+This new version has the system and user text area built into the node for convenience. The textarea uses javascript 
+notation and requires that you return a string. See the image below:
+![](https://raw.githubusercontent.com/montaque22/node-red-contrib-ai-intent/refs/heads/master/images/msg_object.png)
+![](https://raw.githubusercontent.com/montaque22/node-red-contrib-ai-intent/refs/heads/master/images/classes.png)
 
+You also have the ability to reference some classes and the msg object.
+
+**For more control, you can still pass in the `user` and `system` prompts as properties.
 #### **Example:**
 ```javascript
 msg.payload = {
@@ -107,7 +118,7 @@ Defines whether the LLM should use function calling.
 ---
 
 ## **System and User Messages**
-Messages must be passed in the `msg.payload` object:
+Messages can be passed in the `msg.payload` object:
 ```javascript
 msg.payload = {
     system: "You are a helpful assistant.",
@@ -212,22 +223,3 @@ This node acts as a trigger for registered intents. It can:
 }
 ```
 
----
-## LLM Chat Node
-
-### Purpose
-The **LLM Chat Node** integrates with various AI models to process and respond to natural language input dynamically.
-
-### Usage
-Place this node in a flow where dynamic AI-driven responses are required. It can:
-- Answer user queries.
-- Process input and pass structured responses to downstream nodes.
-- Work in conjunction with **Register Intent** and **Call Intent Nodes** to enable complex AI-driven automations.
-
-### Example Use Case
-A user asks: *"What’s the weather today?"*
-1. **LLM Chat Node** processes the request.
-2. If the AI determines a weather function is needed, it triggers a **Call Intent Node**.
-3. The **Call Intent Node** invokes a flow that retrieves weather data and returns a response.
-
----
